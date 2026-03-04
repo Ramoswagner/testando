@@ -41,13 +41,13 @@ body {
 }
 
 /* =========================
-   NAVBAR
+   NAVBAR - COM MENU HAMBÚRGUER PARA MOBILE
 ========================= */
 nav {
     position: fixed;
     width: 100%;
     padding: 18px 60px;
-    background: rgba(13, 27, 42, 0.85); /* --0d1b2a com opacidade */
+    background: rgba(13, 27, 42, 0.85);
     backdrop-filter: blur(10px);
     display: flex;
     justify-content: space-between;
@@ -61,23 +61,76 @@ nav {
     font-size: 1.2rem;
     letter-spacing: 1px;
     color: var(--e0e1dd);
+    text-decoration: none;
 }
 
-nav ul {
-    list-style: none;
+/* Menu desktop */
+.nav-menu {
     display: flex;
+    list-style: none;
     gap: 35px;
 }
 
-nav a {
+.nav-menu a {
     color: var(--e0e1dd);
     text-decoration: none;
     font-weight: 500;
     transition: 0.3s ease;
 }
 
-nav a:hover {
+.nav-menu a:hover {
     color: var(--b3afbf);
+}
+
+/* Botão hambúrguer - escondido no desktop */
+.hamburger {
+    display: none;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0;
+    width: 30px;
+    height: 24px;
+    position: relative;
+    z-index: 1001;
+}
+
+.hamburger span {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background: var(--e0e1dd);
+    border-radius: 3px;
+    transition: all 0.3s ease;
+    position: absolute;
+    left: 0;
+}
+
+.hamburger span:first-child {
+    top: 0;
+}
+
+.hamburger span:nth-child(2) {
+    top: 10px;
+}
+
+.hamburger span:last-child {
+    top: 20px;
+}
+
+/* Animação do hambúrguer quando ativo */
+.hamburger.active span:first-child {
+    transform: rotate(45deg);
+    top: 10px;
+}
+
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.active span:last-child {
+    transform: rotate(-45deg);
+    top: 10px;
 }
 
 /* =========================
@@ -299,6 +352,19 @@ nav a:hover {
     color: var(--415a77);
 }
 
+.card .btn-secondary {
+    margin-top: 15px;
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    border-color: var(--415a77);
+    color: var(--415a77);
+}
+
+.card .btn-secondary:hover {
+    background: var(--415a77);
+    color: var(--e0e1dd);
+}
+
 /* =========================
    EXPERIÊNCIA PROFISSIONAL
 ========================= */
@@ -429,6 +495,15 @@ nav a:hover {
     font-weight: 600;
 }
 
+.curriculo-link {
+    text-align: center;
+    margin: 40px 0 60px;
+}
+
+.curriculo-link .btn-primary {
+    display: inline-block;
+}
+
 /* =========================
    CONTATO
 ========================= */
@@ -451,6 +526,9 @@ nav a:hover {
     border-radius: 12px;
     transition: 0.3s ease;
     color: var(--1b2c3b);
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
 }
 
 .contato-container p:hover {
@@ -462,12 +540,18 @@ nav a:hover {
     font-size: 1.5rem;
     min-width: 40px;
     color: var(--415a77);
+    flex-shrink: 0;
 }
 
 .contato-container a {
     color: var(--415a77);
     text-decoration: none;
     font-weight: 500;
+    word-break: break-all;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    display: inline-block;
+    max-width: 100%;
 }
 
 .contato-container a:hover {
@@ -483,31 +567,6 @@ footer {
     color: var(--e0e1dd);
     text-align: center;
     padding: 30px;
-}
-
-/* =========================
-   RESPONSIVO
-========================= */
-@media (max-width: 768px) {
-
-    nav { padding: 15px 25px; }
-
-    .hero h1 { font-size: 36px; }
-    .hero p { font-size: 16px; }
-
-    .section { padding: 80px 25px; }
-
-    .hero-buttons { flex-direction: column; gap: 15px; }
-    .profile-pic { width: 140px; height: 140px; }
-
-    .exp-header { flex-direction: column; align-items: flex-start; }
-    .exp-periodo { align-self: flex-start; }
-    .experiencia-item { padding: 20px; }
-    .exp-header h3 { font-size: 1.3rem; }
-    .exp-cargo { font-size: 1rem; }
-
-    .contato-container { padding: 20px; }
-    .contato-container p { font-size: 1rem; }
 }
 
 /* =========================
@@ -550,4 +609,196 @@ footer {
 @keyframes waveMove {
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
+}
+
+/* =========================
+   RESPONSIVO - MOBILE (TODOS OS AJUSTES)
+========================= */
+@media (max-width: 768px) {
+    /* Navbar */
+    nav {
+        padding: 15px 25px;
+    }
+
+    /* Mostrar hambúrguer no mobile */
+    .hamburger {
+        display: block;
+    }
+
+    /* Esconder menu por padrão no mobile */
+    .nav-menu {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 70%;
+        height: 100vh;
+        background: var(--0d1b2a);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 40px;
+        transition: right 0.3s ease;
+        z-index: 1000;
+        box-shadow: -5px 0 30px rgba(0,0,0,0.3);
+    }
+
+    /* Menu aberto */
+    .nav-menu.active {
+        right: 0;
+    }
+
+    .nav-menu li {
+        opacity: 0;
+        transform: translateX(30px);
+        transition: all 0.3s ease;
+    }
+
+    .nav-menu.active li {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    /* Delay para cada item aparecer */
+    .nav-menu.active li:nth-child(1) { transition-delay: 0.1s; }
+    .nav-menu.active li:nth-child(2) { transition-delay: 0.2s; }
+    .nav-menu.active li:nth-child(3) { transition-delay: 0.3s; }
+    .nav-menu.active li:nth-child(4) { transition-delay: 0.4s; }
+
+    .nav-menu a {
+        font-size: 1.2rem;
+    }
+
+    /* Hero */
+    .hero h1 { 
+        font-size: 36px; 
+    }
+    
+    .hero p { 
+        font-size: 16px; 
+    }
+
+    /* Sections */
+    .section { 
+        padding: 80px 25px; 
+    }
+
+    /* Hero buttons */
+    .hero-buttons { 
+        flex-direction: column; 
+        gap: 15px; 
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .btn-primary, .btn-secondary {
+        width: 100%;
+        text-align: center;
+    }
+    
+    /* Profile picture */
+    .profile-pic { 
+        width: 140px; 
+        height: 140px; 
+    }
+
+    /* Experiência */
+    .exp-header { 
+        flex-direction: column; 
+        align-items: flex-start; 
+    }
+    
+    .exp-periodo { 
+        align-self: flex-start; 
+    }
+    
+    .experiencia-item { 
+        padding: 20px; 
+    }
+    
+    .exp-header h3 { 
+        font-size: 1.3rem; 
+    }
+    
+    .exp-cargo { 
+        font-size: 1rem; 
+    }
+
+    /* Cards */
+    .cards {
+        grid-template-columns: 1fr;
+    }
+
+    /* =========================
+       CONTATO - AJUSTE MOBILE
+    ========================= */
+    .contato-container { 
+        padding: 25px 20px;
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .contato-container p { 
+        font-size: 0.95rem;
+        padding: 12px 10px;
+        margin-bottom: 15px;
+        word-break: break-word;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .contato-container .icon {
+        font-size: 1.2rem;
+        min-width: 30px;
+    }
+    
+    .contato-container a {
+        word-break: break-all;
+        display: inline-block;
+        max-width: 100%;
+    }
+    
+    /* Para links muito longos */
+    .contato-container p:last-child {
+        flex-wrap: wrap;
+    }
+
+    /* Currículo link */
+    .curriculo-link {
+        margin: 30px 0 40px;
+    }
+}
+
+/* Ajuste extra para telas muito pequenas */
+@media (max-width: 480px) {
+    .section h2 {
+        font-size: 28px;
+    }
+
+    .contato-container {
+        padding: 20px 15px;
+    }
+    
+    .contato-container p {
+        font-size: 0.9rem;
+        gap: 8px;
+    }
+    
+    .contato-container .icon {
+        min-width: 25px;
+        font-size: 1.1rem;
+    }
+
+    .exp-header h3 {
+        font-size: 1.2rem;
+    }
+
+    .exp-periodo {
+        font-size: 0.8rem;
+        padding: 4px 12px;
+    }
+}
+
+/* Prevenir scroll quando menu está aberto */
+body.menu-open {
+    overflow: hidden;
 }
