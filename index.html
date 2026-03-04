@@ -6,12 +6,18 @@
     <title>Wagner Ramos | Portfólio</title>
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <nav>
     <a href="#home" class="logo">WR</a>
-    <ul>
+    
+    <button class="hamburger" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <ul class="nav-menu">
         <li><a href="#sobre">Sobre</a></li>
         <li><a href="#projetos">Projetos</a></li>
         <li><a href="#experiencia">Experiência</a></li>
@@ -59,7 +65,10 @@
 <section id="sobre" class="section">
     <h2>Sobre Mim</h2>
     <p>
-        Engenheiro Civil com atuação em PMO e Gestão de Projetos Estratégicos orientada a dados...
+        Engenheiro Civil com atuação em PMO e Gestão de Projetos Estratégicos orientada a dados. 
+        Experiência sólida em governança de portfólio, controle físico-financeiro, desenvolvimento 
+        de dashboards e automações com Python e Power BI. Apaixonado por transformar dados em 
+        decisões estratégicas e otimizar processos através da tecnologia.
     </p>
 </section>
 
@@ -68,17 +77,17 @@
     <div class="cards">
         <div class="card">
             <h3>Dashboard de Indicadores</h3>
-            <p>Painel estratégico com KPIs financeiros e operacionais.</p>
+            <p>Painel estratégico com KPIs financeiros e operacionais para tomada de decisão em tempo real.</p>
             <a href="#" class="btn-secondary">Ver mais</a>
         </div>
         <div class="card">
             <h3>Automação em Python</h3>
-            <p>Script para consolidação e geração automática de relatórios.</p>
+            <p>Script para consolidação e geração automática de relatórios, reduzindo tempo de análise em 75%.</p>
             <a href="#" class="btn-secondary">Ver mais</a>
         </div>
         <div class="card">
             <h3>Gestão de Projetos</h3>
-            <p>Reestruturação de cronograma e melhoria de performance.</p>
+            <p>Reestruturação de cronograma e melhoria de performance com base nas boas práticas do PMBOK.</p>
             <a href="#" class="btn-secondary">Ver mais</a>
         </div>
     </div>
@@ -107,7 +116,7 @@
             </p>
             
             <ul>
-                <li><strong>Atuação em PMO e Gestão de Projetos Estratégicos</strong>, conduzindo o monitoramento e a governança do portfólio institucional “Navega Baleia – Ondas de Progresso”, estruturado nos eixos de Eficiência Operacional, Engajamento de Pessoas, Qualidade Assistencial e Crescimento.</li>
+                <li><strong>Atuação em PMO e Gestão de Projetos Estratégicos</strong>, conduzindo o monitoramento e a governança do portfólio institucional "Navega Baleia – Ondas de Progresso", estruturado nos eixos de Eficiência Operacional, Engajamento de Pessoas, Qualidade Assistencial e Crescimento.</li>
                 
                 <li><strong>Condução de projetos estratégicos de alta complexidade</strong> em ambiente hospitalar e regulado, incluindo licenciamento ambiental, usina fotovoltaica, iniciativas Lean, gestão de riscos, incêndios e catástrofes, além de reformas assistenciais.</li>
                 
@@ -182,7 +191,9 @@
         <!-- Ensino -->
         <div class="experiencia-item">
             <div class="exp-header">
-                <h3>Experiências Acadêmicas e de Ensino</h3>
+                <div>
+                    <h3>Experiências Acadêmicas e de Ensino</h3>
+                </div>
             </div>
             
             <p class="exp-competencias">
@@ -219,6 +230,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Efeito na foto de perfil
     const profilePic = document.getElementById('profilePic');
     if (profilePic) {
         profilePic.addEventListener('mousemove', function(e) {
@@ -228,18 +240,106 @@ document.addEventListener('DOMContentLoaded', function() {
             const shadowX = (x - rect.width/2) / 15;
             const shadowY = (y - rect.height/2) / 15;
             this.style.boxShadow = `
-                ${-shadowX}px ${-shadowY}px 30px rgba(249, 115, 22, 0.4),
+                ${-shadowX}px ${-shadowY}px 30px rgba(65, 90, 119, 0.4),
                 ${shadowX}px ${shadowY}px 40px rgba(0, 0, 0, 0.6),
                 0 15px 40px rgba(0,0,0,0.5)
             `;
         });
+        
         profilePic.addEventListener('mouseleave', function() {
             this.style.boxShadow = '0 15px 40px rgba(0,0,0,0.5)';
         });
     }
+
+    // Menu Hambúrguer
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-menu');
+    const body = document.body;
+    
+    if (hamburger && navMenu) {
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            
+            // Impedir scroll do body quando menu está aberto
+            if (navMenu.classList.contains('active')) {
+                body.classList.add('menu-open');
+                body.style.overflow = 'hidden';
+            } else {
+                body.classList.remove('menu-open');
+                body.style.overflow = '';
+            }
+        });
+
+        // Fechar menu ao clicar em um link
+        const navLinks = document.querySelectorAll('.nav-menu a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevenir comportamento padrão temporariamente
+                const targetId = link.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    // Fechar menu
+                    hamburger.classList.remove('active');
+                    navMenu.classList.remove('active');
+                    body.classList.remove('menu-open');
+                    body.style.overflow = '';
+                    
+                    // Scroll suave para o elemento
+                    setTimeout(() => {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }, 300);
+                }
+            });
+        });
+
+        // Fechar menu ao redimensionar para desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                hamburger.classList.remove('active');
+                navMenu.classList.remove('active');
+                body.classList.remove('menu-open');
+                body.style.overflow = '';
+            }
+        });
+
+        // Fechar menu ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!navMenu.contains(e.target) && !hamburger.contains(e.target) && navMenu.classList.contains('active')) {
+                    hamburger.classList.remove('active');
+                    navMenu.classList.remove('active');
+                    body.classList.remove('menu-open');
+                    body.style.overflow = '';
+                }
+            }
+        });
+    }
+
+    // Smooth scroll para links âncora
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            if (!this.classList.contains('nav-menu a')) { // Evitar duplicação com o evento acima
+                const href = this.getAttribute('href');
+                if (href !== "#" && href !== "#!") {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                }
+            }
+        });
+    });
 });
 </script>
 
 </body>
 </html>
-
