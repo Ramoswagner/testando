@@ -664,7 +664,7 @@ const projetosData = {
         {
             titulo: "Português: Bora estudar um pouquinho?",
             descricao: "Flashcards de português para te ajudar nos seus estudos.",
-            tipo: "image",
+            tipo: "study",
             tags: ["Html", "Json", "Js", "Português"],
             link: "https://ramoswagner.github.io/flashcards/",
             imagem: "posts/flashcards.png"
@@ -723,6 +723,7 @@ function mostrarProjetos(categoria) {
         const tipoClasse = proj.tipo;
         const acaoTexto = {
             image: 'Visualizar',
+            study: 'Estudar',
             github: 'Ver no GitHub',
             linkedin: 'Ver no LinkedIn',
             pdf: 'Abrir PDF',
@@ -882,6 +883,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+
 
 
 
