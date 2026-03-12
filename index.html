@@ -2,1570 +2,1796 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Navega Baleia — Gerador de Apresentação</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pptxgenjs/3.12.0/pptxgen.bundle.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Wren · Presentation Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:       #07090f;
-  --surface:  #0e1220;
-  --surface2: #141926;
-  --border:   rgba(255,255,255,0.07);
-  --border2:  rgba(255,255,255,0.12);
-  --ocean:    #0d2d6b;
-  --cobalt:   #1d4ed8;
-  --electric: #3b82f6;
-  --aqua:     #06b6d4;
-  --teal:     #0d9488;
-  --mint:     #10ffcb;
-  --white:    #ffffff;
-  --mist:     #94a3b8;
-  --danger:   #f87171;
-  --success:  #34d399;
-  --gold:     #fbbf24;
-  --r:        14px;
-}
+/* ════ RESET & TOKENS ════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;overflow-x:hidden}
-
-/* ── HEADER ── */
-.header{
-  position:sticky;top:0;z-index:200;
-  background:rgba(7,9,15,.92);
-  backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--border);
-  padding:.9rem 2rem;
-  display:flex;align-items:center;gap:1.5rem;
+:root{
+  --bg:#070C14;--bg2:#0D1420;--bg3:#131C2E;
+  --border:rgba(255,255,255,.07);--card:rgba(255,255,255,.04);
+  --text:#FFF;--muted:#8A9BB5;
+  --a1:#1D4ED8;--a2:#06B6D4;--a3:#10FFCB;
+  --danger:#EF4444;--success:#22C55E;
+  --grad:linear-gradient(135deg,var(--a1),var(--a2));
+  --grad-text:linear-gradient(90deg,#3B82F6,#06B6D4,#10FFCB);
+  --r:12px;--r-lg:20px;
+  --sidebar:72px;--panel:320px;
 }
-.header-brand{display:flex;align-items:center;gap:.75rem}
-.logo-preview{
-  width:36px;height:36px;border-radius:8px;
-  background:linear-gradient(135deg,var(--ocean),var(--cobalt));
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Syne',sans-serif;font-size:.65rem;font-weight:800;
-  color:var(--white);letter-spacing:-.02em;
-  overflow:hidden;
-}
-.logo-preview img{width:100%;height:100%;object-fit:contain}
-.header-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700}
-.header-sub{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--aqua);letter-spacing:.15em;text-transform:uppercase}
-.header-spacer{flex:1}
-.btn{
-  display:inline-flex;align-items:center;gap:.5rem;
-  padding:.55rem 1.25rem;border-radius:8px;
-  font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;
-  cursor:pointer;border:none;transition:all .2s;white-space:nowrap;
-}
-.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--mist)}
-.btn-ghost:hover{border-color:var(--electric);color:var(--white)}
-.btn-primary{background:linear-gradient(135deg,var(--cobalt),var(--aqua));color:var(--white)}
-.btn-primary:hover{opacity:.88;transform:translateY(-1px)}
-.btn-success{background:linear-gradient(135deg,var(--teal),var(--mint));color:var(--bg)}
-.btn-success:hover{opacity:.88;transform:translateY(-1px)}
-.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
-.btn svg{width:16px;height:16px;flex-shrink:0}
-
-/* ── LAYOUT ── */
-.app{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 57px)}
-
-/* ── SIDEBAR ── */
-.sidebar{
-  background:var(--surface);
-  border-right:1px solid var(--border);
-  padding:1.5rem 0;
-  position:sticky;top:57px;height:calc(100vh - 57px);
-  overflow-y:auto;
-}
-.sidebar-section{padding:0 1.25rem;margin-bottom:1.5rem}
-.sidebar-label{
-  font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.25em;
-  text-transform:uppercase;color:var(--mist);opacity:.5;
-  padding:.5rem .75rem;display:block;
-}
-.tab-btn{
-  width:100%;display:flex;align-items:center;gap:.75rem;
-  padding:.7rem .75rem;border-radius:8px;
-  background:transparent;border:none;color:var(--mist);
-  cursor:pointer;transition:all .2s;text-align:left;
-  font-family:'DM Sans',sans-serif;font-size:.83rem;
-}
-.tab-btn:hover{background:rgba(255,255,255,.04);color:var(--white)}
-.tab-btn.active{background:rgba(59,130,246,.12);color:var(--electric);border-left:2px solid var(--electric)}
-.tab-icon{
-  width:28px;height:28px;border-radius:6px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  font-size:.75rem;font-weight:700;font-family:'Syne',sans-serif;
-}
-.tab-num{font-size:.6rem;font-family:'DM Mono',monospace;color:var(--mist);margin-left:auto;opacity:.6}
-.tab-complete{width:6px;height:6px;border-radius:50%;background:var(--success);margin-left:auto;flex-shrink:0}
-
-.progress-wrap{padding:1.25rem;margin:0 1.25rem;background:var(--surface2);border-radius:10px}
-.progress-label{display:flex;justify-content:space-between;margin-bottom:.5rem}
-.progress-label span{font-size:.7rem;color:var(--mist)}
-.progress-label strong{font-size:.7rem;color:var(--mint);font-family:'DM Mono',monospace}
-.progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--cobalt),var(--mint));border-radius:2px;transition:width .4s}
-
-/* ── MAIN CONTENT ── */
-.main{padding:2.5rem;max-width:900px}
-
-.panel{display:none}
-.panel.active{display:block}
-
-.panel-header{margin-bottom:2rem}
-.panel-tag{
-  font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.25em;
-  text-transform:uppercase;color:var(--aqua);margin-bottom:.5rem;display:block;
-}
-.panel-title{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;line-height:1.1;margin-bottom:.5rem}
-.panel-desc{font-size:.85rem;color:var(--mist);line-height:1.6}
-
-/* ── FORM ── */
-.form-section{margin-bottom:2rem}
-.form-section-title{
-  font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;
-  color:var(--white);margin-bottom:1rem;
-  display:flex;align-items:center;gap:.5rem;padding-bottom:.5rem;
-  border-bottom:1px solid var(--border);
-}
-.form-section-title span{
-  width:22px;height:22px;border-radius:5px;
-  background:linear-gradient(135deg,var(--cobalt),var(--aqua));
-  display:inline-flex;align-items:center;justify-content:center;
-  font-size:.65rem;color:var(--white);flex-shrink:0;
-}
-
-.form-grid{display:grid;gap:1rem}
-.form-grid-2{grid-template-columns:1fr 1fr}
-.form-grid-3{grid-template-columns:1fr 1fr 1fr}
-
-.field{display:flex;flex-direction:column;gap:.4rem}
-.field label{
-  font-size:.72rem;font-weight:500;color:var(--mist);
-  letter-spacing:.04em;text-transform:uppercase;
-  font-family:'DM Mono',monospace;
-}
-.field label .req{color:var(--electric)}
-
-input[type=text],input[type=date],textarea,select{
-  background:var(--surface2);
-  border:1px solid var(--border);
-  border-radius:8px;
-  padding:.6rem .85rem;
-  font-family:'DM Sans',sans-serif;font-size:.85rem;
-  color:var(--white);width:100%;
-  transition:border-color .2s;outline:none;
-  resize:vertical;
-}
-input[type=text]:focus,input[type=date]:focus,textarea:focus,select:focus{
-  border-color:var(--electric);
-}
-input[type=text]::placeholder,textarea::placeholder{color:rgba(148,163,184,.4)}
-select option{background:var(--surface2)}
-
-/* ── REPEATER ── */
-.repeater{display:flex;flex-direction:column;gap:.75rem}
-.repeater-item{
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:10px;padding:1rem;position:relative;
-}
-.repeater-item-header{
-  display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem;
-}
-.repeater-badge{
-  font-family:'DM Mono',monospace;font-size:.6rem;
-  background:rgba(59,130,246,.15);color:var(--electric);
-  padding:.2rem .5rem;border-radius:4px;
-}
-.repeater-remove{
-  margin-left:auto;background:transparent;border:none;
-  color:rgba(248,113,113,.5);cursor:pointer;font-size:.8rem;
-  padding:.25rem .5rem;border-radius:4px;transition:all .2s;
-}
-.repeater-remove:hover{background:rgba(248,113,113,.1);color:var(--danger)}
-.btn-add{
-  background:transparent;border:1px dashed rgba(59,130,246,.3);
-  color:var(--electric);border-radius:8px;
-  padding:.6rem;width:100%;cursor:pointer;
-  font-size:.8rem;transition:all .2s;
-  display:flex;align-items:center;justify-content:center;gap:.5rem;
-}
-.btn-add:hover{border-color:var(--electric);background:rgba(59,130,246,.05)}
-
-/* ── KPI ROW ── */
-.kpi-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:.5rem}
-
-/* ── UPLOAD ── */
-.upload-zone{
-  border:1.5px dashed var(--border2);border-radius:10px;
-  padding:2rem;text-align:center;cursor:pointer;
-  transition:all .2s;background:var(--surface2);
-  position:relative;overflow:hidden;
-}
-.upload-zone:hover{border-color:var(--electric);background:rgba(59,130,246,.04)}
-.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.upload-icon{font-size:1.5rem;margin-bottom:.5rem}
-.upload-label{font-size:.8rem;color:var(--mist);line-height:1.5}
-.upload-label strong{color:var(--electric)}
-.upload-preview{
-  max-height:120px;object-fit:contain;border-radius:6px;
-  margin-top:.75rem;max-width:100%;
-}
-.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-
-/* ── STATUS BADGE ── */
-.status-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.25rem}
-.status-opt{
-  padding:.4rem .9rem;border-radius:100px;font-size:.75rem;
-  border:1px solid var(--border);cursor:pointer;transition:all .2s;color:var(--mist);
-  font-family:'DM Sans',sans-serif;
-}
-.status-opt:hover{border-color:var(--electric);color:var(--white)}
-.status-opt.selected{border-color:transparent;color:var(--bg)}
-.status-opt[data-val="Concluído"].selected{background:var(--success)}
-.status-opt[data-val="Em andamento"].selected{background:var(--gold)}
-.status-opt[data-val="Pausado"].selected{background:var(--danger)}
-
-/* ── GLOBAL SECTION ── */
-.global-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
-
-/* ── PREVIEW CARD ── */
-.preview-card{
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:12px;padding:1.25rem;margin-top:1.5rem;
-}
-.preview-title{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;margin-bottom:1rem;color:var(--mist)}
-.preview-slide-list{display:flex;flex-direction:column;gap:.4rem}
-.preview-slide{
-  display:flex;align-items:center;gap:.75rem;padding:.5rem .75rem;
-  border-radius:6px;background:rgba(255,255,255,.02);
-  font-size:.78rem;color:var(--mist);
-}
-.preview-slide .slide-n{
-  font-family:'DM Mono',monospace;font-size:.6rem;
-  color:var(--electric);width:24px;flex-shrink:0;
-}
-.slide-sep{
-  background:rgba(59,130,246,.08);border-left:2px solid var(--cobalt);
-  color:var(--electric);font-weight:600;
-}
-
-/* ── GENERATE PANEL ── */
-.generate-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-top:1.5rem}
-.gen-card{
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:14px;padding:1.75rem;
-  display:flex;flex-direction:column;gap:1rem;
-  transition:border-color .3s;
-}
-.gen-card:hover{border-color:var(--border2)}
-.gen-icon{font-size:2rem}
-.gen-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700}
-.gen-desc{font-size:.78rem;color:var(--mist);line-height:1.6}
-.gen-badge{
-  display:inline-flex;align-items:center;gap:.35rem;
-  font-family:'DM Mono',monospace;font-size:.6rem;
-  color:var(--mint);background:rgba(16,255,203,.08);
-  border:1px solid rgba(16,255,203,.2);border-radius:100px;
-  padding:.2rem .6rem;align-self:flex-start;
-}
-
-/* ── TOAST ── */
-.toast{
-  position:fixed;bottom:2rem;right:2rem;z-index:999;
-  background:var(--surface2);border:1px solid var(--border2);
-  border-radius:10px;padding:.9rem 1.25rem;
-  display:flex;align-items:center;gap:.75rem;
-  font-size:.83rem;max-width:320px;
-  transform:translateY(100px);opacity:0;transition:all .3s;
-  pointer-events:none;
-}
-.toast.show{transform:translateY(0);opacity:1}
-.toast-icon{font-size:1rem}
-
-/* ── SCROLLBAR ── */
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+img{max-width:100%;display:block}
+button{cursor:pointer;font-family:inherit}
+input,textarea,select{font-family:inherit}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
 
-@media(max-width:768px){
-  .app{grid-template-columns:1fr}
-  .sidebar{position:relative;height:auto;top:0}
-  .form-grid-2,.form-grid-3,.global-grid,.generate-grid,.kpi-grid{grid-template-columns:1fr}
-  .header{padding:.75rem 1rem;flex-wrap:wrap}
+/* ════ TYPOGRAPHY ════ */
+.font-syne{font-family:'Syne',sans-serif}
+.font-mono{font-family:'DM Mono',monospace}
+.eyebrow{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.35em;text-transform:uppercase;color:var(--muted);opacity:.7}
+.grad-text{background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+/* ════ LAYOUT ════ */
+#app{display:flex;height:100vh;overflow:hidden}
+
+/* ════ ICON SIDEBAR ════ */
+.icon-rail{
+  width:var(--sidebar);flex-shrink:0;
+  background:var(--bg2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;
+  padding:1rem 0;gap:.25rem;z-index:50;
 }
+.rail-logo{
+  width:40px;height:40px;border-radius:10px;
+  background:var(--grad);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:1rem;
+}
+.rail-logo svg{width:22px;height:22px;fill:white}
+.rail-btn{
+  width:42px;height:42px;border-radius:10px;
+  background:transparent;border:none;
+  color:var(--muted);font-size:1.1rem;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s,color .2s;position:relative;
+}
+.rail-btn:hover{background:var(--card);color:var(--text)}
+.rail-btn.active{background:rgba(29,78,216,.2);color:var(--a2)}
+.rail-btn .tip{
+  position:absolute;left:calc(100% + 8px);
+  background:var(--bg3);border:1px solid var(--border);
+  padding:.3rem .75rem;border-radius:6px;
+  font-size:.72rem;white-space:nowrap;color:var(--text);
+  opacity:0;pointer-events:none;transition:opacity .15s;z-index:200;
+}
+.rail-btn:hover .tip{opacity:1}
+.rail-spacer{flex:1}
+.rail-sep{width:28px;height:1px;background:var(--border);margin:.5rem 0}
+
+/* ════ LEFT PANEL ════ */
+.left-panel{
+  width:var(--panel);flex-shrink:0;
+  background:var(--bg2);border-right:1px solid var(--border);
+  overflow-y:auto;
+  transition:transform .3s cubic-bezier(.16,1,.3,1);
+}
+.panel-header{
+  padding:1.25rem 1.25rem 1rem;
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:10;
+  background:var(--bg2);
+}
+.panel-title{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700}
+.panel-sub{font-size:.72rem;color:var(--muted);margin-top:.2rem}
+
+/* ════ MAIN CANVAS ════ */
+.canvas{flex:1;overflow-y:auto;padding:2rem 2.5rem;background:var(--bg)}
+
+/* ════ BUTTONS ════ */
+.btn{
+  display:inline-flex;align-items:center;gap:.45rem;
+  padding:.55rem 1.2rem;border-radius:8px;border:none;
+  font-size:.82rem;font-weight:500;transition:all .2s;white-space:nowrap;
+}
+.btn-primary{background:var(--grad);color:#fff}
+.btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{background:var(--card);border-color:rgba(255,255,255,.15)}
+.btn-ghost{background:transparent;border:none;color:var(--muted)}
+.btn-ghost:hover{color:var(--text)}
+.btn-danger{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:var(--danger)}
+.btn-success{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:var(--success)}
+.btn-sm{padding:.35rem .85rem;font-size:.74rem}
+.btn-xs{padding:.22rem .6rem;font-size:.68rem;border-radius:5px}
+.btn-icon{padding:.45rem;border-radius:7px}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;filter:none!important}
+
+/* ════ FORM ELEMENTS ════ */
+.field{display:flex;flex-direction:column;gap:.4rem}
+.field label{font-size:.68rem;font-weight:500;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.field input,.field textarea,.field select{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:8px;padding:.6rem .85rem;
+  color:var(--text);font-size:.84rem;outline:none;
+  transition:border-color .2s;width:100%;
+}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--a1)}
+.field textarea{resize:vertical;min-height:72px;line-height:1.6}
+.field input::placeholder,.field textarea::placeholder{color:rgba(255,255,255,.18)}
+.field select option{background:var(--bg2)}
+.field-row{display:grid;gap:.85rem}
+.field-row.c2{grid-template-columns:1fr 1fr}
+.field-row.c3{grid-template-columns:1fr 1fr 1fr}
+
+/* ════ CARDS ════ */
+.card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:1.5rem;
+}
+.card-title{
+  font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;
+  color:var(--a2);margin-bottom:1.25rem;
+  display:flex;align-items:center;gap:.5rem;
+}
+.card-title::before{
+  content:'';width:3px;height:14px;border-radius:2px;
+  background:var(--grad);flex-shrink:0;
+}
+
+/* ════ SECTION PANELS ════ */
+.section-wrap{margin-bottom:1.25rem}
+.section-head{
+  display:flex;align-items:center;gap:.75rem;
+  padding:.9rem 1.1rem;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r);cursor:pointer;
+  transition:background .2s,border-color .2s;
+  user-select:none;
+}
+.section-head:hover{background:var(--bg3);border-color:rgba(255,255,255,.12)}
+.section-head.open{border-bottom-left-radius:0;border-bottom-right-radius:0;border-color:var(--a1)}
+.section-toggle-icon{font-size:.65rem;color:var(--muted);margin-left:auto;transition:transform .25s}
+.section-head.open .section-toggle-icon{transform:rotate(180deg)}
+.section-body{
+  display:none;padding:1.25rem;
+  background:var(--bg2);
+  border:1px solid var(--a1);border-top:none;
+  border-bottom-left-radius:var(--r);border-bottom-right-radius:var(--r);
+}
+.section-body.open{display:block}
+.block-badge{
+  font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.15em;
+  padding:.2rem .6rem;border-radius:100px;
+  background:rgba(59,130,246,.12);color:var(--a2);
+  border:1px solid rgba(59,130,246,.2);
+}
+.block-badge.required{background:rgba(239,68,68,.1);color:#fca5a5;border-color:rgba(239,68,68,.25)}
+.block-enabled-dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background .2s}
+.section-head.enabled .block-enabled-dot{background:var(--a3)}
+
+/* ════ TOGGLE SWITCH ════ */
+.toggle-wrap{display:flex;align-items:center;gap:.6rem}
+.toggle{
+  width:36px;height:20px;background:var(--bg3);
+  border:1px solid var(--border);border-radius:100px;
+  position:relative;cursor:pointer;transition:background .2s,border-color .2s;
+  flex-shrink:0;
+}
+.toggle.on{background:var(--a1);border-color:var(--a1)}
+.toggle::after{
+  content:'';position:absolute;top:2px;left:2px;
+  width:14px;height:14px;border-radius:50%;background:#fff;
+  transition:transform .2s cubic-bezier(.16,1,.3,1);
+}
+.toggle.on::after{transform:translateX(16px)}
+.toggle-label{font-size:.78rem;color:var(--muted)}
+
+/* ════ REPEATABLE ITEMS ════ */
+.rep-list{display:flex;flex-direction:column;gap:.6rem}
+.rep-item{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:10px;padding:.9rem;position:relative;
+}
+.rep-item-num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:22px;border-radius:5px;
+  background:rgba(59,130,246,.12);
+  font-family:'DM Mono',monospace;font-size:.62rem;color:var(--a2);
+  flex-shrink:0;margin-bottom:.6rem;
+}
+.rep-remove{
+  position:absolute;top:.65rem;right:.65rem;
+  width:20px;height:20px;border-radius:4px;
+  background:transparent;border:none;
+  color:rgba(239,68,68,.5);font-size:.7rem;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .15s,color .15s;
+}
+.rep-item:hover .rep-remove{opacity:1}
+.rep-remove:hover{color:var(--danger)!important;opacity:1!important}
+.add-row{
+  display:flex;align-items:center;gap:.5rem;
+  padding:.55rem .9rem;border-radius:8px;
+  background:transparent;border:1px dashed rgba(59,130,246,.2);
+  color:var(--a1);font-size:.76rem;width:100%;margin-top:.5rem;
+  transition:all .2s;
+}
+.add-row:hover{background:rgba(59,130,246,.06);border-color:var(--a1)}
+
+/* ════ IMAGE SLOTS ════ */
+.img-grid{display:grid;gap:.6rem}
+.img-grid.g2{grid-template-columns:1fr 1fr}
+.img-grid.g4{grid-template-columns:repeat(4,1fr)}
+.img-slot{
+  aspect-ratio:16/9;border-radius:10px;
+  border:1.5px dashed rgba(59,130,246,.2);background:var(--bg3);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .2s;overflow:hidden;position:relative;
+}
+.img-slot:hover{border-color:var(--a1);background:rgba(29,78,216,.05)}
+.img-slot input{display:none}
+.img-slot-label{font-size:.65rem;color:var(--muted);text-align:center;margin-top:.35rem}
+.img-slot-icon{font-size:1.4rem;opacity:.35}
+.img-slot img.prev{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  display:none;
+}
+.img-slot img.prev.show{display:block}
+.img-remove{
+  position:absolute;top:.3rem;right:.3rem;
+  width:20px;height:20px;border-radius:4px;
+  background:rgba(0,0,0,.75);color:#fff;border:none;
+  font-size:.65rem;display:none;align-items:center;justify-content:center;
+}
+.img-slot:hover .img-remove.show{display:flex}
+
+/* ════ PALETTE PICKER ════ */
+.palette-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem}
+.palette-card{
+  border-radius:10px;border:2px solid transparent;
+  overflow:hidden;cursor:pointer;transition:border-color .2s;
+}
+.palette-card.selected{border-color:var(--a3)}
+.palette-preview{display:flex;height:32px}
+.palette-preview span{flex:1}
+.palette-name{font-size:.72rem;font-weight:600;padding:.4rem .6rem;background:var(--bg3);color:var(--text)}
+.palette-desc{font-size:.6rem;color:var(--muted);padding:0 .6rem .45rem}
+
+/* ════ PROJECT CARDS (portfolio list) ════ */
+.proj-list{display:flex;flex-direction:column;gap:.6rem;margin-bottom:.75rem}
+.proj-card{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:var(--r);padding:.9rem 1rem;
+  display:flex;align-items:center;gap:.75rem;
+  cursor:pointer;transition:border-color .2s,background .2s;
+}
+.proj-card:hover{background:var(--card);border-color:rgba(255,255,255,.12)}
+.proj-card.active{border-color:var(--a1);background:rgba(29,78,216,.06)}
+.proj-color-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.proj-info{flex:1;overflow:hidden}
+.proj-name{font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.proj-leader{font-size:.68rem;color:var(--muted);margin-top:.15rem}
+.proj-status-dot{width:7px;height:7px;border-radius:50%;background:var(--border);flex-shrink:0}
+.proj-status-dot.filled{background:var(--a3)}
+
+/* ════ MODE SELECTOR ════ */
+.mode-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:2rem}
+.mode-card{
+  border-radius:var(--r);border:1.5px solid var(--border);
+  padding:1.25rem 1rem;text-align:center;
+  cursor:pointer;transition:all .25s;background:var(--card);
+}
+.mode-card:hover{border-color:rgba(59,130,246,.4);background:rgba(29,78,216,.07)}
+.mode-card.selected{border-color:var(--a1);background:rgba(29,78,216,.1)}
+.mode-icon{font-size:1.6rem;margin-bottom:.6rem}
+.mode-name{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;margin-bottom:.25rem}
+.mode-desc{font-size:.7rem;color:var(--muted);line-height:1.5}
+
+/* ════ GENERATE PANEL ════ */
+.gen-check-list{display:flex;flex-direction:column;gap:.6rem;margin:1.25rem 0}
+.gen-check-item{display:flex;align-items:flex-start;gap:.6rem;font-size:.8rem}
+.gen-check-icon{font-size:.85rem;flex-shrink:0;margin-top:.05rem}
+.gen-check-text{color:var(--muted)}
+.gen-check-text strong{color:var(--text)}
+.progress-outer{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin:.75rem 0}
+.progress-inner{height:100%;background:var(--grad);border-radius:3px;width:0%;transition:width .35s cubic-bezier(.16,1,.3,1)}
+.progress-label{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted)}
+
+/* ════ STEP INDICATOR ════ */
+.steps-bar{
+  display:flex;align-items:center;gap:0;
+  margin-bottom:2.5rem;padding:.85rem 1.25rem;
+  background:var(--bg2);border-radius:var(--r);
+  border:1px solid var(--border);
+}
+.step-item{display:flex;align-items:center;gap:.6rem;flex:1}
+.step-num{
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  background:var(--bg3);border:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);
+  transition:all .3s;
+}
+.step-item.done .step-num{background:var(--a1);border-color:var(--a1);color:#fff}
+.step-item.active .step-num{background:var(--bg3);border-color:var(--a2);color:var(--a2);box-shadow:0 0 0 3px rgba(6,182,212,.15)}
+.step-text{font-size:.74rem;color:var(--muted);line-height:1.3;transition:color .3s}
+.step-item.active .step-text,.step-item.done .step-text{color:var(--text)}
+.step-connector{width:24px;height:1px;background:var(--border);flex-shrink:0;margin:0 .35rem}
+
+/* ════ TOAST ════ */
+.toast-wrap{position:fixed;bottom:1.5rem;right:1.5rem;display:flex;flex-direction:column;gap:.5rem;z-index:9999}
+.toast{
+  padding:.7rem 1.1rem;border-radius:9px;font-size:.79rem;font-weight:500;
+  max-width:300px;animation:toastIn .3s cubic-bezier(.16,1,.3,1);
+}
+.toast.ok{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#86efac}
+.toast.err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
+.toast.info{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);color:#93c5fd}
+@keyframes toastIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ════ PAGE VIEWS ════ */
+.view{display:none;animation:fadeView .25s ease}
+.view.active{display:block}
+@keyframes fadeView{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ════ CANVAS HEADER ════ */
+.canvas-header{
+  display:flex;align-items:center;gap:1rem;
+  margin-bottom:2rem;
+  padding-bottom:1.5rem;
+  border-bottom:1px solid var(--border);
+}
+.canvas-title{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800}
+.canvas-sub{font-size:.82rem;color:var(--muted);margin-top:.3rem}
+
+/* ════ BEFORE/AFTER ════ */
+.ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.ba-slot{border-radius:var(--r);border:1px solid var(--border);overflow:hidden;background:var(--bg3)}
+.ba-slot-head{padding:.6rem 1rem;background:var(--bg2);font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem}
+.ba-slot-head.before{color:#f87171}
+.ba-slot-head.after{color:#34d399}
+.ba-slot-body{padding:1rem}
+
+/* ════ COLOR ACCENT OVERRIDES (applied by theme engine) ════ */
+.accent-bg{background:var(--a1)}
+.accent-text{color:var(--a2)}
+.accent-border{border-color:var(--a1)}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<header class="header">
-  <div class="header-brand">
-    <div class="logo-preview" id="headerLogo">NB</div>
-    <div>
-      <div class="header-title">Navega Baleia</div>
-      <div class="header-sub">Gerador de Apresentação</div>
+<div id="app">
+
+  <!-- ICON RAIL -->
+  <nav class="icon-rail">
+    <div class="rail-logo">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6 2 2 7 2 12s4 10 10 10 10-4.5 10-10S18 2 12 2zm0 3l3 5H9l3-5zm-5 7h10l-5 7-5-7z"/></svg>
     </div>
-  </div>
-  <div class="header-spacer"></div>
-  <button class="btn btn-ghost" onclick="saveData()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-    Salvar rascunho
-  </button>
-  <button class="btn btn-ghost" onclick="loadData()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    Carregar
-  </button>
-  <button class="btn btn-primary" onclick="showPanel('generate')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-    Gerar Apresentação
-  </button>
-</header>
+    <button class="rail-btn active" id="rail-home" onclick="railNav('home')">🏠<span class="tip">Início</span></button>
+    <button class="rail-btn" id="rail-identity" onclick="railNav('identity')">🏷️<span class="tip">Identidade</span></button>
+    <button class="rail-btn" id="rail-blocks" onclick="railNav('blocks')">🧱<span class="tip">Blocos</span></button>
+    <button class="rail-btn" id="rail-projects" onclick="railNav('projects')">📁<span class="tip">Projetos</span></button>
+    <button class="rail-btn" id="rail-theme" onclick="railNav('theme')">🎨<span class="tip">Tema</span></button>
+    <div class="rail-spacer"></div>
+    <div class="rail-sep"></div>
+    <button class="rail-btn" id="rail-generate" onclick="railNav('generate')">⚡<span class="tip">Gerar</span></button>
+  </nav>
 
-<div class="app">
+  <!-- LEFT PANEL -->
+  <aside class="left-panel" id="leftPanel">
 
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <span class="sidebar-label">Global</span>
-  <div style="padding:0 1rem;margin-bottom:1rem">
-    <button class="tab-btn" onclick="showPanel('global')" id="tab-global">
-      <div class="tab-icon" style="background:linear-gradient(135deg,#1e40af,#0891b2)">🌐</div>
-      Configurações Gerais
-    </button>
-  </div>
-
-  <span class="sidebar-label">Projetos</span>
-  <div style="padding:0 1rem;display:flex;flex-direction:column;gap:.25rem" id="projectTabs"></div>
-
-  <div style="padding:1rem">
-    <div class="progress-wrap">
-      <div class="progress-label">
-        <span>Preenchimento</span>
-        <strong id="progressPct">0%</strong>
+    <!-- HOME panel -->
+    <div id="lp-home">
+      <div class="panel-header">
+        <div class="panel-title">Wren</div>
+        <div class="panel-sub">Presentation Builder · by Wagner Ramos</div>
       </div>
-      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-    </div>
-  </div>
+      <div style="padding:1.25rem">
+        <div class="eyebrow" style="margin-bottom:.75rem">Modo de Apresentação</div>
+        <div style="display:flex;flex-direction:column;gap:.45rem">
+          <button class="proj-card active" id="modeBtn-single" onclick="setMode('single')">
+            <span style="font-size:1.1rem">📄</span>
+            <div class="proj-info"><div class="proj-name">Projeto Único</div><div class="proj-leader">Um projeto, focado</div></div>
+          </button>
+          <button class="proj-card" id="modeBtn-portfolio" onclick="setMode('portfolio')">
+            <span style="font-size:1.1rem">📁</span>
+            <div class="proj-info"><div class="proj-name">Portfólio</div><div class="proj-leader">Vários projetos</div></div>
+          </button>
+          <button class="proj-card" id="modeBtn-program" onclick="setMode('program')">
+            <span style="font-size:1.1rem">🗂️</span>
+            <div class="proj-info"><div class="proj-name">Programa</div><div class="proj-leader">Projetos com eixo comum</div></div>
+          </button>
+        </div>
 
-  <span class="sidebar-label">Ação</span>
-  <div style="padding:0 1rem">
-    <button class="tab-btn" onclick="showPanel('generate')" id="tab-generate">
-      <div class="tab-icon" style="background:linear-gradient(135deg,var(--teal),var(--mint))">⚡</div>
-      Gerar Apresentação
-    </button>
-    <button class="tab-btn" onclick="showPanel('preview')" id="tab-preview">
-      <div class="tab-icon" style="background:linear-gradient(135deg,#7c3aed,#2563eb)">👁</div>
-      Pré-visualizar Estrutura
-    </button>
-  </div>
-</aside>
-
-<!-- MAIN -->
-<main class="main" id="mainContent">
-
-  <!-- PANEL: GLOBAL -->
-  <div class="panel active" id="panel-global">
-    <div class="panel-header">
-      <span class="panel-tag">Configuração Global</span>
-      <h1 class="panel-title">Logos & Imagens Gerais</h1>
-      <p class="panel-desc">Estas informações aparecerão em todos os slides. Configure antes de preencher os projetos.</p>
+        <div class="rail-sep" style="width:100%;margin:1.25rem 0"></div>
+        <div class="eyebrow" style="margin-bottom:.75rem">Ação Rápida</div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:.5rem" onclick="railNav('generate')">⚡ Gerar apresentação</button>
+        <button class="btn btn-outline btn-sm" style="width:100%;justify-content:center" onclick="saveDraft()">💾 Salvar rascunho</button>
+      </div>
     </div>
 
-    <div class="form-section">
-      <div class="form-section-title"><span>📋</span>Informações do Evento</div>
-      <div class="form-grid form-grid-2">
-        <div class="field">
-          <label>Nome do Evento</label>
-          <input type="text" id="g_evento" value="Navega Baleia" placeholder="Ex: Navega Baleia">
+    <!-- IDENTITY panel -->
+    <div id="lp-identity" style="display:none">
+      <div class="panel-header">
+        <div class="panel-title">Identidade</div>
+        <div class="panel-sub">Logos e informações da organização</div>
+      </div>
+      <div style="padding:1.25rem;display:flex;flex-direction:column;gap:1rem">
+        <div id="upload-logoInst" class="img-slot" style="aspect-ratio:3/1;border-radius:10px" onclick="triggerUpload('uLogoInst')">
+          <input type="file" id="uLogoInst" accept="image/*" onchange="handleUpload('logoInst',this)">
+          <img class="prev" id="prev-logoInst">
+          <div class="img-slot-icon">🏢</div>
+          <div class="img-slot-label">Logo Instituição</div>
+          <button class="img-remove" id="rmv-logoInst" onclick="removeImg(event,'logoInst')">✕</button>
         </div>
-        <div class="field">
-          <label>Data da Apresentação</label>
-          <input type="date" id="g_data" value="2026-03-18">
+        <div id="upload-logoProg" class="img-slot" style="aspect-ratio:3/1;border-radius:10px" onclick="triggerUpload('uLogoProg')">
+          <input type="file" id="uLogoProg" accept="image/*" onchange="handleUpload('logoProg',this)">
+          <img class="prev" id="prev-logoProg">
+          <div class="img-slot-icon">🎯</div>
+          <div class="img-slot-label">Logo Portfólio / Programa (opcional)</div>
+          <button class="img-remove" id="rmv-logoProg" onclick="removeImg(event,'logoProg')">✕</button>
         </div>
-        <div class="field">
-          <label>Hospital / Organização</label>
-          <input type="text" id="g_org" value="Hospital da Baleia" placeholder="Ex: Hospital da Baleia">
+        <div class="field"><label>Nome da Instituição</label>
+          <input id="instName" placeholder="Ex: Hospital da Baleia" oninput="G.identity.instName=this.value">
         </div>
-        <div class="field">
-          <label>Subtítulo da Apresentação</label>
-          <input type="text" id="g_subtitle" value="Portfólio de Projetos Estratégicos 2024–2026" placeholder="Subtítulo">
+        <div class="field"><label>Departamento / Área (opcional)</label>
+          <input id="instDept" placeholder="Ex: Gestão e Desenvolvimento" oninput="G.identity.instDept=this.value">
+        </div>
+        <div class="field"><label>Título da Apresentação</label>
+          <input id="presTitle" placeholder="Ex: Navega Baleia 2026" oninput="G.identity.presTitle=this.value">
+        </div>
+        <div class="field"><label>Data / Período</label>
+          <input id="presDate" placeholder="Ex: Março 2026" oninput="G.identity.presDate=this.value">
+        </div>
+        <div class="field"><label>Subtítulo (opcional)</label>
+          <input id="presSub" placeholder="Ex: Portfólio de Projetos Estratégicos" oninput="G.identity.presSub=this.value">
         </div>
       </div>
     </div>
 
-    <div class="form-section">
-      <div class="form-section-title"><span>🖼</span>Logos</div>
-      <div class="upload-grid">
-        <div class="field">
-          <label>Logo Navega Baleia</label>
-          <div class="upload-zone" id="zone-logoNavega">
-            <input type="file" accept="image/*" onchange="handleUpload(this,'logoNavega','zone-logoNavega')">
-            <div class="upload-icon">🧭</div>
-            <div class="upload-label"><strong>Clique para enviar</strong><br>PNG ou SVG recomendado</div>
+    <!-- BLOCKS panel -->
+    <div id="lp-blocks" style="display:none">
+      <div class="panel-header">
+        <div class="panel-title">Blocos</div>
+        <div class="panel-sub">Ative o que sua apresentação precisa</div>
+      </div>
+      <div style="padding:1rem 1.25rem;display:flex;flex-direction:column;gap:.5rem" id="blockToggleList">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+
+    <!-- PROJECTS panel -->
+    <div id="lp-projects" style="display:none">
+      <div class="panel-header">
+        <div class="panel-title">Projetos</div>
+        <div class="panel-sub" id="projPanelSub">1 projeto ativo</div>
+      </div>
+      <div style="padding:1rem 1.25rem">
+        <div class="proj-list" id="projList"></div>
+        <button class="btn btn-outline btn-sm" style="width:100%;justify-content:center" onclick="addProject()">+ Adicionar projeto</button>
+      </div>
+    </div>
+
+    <!-- THEME panel -->
+    <div id="lp-theme" style="display:none">
+      <div class="panel-header">
+        <div class="panel-title">Tema Visual</div>
+        <div class="panel-sub">Paleta de cores da apresentação</div>
+      </div>
+      <div style="padding:1.25rem">
+        <div class="palette-grid" id="paletteGrid"></div>
+      </div>
+    </div>
+
+    <!-- GENERATE panel -->
+    <div id="lp-generate" style="display:none">
+      <div class="panel-header">
+        <div class="panel-title">Gerar</div>
+        <div class="panel-sub">Exportar apresentação</div>
+      </div>
+      <div style="padding:1.25rem;display:flex;flex-direction:column;gap:.75rem">
+        <div class="gen-check-list" id="sideGenCheck"></div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="generatePptx()">📊 Gerar PPTX</button>
+        <button class="btn btn-outline btn-sm" style="width:100%;justify-content:center" onclick="generatePdf()">📄 Como PDF</button>
+        <div class="progress-outer" id="sideProgress" style="display:none"><div class="progress-inner" id="sideBar"></div></div>
+        <div class="progress-label" id="sideLabel"></div>
+        <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;margin-top:.5rem" onclick="saveDraft()">💾 Salvar rascunho JSON</button>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- MAIN CANVAS -->
+  <main class="canvas" id="canvas">
+
+    <!-- VIEW: HOME -->
+    <div class="view active" id="view-home">
+      <div class="canvas-header">
+        <div>
+          <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.35rem">
+            <div style="width:36px;height:36px;border-radius:9px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:1.1rem">🐦</div>
+            <div class="canvas-title font-syne">Wren</div>
+          </div>
+          <div class="canvas-sub">Presentation Builder · Dê forma ao que você construiu.</div>
+        </div>
+      </div>
+
+      <div class="mode-grid">
+        <div class="mode-card selected" id="mc-single" onclick="setMode('single');showView('projects')">
+          <div class="mode-icon">📄</div>
+          <div class="mode-name font-syne">Projeto Único</div>
+          <div class="mode-desc">Uma iniciativa completa, com todos os blocos que você escolher.</div>
+        </div>
+        <div class="mode-card" id="mc-portfolio" onclick="setMode('portfolio');showView('projects')">
+          <div class="mode-icon">📁</div>
+          <div class="mode-name font-syne">Portfólio</div>
+          <div class="mode-desc">Vários projetos numa mesma apresentação, com sumário automático.</div>
+        </div>
+        <div class="mode-card" id="mc-program" onclick="setMode('program');showView('projects')">
+          <div class="mode-icon">🗂️</div>
+          <div class="mode-name font-syne">Programa</div>
+          <div class="mode-desc">Projetos com eixo temático comum. Capa + panorama + projetos.</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">
+        <div class="card" style="cursor:pointer" onclick="railNav('identity')">
+          <div style="font-size:1.5rem;margin-bottom:.75rem">🏷️</div>
+          <div class="font-syne" style="font-size:.9rem;font-weight:700;margin-bottom:.35rem">Identidade</div>
+          <div style="font-size:.77rem;color:var(--muted);line-height:1.5">Logo e informações da organização ou pessoa.</div>
+        </div>
+        <div class="card" style="cursor:pointer" onclick="railNav('blocks')">
+          <div style="font-size:1.5rem;margin-bottom:.75rem">🧱</div>
+          <div class="font-syne" style="font-size:.9rem;font-weight:700;margin-bottom:.35rem">Blocos</div>
+          <div style="font-size:.77rem;color:var(--muted);line-height:1.5">Escolha quais seções incluir. Lego: só o que você precisa.</div>
+        </div>
+        <div class="card" style="cursor:pointer" onclick="railNav('theme')">
+          <div style="font-size:1.5rem;margin-bottom:.75rem">🎨</div>
+          <div class="font-syne" style="font-size:.9rem;font-weight:700;margin-bottom:.35rem">Tema Visual</div>
+          <div style="font-size:.77rem;color:var(--muted);line-height:1.5">5 paletas prontas. Escolha a que combina com o contexto.</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:1rem">
+        <div class="card-title">Como funciona</div>
+        <div style="display:flex;gap:2rem;flex-wrap:wrap">
+          <div style="flex:1;min-width:160px">
+            <div style="font-size:.72rem;color:var(--a2);font-family:'DM Mono',monospace;letter-spacing:.15em;margin-bottom:.4rem">01</div>
+            <div style="font-size:.85rem;font-weight:600;margin-bottom:.3rem">Escolha o modo</div>
+            <div style="font-size:.77rem;color:var(--muted);line-height:1.5">Projeto único, portfólio ou programa estratégico.</div>
+          </div>
+          <div style="flex:1;min-width:160px">
+            <div style="font-size:.72rem;color:var(--a2);font-family:'DM Mono',monospace;letter-spacing:.15em;margin-bottom:.4rem">02</div>
+            <div style="font-size:.85rem;font-weight:600;margin-bottom:.3rem">Monte os blocos</div>
+            <div style="font-size:.77rem;color:var(--muted);line-height:1.5">Ative só o que faz sentido. Cada bloco é um slide.</div>
+          </div>
+          <div style="flex:1;min-width:160px">
+            <div style="font-size:.72rem;color:var(--a2);font-family:'DM Mono',monospace;letter-spacing:.15em;margin-bottom:.4rem">03</div>
+            <div style="font-size:.85rem;font-weight:600;margin-bottom:.3rem">Preencha os dados</div>
+            <div style="font-size:.77rem;color:var(--muted);line-height:1.5">Textos, números, imagens. Placeholders para o que faltar.</div>
+          </div>
+          <div style="flex:1;min-width:160px">
+            <div style="font-size:.72rem;color:var(--a2);font-family:'DM Mono',monospace;letter-spacing:.15em;margin-bottom:.4rem">04</div>
+            <div style="font-size:.85rem;font-weight:600;margin-bottom:.3rem">Gere o PPTX</div>
+            <div style="font-size:.77rem;color:var(--muted);line-height:1.5">Download em segundos. Editável no PowerPoint / Google Slides.</div>
           </div>
         </div>
-        <div class="field">
-          <label>Logo Hospital da Baleia</label>
-          <div class="upload-zone" id="zone-logoHospital">
-            <input type="file" accept="image/*" onchange="handleUpload(this,'logoHospital','zone-logoHospital')">
-            <div class="upload-icon">🏥</div>
-            <div class="upload-label"><strong>Clique para enviar</strong><br>PNG ou SVG recomendado</div>
+      </div>
+    </div>
+
+    <!-- VIEW: PROJECTS / FORM -->
+    <div class="view" id="view-projects">
+      <div class="canvas-header">
+        <div>
+          <div class="canvas-title font-syne" id="formViewTitle">Projetos</div>
+          <div class="canvas-sub" id="formViewSub">Preencha os dados de cada projeto</div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:.5rem">
+          <button class="btn btn-outline btn-sm" onclick="addProject()" id="btnAddProj">+ Projeto</button>
+        </div>
+      </div>
+      <div id="projectForms"></div>
+    </div>
+
+    <!-- VIEW: THEME -->
+    <div class="view" id="view-theme">
+      <div class="canvas-header">
+        <div>
+          <div class="canvas-title font-syne">Tema Visual</div>
+          <div class="canvas-sub">Escolha a paleta da apresentação</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem" id="themeBigGrid"></div>
+    </div>
+
+    <!-- VIEW: GENERATE -->
+    <div class="view" id="view-generate">
+      <div class="canvas-header">
+        <div>
+          <div class="canvas-title font-syne">Gerar Apresentação</div>
+          <div class="canvas-sub">Tudo pronto? Exporte agora.</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:1.5rem;align-items:start">
+        <div>
+          <div class="card" style="margin-bottom:1.25rem">
+            <div class="card-title">Checklist de Completude</div>
+            <div id="bigChecklist"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Estrutura que será gerada</div>
+            <div id="slideStructure" style="font-size:.8rem;color:var(--muted);line-height:2"></div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-title">Exportar</div>
+            <div style="display:flex;flex-direction:column;gap:.75rem">
+              <button class="btn btn-primary" style="width:100%;justify-content:center;padding:.75rem" onclick="generatePptx()">📊 Baixar PPTX</button>
+              <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="generatePdf()">📄 Como PDF</button>
+              <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="saveDraft()">💾 Salvar rascunho</button>
+            </div>
+            <div class="progress-outer" id="bigProgress" style="margin-top:1rem;display:none"><div class="progress-inner" id="bigBar"></div></div>
+            <div class="progress-label" id="bigLabel" style="margin-top:.35rem"></div>
+          </div>
+          <div class="card" style="margin-top:1rem">
+            <div class="card-title">Tema selecionado</div>
+            <div id="selectedThemeInfo"></div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="form-section">
-      <div class="form-section-title"><span>📊</span>Dashboard BI</div>
-      <div class="upload-grid">
-        <div class="field">
-          <label>Print BI Navega 2025</label>
-          <div class="upload-zone" id="zone-bi2025">
-            <input type="file" accept="image/*" onchange="handleUpload(this,'bi2025','zone-bi2025')">
-            <div class="upload-icon">📈</div>
-            <div class="upload-label"><strong>Clique para enviar</strong><br>Screenshot do dashboard 2025</div>
-          </div>
-        </div>
-        <div class="field">
-          <label>Print BI Navega 2026</label>
-          <div class="upload-zone" id="zone-bi2026">
-            <input type="file" accept="image/*" onchange="handleUpload(this,'bi2026','zone-bi2026')">
-            <div class="upload-icon">📊</div>
-            <div class="upload-label"><strong>Clique para enviar</strong><br>Screenshot do dashboard 2026</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PANELS: PROJECTS (gerados por JS) -->
-
-  <!-- PANEL: PREVIEW -->
-  <div class="panel" id="panel-preview">
-    <div class="panel-header">
-      <span class="panel-tag">Estrutura</span>
-      <h1 class="panel-title">Pré-visualização dos Slides</h1>
-      <p class="panel-desc">Mapa completo de todos os slides que serão gerados.</p>
-    </div>
-    <div id="previewContent"></div>
-  </div>
-
-  <!-- PANEL: GENERATE -->
-  <div class="panel" id="panel-generate">
-    <div class="panel-header">
-      <span class="panel-tag">Exportar</span>
-      <h1 class="panel-title">Gerar Apresentação</h1>
-      <p class="panel-desc">Escolha o formato de exportação. Todos os dados preenchidos serão incluídos.</p>
-    </div>
-
-    <div id="validationMsg" style="display:none;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.3);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:.82rem;color:var(--gold);line-height:1.7"></div>
-
-    <div class="generate-grid">
-      <div class="gen-card">
-        <div class="gen-icon">📊</div>
-        <div class="gen-title">PowerPoint (PPTX)</div>
-        <div class="gen-desc">Arquivo editável no PowerPoint ou Google Slides. Ideal para ajustes finais e apresentação ao vivo.</div>
-        <div class="gen-badge">✦ Editável · Animações · 16:9</div>
-        <button class="btn btn-primary" onclick="generatePPTX()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Baixar PPTX
-        </button>
-      </div>
-      <div class="gen-card">
-        <div class="gen-icon">📄</div>
-        <div class="gen-title">PDF</div>
-        <div class="gen-desc">Documento fechado para envio por email ou impressão. Layout fiel ao design da apresentação.</div>
-        <div class="gen-badge">✦ Compartilhável · Imprimível · A4</div>
-        <button class="btn btn-success" onclick="generatePDF()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Baixar PDF
-        </button>
-      </div>
-    </div>
-
-    <div class="preview-card" style="margin-top:2rem">
-      <div class="preview-title">⚡ O que será gerado</div>
-      <div id="genSlideList" class="preview-slide-list"></div>
-    </div>
-  </div>
-
-</main>
+  </main>
 </div>
 
 <!-- TOAST -->
-<div class="toast" id="toast">
-  <span class="toast-icon" id="toastIcon">✓</span>
-  <span id="toastMsg">Salvo com sucesso</span>
-</div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- PptxGenJS -->
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 
 <script>
-// ─────────────────────────────────────────────
-// DATA MODEL
-// ─────────────────────────────────────────────
-const PROJECTS = [
-  { id:'p1', name:'Gestão do Ciclo de Receita', leader:'Ricardo', color:'1d4ed8' },
-  { id:'p2', name:'Brand 2025',                leader:'Flávia',  color:'7c3aed' },
-  { id:'p3', name:'Lean no Bloco Cirúrgico',   leader:'Roberta', color:'0d9488' },
-  { id:'p4', name:'100% SUS / BG Saúde',       leader:'Josi',    color:'b45309' },
-  { id:'p5', name:'Nova UDC (Assistência)',     leader:'Thaís',   color:'0891b2' },
-  { id:'p6', name:'Governança Clínica',         leader:'Samar',   color:'9333ea' },
-];
+// ════════════════════════════════════════════════════
+// GLOBAL STATE
+// ════════════════════════════════════════════════════
+const G = {
+  mode: 'single',    // single | portfolio | program
+  theme: 'default',
+  identity: {
+    instName:'', instDept:'', presTitle:'', presDate:'', presSub:'',
+    logoInst: null, logoProg: null,
+    bi2025: null, bi2026: null,
+  },
+  blocks: {
+    cover:      { enabled:true,  required:true,  label:'Capa',              icon:'🏷️' },
+    panorama:   { enabled:false, required:false, label:'Panorama Anterior', icon:'📊' },
+    team:       { enabled:false, required:false, label:'Equipe',            icon:'👥' },
+    objetivo:   { enabled:true,  required:true,  label:'Objetivo',          icon:'🎯' },
+    etapas:     { enabled:true,  required:false, label:'Etapas',            icon:'🪜' },
+    marcos:     { enabled:true,  required:false, label:'Marcos / Timeline', icon:'📍' },
+    indicadores:{ enabled:true,  required:false, label:'Indicadores KPI',   icon:'📊' },
+    resultados: { enabled:true,  required:false, label:'Resultados',        icon:'🏆' },
+    riscos:     { enabled:false, required:false, label:'Riscos & Atenção',  icon:'⚠️' },
+    licoes:     { enabled:false, required:false, label:'Lições Aprendidas', icon:'💡' },
+    antesdepois:{ enabled:false, required:false, label:'Antes & Depois',    icon:'🔄' },
+    evidencias: { enabled:true,  required:false, label:'Evidências',        icon:'📸' },
+    desafios:   { enabled:false, required:false, label:'Desafios Futuros',  icon:'🚀' },
+    closing:    { enabled:true,  required:false, label:'Encerramento',      icon:'🙏' },
+  },
+  projects: [],
+  activeProjectId: null,
+};
 
-const uploads = {}; // key -> base64
+// Project colors pool
+const PROJ_COLORS = ['#1D4ED8','#7C3AED','#0D9488','#D97706','#DC2626','#059669','#DB2777','#0369A1'];
 
-// ─────────────────────────────────────────────
+// ════════════════════════════════════════════════════
+// MODELS
+// ════════════════════════════════════════════════════
+const MODELS = {
+  default: { id:'default', name:'Oceano',    desc:'Azul profundo · Aqua',       preview:['#070C14','#1D4ED8','#06B6D4','#10FFCB'],
+    pptx:{ bg:'070C14',bg2:'0D1420',a1:'1D4ED8',a2:'06B6D4',a3:'10FFCB',txt:'FFFFFF',muted:'8A9BB5',cover:'0A2463',danger:'EF4444',teal:'0D9488' }},
+  aurora:  { id:'aurora',  name:'Aurora',    desc:'Violeta · Rosa · Premium',    preview:['#0F0A1E','#7C3AED','#EC4899','#F0ABFC'],
+    pptx:{ bg:'0F0A1E',bg2:'160D2E',a1:'7C3AED',a2:'EC4899',a3:'F0ABFC',txt:'FFFFFF',muted:'A89EC0',cover:'1E1040',danger:'F43F5E',teal:'7C3AED' }},
+  clean:   { id:'clean',   name:'Minimal',   desc:'Branco · Carbono · Clean',    preview:['#F8F9FA','#111827','#6366F1','#818CF8'],
+    pptx:{ bg:'F8F9FA',bg2:'FFFFFF',a1:'111827',a2:'6366F1',a3:'818CF8',txt:'111827',muted:'6B7280',cover:'111827',danger:'EF4444',teal:'6366F1' }},
+  forest:  { id:'forest',  name:'Floresta',  desc:'Verde escuro · Dourado',      preview:['#0A1A0F','#166534','#D97706','#FCD34D'],
+    pptx:{ bg:'0A1A0F',bg2:'0F2318',a1:'166534',a2:'D97706',a3:'FCD34D',txt:'FFFFFF',muted:'86A892',cover:'052E16',danger:'EF4444',teal:'166534' }},
+  terra:   { id:'terra',   name:'Terra',     desc:'Terracota · Laranja · Quente', preview:['#1C0F0A','#B45309','#F97316','#FED7AA'],
+    pptx:{ bg:'1C0F0A',bg2:'251409',a1:'B45309',a2:'F97316',a3:'FED7AA',txt:'FFFFFF',muted:'C4A882',cover:'431407',danger:'EF4444',teal:'B45309' }},
+};
+
+// ════════════════════════════════════════════════════
 // INIT
-// ─────────────────────────────────────────────
+// ════════════════════════════════════════════════════
 function init() {
-  buildProjectTabs();
-  buildProjectPanels();
-  buildPreview();
-  buildGenList();
-  updateProgress();
+  addProject();
+  renderBlockToggles();
+  renderPalettes();
+  renderThemeBig();
+  updateGenChecklist();
 }
 
-function buildProjectTabs() {
-  const container = document.getElementById('projectTabs');
-  PROJECTS.forEach((p, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'tab-btn';
-    btn.id = `tab-${p.id}`;
-    btn.onclick = () => showPanel(p.id);
-    btn.innerHTML = `
-      <div class="tab-icon" style="background:linear-gradient(135deg,#${p.color},#06b6d4);font-size:.7rem">${i+1}</div>
-      <div style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name}</div>
-    `;
-    container.appendChild(btn);
+// ════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════
+const RAIL_MAP = {
+  home:     { lp:'lp-home',     view:'view-home' },
+  identity: { lp:'lp-identity', view:'view-projects' },
+  blocks:   { lp:'lp-blocks',   view:'view-projects' },
+  projects: { lp:'lp-projects', view:'view-projects' },
+  theme:    { lp:'lp-theme',    view:'view-theme' },
+  generate: { lp:'lp-generate', view:'view-generate' },
+};
+
+function railNav(key) {
+  // rail buttons
+  document.querySelectorAll('.rail-btn').forEach(b => b.classList.remove('active'));
+  const rb = document.getElementById('rail-'+key);
+  if(rb) rb.classList.add('active');
+  // left panels
+  Object.values(RAIL_MAP).forEach(m => {
+    const el = document.getElementById(m.lp);
+    if(el) el.style.display = 'none';
+  });
+  const map = RAIL_MAP[key];
+  if(!map) return;
+  const lp = document.getElementById(map.lp);
+  if(lp) lp.style.display = '';
+  showView(map.view.replace('view-',''));
+  if(key==='generate') { updateGenChecklist(); renderSlideStructure(); renderSelectedTheme(); }
+}
+
+function showView(key) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const el = document.getElementById('view-'+key);
+  if(el) el.classList.add('active');
+}
+
+// ════════════════════════════════════════════════════
+// MODE
+// ════════════════════════════════════════════════════
+function setMode(mode) {
+  G.mode = mode;
+  document.querySelectorAll('.mode-card,[id^=modeBtn-]').forEach(c => c.classList.remove('selected','active'));
+  const mc = document.getElementById('mc-'+mode);
+  if(mc) mc.classList.add('selected');
+  const mb = document.getElementById('modeBtn-'+mode);
+  if(mb) mb.classList.add('active');
+
+  // Show/hide add button
+  const ba = document.getElementById('btnAddProj');
+  if(ba) ba.style.display = (mode==='single') ? 'none' : '';
+
+  // Show/hide panorama block option
+  const panBlock = document.querySelector('[data-block="panorama"]');
+  // portfolio/program: show panorama toggle
+  updateFormTitles();
+  updateGenChecklist();
+}
+
+function updateFormTitles() {
+  const t = document.getElementById('formViewTitle');
+  const s = document.getElementById('formViewSub');
+  if(!t) return;
+  if(G.mode==='single') { t.textContent='Projeto'; s.textContent='Preencha as informações do seu projeto'; }
+  else if(G.mode==='portfolio') { t.textContent='Portfólio'; s.textContent='Gerencie os projetos do portfólio'; }
+  else { t.textContent='Programa'; s.textContent='Projetos do programa estratégico'; }
+}
+
+// ════════════════════════════════════════════════════
+// PROJECTS
+// ════════════════════════════════════════════════════
+let projIdCounter = 0;
+
+function addProject() {
+  const id = 'p'+(++projIdCounter);
+  const colorIdx = (G.projects.length) % PROJ_COLORS.length;
+  const proj = {
+    id, color: PROJ_COLORS[colorIdx],
+    name:'', leader:'', status:'Concluído',
+    periodo_inicio:'', periodo_fim:'',
+    objetivo:'',
+    etapas:    [{titulo:'',descricao:''},{titulo:'',descricao:''},{titulo:'',descricao:''},{titulo:'',descricao:''}],
+    marcos:    [{data:'',entrega:''},{data:'',entrega:''},{data:'',entrega:''},{data:'',entrega:''}],
+    indicadores:[{nome:'',meta:'',realizado:''},{nome:'',meta:'',realizado:''},{nome:'',meta:'',realizado:''}],
+    resultados: [{metrica:'',absoluto:'',percentual:''},{metrica:'',absoluto:'',percentual:''},{metrica:'',absoluto:'',percentual:''},{metrica:'',absoluto:'',percentual:''}],
+    riscos:[{texto:''}], licoes:[{texto:''}],
+    antesdepois:{ antes_titulo:'', antes_desc:'', antes_img:null, depois_titulo:'', depois_desc:'', depois_img:null },
+    evidencias:[null,null,null,null],
+    desafios:'',
+    team:[{nome:'',cargo:''}],
+  };
+  G.projects.push(proj);
+  G.activeProjectId = id;
+  renderProjectList();
+  renderAllProjectForms();
+  selectProject(id);
+}
+
+function removeProject(id) {
+  if(G.projects.length <= 1) { toast('Precisa de pelo menos 1 projeto','err'); return; }
+  G.projects = G.projects.filter(p => p.id !== id);
+  if(G.activeProjectId === id) G.activeProjectId = G.projects[0].id;
+  renderProjectList();
+  renderAllProjectForms();
+  selectProject(G.activeProjectId);
+}
+
+function selectProject(id) {
+  G.activeProjectId = id;
+  renderProjectList();
+  document.querySelectorAll('.proj-form-wrap').forEach(el => {
+    el.style.display = el.dataset.pid === id ? '' : 'none';
   });
 }
 
-function buildProjectPanels() {
-  const main = document.getElementById('mainContent');
-  PROJECTS.forEach((p, idx) => {
-    const div = document.createElement('div');
-    div.className = 'panel';
-    div.id = `panel-${p.id}`;
-    div.innerHTML = projectPanelHTML(p, idx);
-    main.appendChild(div);
-    // init repeaters
-    addRepeaterItem(`etapas_${p.id}`, etapaTemplate);
-    addRepeaterItem(`marcos_${p.id}`, marcoTemplate);
-    addRepeaterItem(`kpis_${p.id}`, kpiTemplate);
-    addRepeaterItem(`resultados_${p.id}`, resultadoTemplate);
-    addRepeaterItem(`riscos_${p.id}`, riscoTemplate);
-    addRepeaterItem(`licoes_${p.id}`, licaoTemplate);
+function renderProjectList() {
+  const list = document.getElementById('projList');
+  if(!list) return;
+  list.innerHTML = G.projects.map(p => `
+    <div class="proj-card ${p.id===G.activeProjectId?'active':''}" onclick="selectProject('${p.id}');showView('projects');railNav('projects')" data-pid="${p.id}">
+      <div class="proj-color-dot" style="background:${p.color}"></div>
+      <div class="proj-info">
+        <div class="proj-name">${p.name||'Projeto sem nome'}</div>
+        <div class="proj-leader">${p.leader||'Líder não definido'}</div>
+      </div>
+      <div class="proj-status-dot ${p.name&&p.objetivo?'filled':''}"></div>
+    </div>
+  `).join('');
+  const sub = document.getElementById('projPanelSub');
+  if(sub) sub.textContent = G.projects.length + (G.projects.length===1?' projeto':' projetos');
+}
+
+// ════════════════════════════════════════════════════
+// PROJECT FORM RENDER
+// ════════════════════════════════════════════════════
+function renderAllProjectForms() {
+  const container = document.getElementById('projectForms');
+  if(!container) return;
+  container.innerHTML = '';
+  G.projects.forEach(p => {
+    const wrap = document.createElement('div');
+    wrap.className = 'proj-form-wrap';
+    wrap.dataset.pid = p.id;
+    wrap.style.display = p.id === G.activeProjectId ? '' : 'none';
+    wrap.innerHTML = buildProjectForm(p);
+    container.appendChild(wrap);
   });
 }
 
-function projectPanelHTML(p, idx) {
+function buildProjectForm(p) {
+  const num = G.projects.findIndex(x=>x.id===p.id)+1;
   return `
-    <div class="panel-header">
-      <span class="panel-tag">Projeto ${idx+1} de ${PROJECTS.length} · ${p.leader}</span>
-      <h1 class="panel-title">${p.name}</h1>
-      <p class="panel-desc">Preencha todas as seções. Campos marcados com <span style="color:var(--electric)">*</span> são obrigatórios para geração.</p>
+  <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.75rem;padding:.85rem 1.1rem;background:var(--bg2);border-radius:var(--r);border:1px solid var(--border)">
+    <div style="width:40px;height:40px;border-radius:10px;background:${p.color};display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;color:#fff;flex-shrink:0">${String(num).padStart(2,'0')}</div>
+    <div style="flex:1">
+      <div style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:700" id="formTitle-${p.id}">${p.name||'Novo Projeto'}</div>
+      <div style="font-size:.72rem;color:var(--muted);margin-top:.15rem">Preencha todas as seções abaixo</div>
     </div>
+    ${G.mode!=='single'?`<button class="btn btn-danger btn-xs" onclick="removeProject('${p.id}')">✕ Remover</button>`:''}
+  </div>
 
-    <!-- 1. Identificação -->
-    <div class="form-section">
-      <div class="form-section-title"><span>1</span>Identificação</div>
-      <div class="form-grid form-grid-2">
-        <div class="field">
-          <label>Nome do Projeto <span class="req">*</span></label>
-          <input type="text" id="${p.id}_nome" value="${p.name}" oninput="updateProgress()">
-        </div>
-        <div class="field">
-          <label>Líder do Projeto <span class="req">*</span></label>
-          <input type="text" id="${p.id}_lider" value="${p.leader}" oninput="updateProgress()">
-        </div>
-        <div class="field">
-          <label>Data de Início <span class="req">*</span></label>
-          <input type="date" id="${p.id}_inicio">
-        </div>
-        <div class="field">
-          <label>Data de Conclusão <span class="req">*</span></label>
-          <input type="date" id="${p.id}_fim">
-        </div>
-        <div class="field" style="grid-column:1/-1">
-          <label>Status</label>
-          <div class="status-row" id="${p.id}_status_row">
-            ${['Concluído','Em andamento','Pausado'].map(s=>`<div class="status-opt${s==='Concluído'?' selected':''}" data-val="${s}" onclick="selectStatus('${p.id}',this)">${s}</div>`).join('')}
+  ${buildSection(p,'ident','🏷️ Identificação',true,`
+    <div class="field-row c2">
+      <div class="field"><label>Nome do Projeto</label>
+        <input value="${esc(p.name)}" placeholder="Ex: Lean no Bloco Cirúrgico" oninput="pset('${p.id}','name',this.value);document.getElementById('formTitle-${p.id}').textContent=this.value||'Novo Projeto';renderProjectList()">
+      </div>
+      <div class="field"><label>Líder / Responsável</label>
+        <input value="${esc(p.leader)}" placeholder="Nome do líder" oninput="pset('${p.id}','leader',this.value);renderProjectList()">
+      </div>
+      <div class="field"><label>Data de Início</label>
+        <input type="date" value="${p.periodo_inicio}" oninput="pset('${p.id}','periodo_inicio',this.value)">
+      </div>
+      <div class="field"><label>Data de Conclusão</label>
+        <input type="date" value="${p.periodo_fim}" oninput="pset('${p.id}','periodo_fim',this.value)">
+      </div>
+      <div class="field"><label>Status</label>
+        <select oninput="pset('${p.id}','status',this.value)">
+          <option ${p.status==='Concluído'?'selected':''}>Concluído</option>
+          <option ${p.status==='Em andamento'?'selected':''}>Em andamento</option>
+          <option ${p.status==='Pausado'?'selected':''}>Pausado</option>
+          <option ${p.status==='Cancelado'?'selected':''}>Cancelado</option>
+        </select>
+      </div>
+    </div>
+  `)}
+
+  ${buildSection(p,'objetivo','🎯 Objetivo',true,`
+    <div class="field">
+      <label>Qual problema ou oportunidade o projeto buscou resolver?</label>
+      <textarea rows="4" placeholder="Descreva o contexto, o problema identificado e o que o projeto buscou alcançar..." oninput="pset('${p.id}','objetivo',this.value);renderProjectList()">${esc(p.objetivo)}</textarea>
+    </div>
+  `)}
+
+  ${buildSection(p,'team','👥 Equipe',false,`
+    <div class="rep-list" id="team-${p.id}">
+      ${p.team.map((t,i)=>buildTeamItem(p.id,i)).join('')}
+    </div>
+    <button class="add-row" onclick="addRep('${p.id}','team',{nome:'',cargo:''})">+ Adicionar membro</button>
+  `)}
+
+  ${buildSection(p,'etapas','🪜 Etapas do Projeto',false,`
+    <div class="rep-list" id="etapas-${p.id}">
+      ${p.etapas.map((e,i)=>buildEtapaItem(p.id,i)).join('')}
+    </div>
+    <button class="add-row" onclick="addRep('${p.id}','etapas',{titulo:'',descricao:''})">+ Adicionar etapa</button>
+  `)}
+
+  ${buildSection(p,'marcos','📍 Marcos do Projeto',false,`
+    <div class="rep-list" id="marcos-${p.id}">
+      ${p.marcos.map((m,i)=>buildMarcoItem(p.id,i)).join('')}
+    </div>
+    <button class="add-row" onclick="addRep('${p.id}','marcos',{data:'',entrega:''})">+ Adicionar marco</button>
+  `)}
+
+  ${buildSection(p,'indicadores','📊 Indicadores KPI',false,`
+    <div class="rep-list" id="indicadores-${p.id}">
+      ${p.indicadores.map((ind,i)=>buildIndicItem(p.id,i)).join('')}
+    </div>
+    <button class="add-row" onclick="addRep('${p.id}','indicadores',{nome:'',meta:'',realizado:''})">+ Adicionar indicador</button>
+  `)}
+
+  ${buildSection(p,'resultados','🏆 Resultados',false,`
+    <div class="rep-list" id="resultados-${p.id}">
+      ${p.resultados.map((r,i)=>buildResultItem(p.id,i)).join('')}
+    </div>
+    <button class="add-row" onclick="addRep('${p.id}','resultados',{metrica:'',absoluto:'',percentual:''})">+ Adicionar resultado</button>
+  `)}
+
+  ${buildSection(p,'riscos','⚠️ Riscos & Atenção',false,`
+    <div class="rep-list" id="riscos-${p.id}">
+      ${p.riscos.map((r,i)=>buildTextoItem(p.id,'riscos',i,'Risco ou ponto de atenção identificado...')).join('')}
+    </div>
+    <button class="add-row" onclick="addRep('${p.id}','riscos',{texto:''})">+ Adicionar risco</button>
+  `)}
+
+  ${buildSection(p,'licoes','💡 Lições Aprendidas',false,`
+    <div class="rep-list" id="licoes-${p.id}">
+      ${p.licoes.map((l,i)=>buildTextoItem(p.id,'licoes',i,'Lição aprendida durante a execução...')).join('')}
+    </div>
+    <button class="add-row" onclick="addRep('${p.id}','licoes',{texto:''})">+ Adicionar lição</button>
+  `)}
+
+  ${buildSection(p,'antesdepois','🔄 Antes & Depois',false,`
+    <div class="ba-grid">
+      <div class="ba-slot">
+        <div class="ba-slot-head before">⬅ Antes</div>
+        <div class="ba-slot-body">
+          <div class="field" style="margin-bottom:.75rem"><label>Título</label>
+            <input value="${esc(p.antesdepois.antes_titulo)}" placeholder="Ex: Situação anterior" oninput="psetDeep('${p.id}','antesdepois','antes_titulo',this.value)">
           </div>
-          <input type="hidden" id="${p.id}_status" value="Concluído">
-        </div>
-      </div>
-    </div>
-
-    <!-- 2. Objetivo -->
-    <div class="form-section">
-      <div class="form-section-title"><span>2</span>Objetivo do Projeto</div>
-      <div class="field">
-        <label>Descreva o problema ou oportunidade <span class="req">*</span></label>
-        <textarea id="${p.id}_objetivo" rows="4" placeholder="Ex: O projeto buscou reduzir o tempo de ciclo de faturamento, aumentar a taxa de aprovação de contas e diminuir as glosas, impactando diretamente a receita hospitalar..."></textarea>
-      </div>
-    </div>
-
-    <!-- 3. Etapas -->
-    <div class="form-section">
-      <div class="form-section-title"><span>3</span>Etapas do Projeto (4–5 fases)</div>
-      <div class="repeater" id="etapas_${p.id}"></div>
-      <button class="btn-add" onclick="addRepeaterItem('etapas_${p.id}',etapaTemplate)">+ Adicionar etapa</button>
-    </div>
-
-    <!-- 4. Marcos -->
-    <div class="form-section">
-      <div class="form-section-title"><span>4</span>Marcos do Projeto (4–5 entregas)</div>
-      <div class="repeater" id="marcos_${p.id}"></div>
-      <button class="btn-add" onclick="addRepeaterItem('marcos_${p.id}',marcoTemplate)">+ Adicionar marco</button>
-    </div>
-
-    <!-- 5. KPIs -->
-    <div class="form-section">
-      <div class="form-section-title"><span>5</span>Indicadores de Acompanhamento</div>
-      <div class="repeater" id="kpis_${p.id}"></div>
-      <button class="btn-add" onclick="addRepeaterItem('kpis_${p.id}',kpiTemplate)">+ Adicionar indicador</button>
-    </div>
-
-    <!-- 6. Resultados -->
-    <div class="form-section">
-      <div class="form-section-title"><span>6</span>Resultados do Projeto</div>
-      <div class="repeater" id="resultados_${p.id}"></div>
-      <button class="btn-add" onclick="addRepeaterItem('resultados_${p.id}',resultadoTemplate)">+ Adicionar resultado</button>
-    </div>
-
-    <!-- 7. Riscos -->
-    <div class="form-section">
-      <div class="form-section-title"><span>7</span>Riscos e Pontos de Atenção</div>
-      <div class="repeater" id="riscos_${p.id}"></div>
-      <button class="btn-add" onclick="addRepeaterItem('riscos_${p.id}',riscoTemplate)">+ Adicionar risco</button>
-    </div>
-
-    <!-- 8. Lições -->
-    <div class="form-section">
-      <div class="form-section-title"><span>8</span>Lições Aprendidas</div>
-      <div class="repeater" id="licoes_${p.id}"></div>
-      <button class="btn-add" onclick="addRepeaterItem('licoes_${p.id}',licaoTemplate)">+ Adicionar lição</button>
-    </div>
-
-    <!-- 9. Evidências -->
-    <div class="form-section">
-      <div class="form-section-title"><span>9</span>Fotos e Evidências (até 4 imagens)</div>
-      <div class="upload-grid">
-        ${[1,2,3,4].map(n=>`
-          <div class="field">
-            <label>Evidência ${n}</label>
-            <div class="upload-zone" id="zone-ev_${p.id}_${n}">
-              <input type="file" accept="image/*" onchange="handleUpload(this,'ev_${p.id}_${n}','zone-ev_${p.id}_${n}')">
-              <div class="upload-icon">📷</div>
-              <div class="upload-label"><strong>Upload</strong> foto ou print</div>
-            </div>
+          <div class="field" style="margin-bottom:.75rem"><label>Descrição</label>
+            <textarea rows="2" placeholder="Descreva o estado anterior..." oninput="psetDeep('${p.id}','antesdepois','antes_desc',this.value)">${esc(p.antesdepois.antes_desc)}</textarea>
           </div>
-        `).join('')}
+          <div class="img-slot" onclick="triggerUpload('uBA-antes-${p.id}')">
+            <input type="file" id="uBA-antes-${p.id}" accept="image/*" onchange="handleBAImg('${p.id}','antes',this)">
+            <img class="prev" id="prev-BA-antes-${p.id}">
+            <div class="img-slot-icon">🖼️</div><div class="img-slot-label">Foto Antes</div>
+            <button class="img-remove" id="rmv-BA-antes-${p.id}" onclick="removeBAImg(event,'${p.id}','antes')">✕</button>
+          </div>
+        </div>
       </div>
-    </div>
-
-    <!-- 10. Pós-projeto -->
-    <div class="form-section">
-      <div class="form-section-title"><span>10</span>Desafios Futuros (Pós-projeto)</div>
-      <div class="form-grid">
-        <div class="field">
-          <label>Continuidade e desdobramentos</label>
-          <textarea id="${p.id}_futuros" rows="4" placeholder="Descreva os desafios para continuidade, necessidade de acompanhamento e possíveis novos projetos derivados..."></textarea>
+      <div class="ba-slot">
+        <div class="ba-slot-head after">➡ Depois</div>
+        <div class="ba-slot-body">
+          <div class="field" style="margin-bottom:.75rem"><label>Título</label>
+            <input value="${esc(p.antesdepois.depois_titulo)}" placeholder="Ex: Situação atual" oninput="psetDeep('${p.id}','antesdepois','depois_titulo',this.value)">
+          </div>
+          <div class="field" style="margin-bottom:.75rem"><label>Descrição</label>
+            <textarea rows="2" placeholder="Descreva o estado atual..." oninput="psetDeep('${p.id}','antesdepois','depois_desc',this.value)">${esc(p.antesdepois.depois_desc)}</textarea>
+          </div>
+          <div class="img-slot" onclick="triggerUpload('uBA-depois-${p.id}')">
+            <input type="file" id="uBA-depois-${p.id}" accept="image/*" onchange="handleBAImg('${p.id}','depois',this)">
+            <img class="prev" id="prev-BA-depois-${p.id}">
+            <div class="img-slot-icon">🖼️</div><div class="img-slot-label">Foto Depois</div>
+            <button class="img-remove" id="rmv-BA-depois-${p.id}" onclick="removeBAImg(event,'${p.id}','depois')">✕</button>
+          </div>
         </div>
       </div>
     </div>
+  `)}
+
+  ${buildSection(p,'evidencias','📸 Evidências',false,`
+    <div class="img-grid g4">
+      ${[0,1,2,3].map(i=>`
+        <div class="img-slot" onclick="triggerUpload('uEv-${p.id}-${i}')">
+          <input type="file" id="uEv-${p.id}-${i}" accept="image/*" onchange="handleEvImg('${p.id}',${i},this)">
+          <img class="prev" id="prev-ev-${p.id}-${i}">
+          <div class="img-slot-icon">🖼️</div><div class="img-slot-label">Evidência ${i+1}</div>
+          <button class="img-remove" id="rmv-ev-${p.id}-${i}" onclick="removeEvImg(event,'${p.id}',${i})">✕</button>
+        </div>
+      `).join('')}
+    </div>
+    <div style="margin-top:.6rem;font-size:.68rem;color:var(--muted)">Até 4 imagens por projeto.</div>
+  `)}
+
+  ${buildSection(p,'desafios','🚀 Desafios Futuros',false,`
+    <div class="field">
+      <label>Continuidade, acompanhamento e desdobramentos estratégicos</label>
+      <textarea rows="4" placeholder="Descreva os próximos passos, riscos remanescentes e possíveis novos desdobramentos deste projeto..." oninput="pset('${p.id}','desafios',this.value)">${esc(p.desafios)}</textarea>
+    </div>
+  `)}
+
+  ${buildSection(p,'panorama','📊 Panorama Anterior (BI)',false,`
+    <div class="field-row c2" style="margin-bottom:1rem">
+      <div class="img-slot" onclick="triggerUpload('uBI2025-${p.id}')">
+        <input type="file" id="uBI2025-${p.id}" accept="image/*" onchange="handleGlobal('bi2025',this)">
+        <img class="prev" id="prev-bi2025">
+        <div class="img-slot-icon">📊</div><div class="img-slot-label">Dashboard BI Ano Anterior</div>
+        <button class="img-remove" id="rmv-bi2025" onclick="removeImg(event,'bi2025')">✕</button>
+      </div>
+      <div class="img-slot" onclick="triggerUpload('uBI2026-${p.id}')">
+        <input type="file" id="uBI2026-${p.id}" accept="image/*" onchange="handleGlobal('bi2026',this)">
+        <img class="prev" id="prev-bi2026">
+        <div class="img-slot-icon">📈</div><div class="img-slot-label">Dashboard BI Atual</div>
+        <button class="img-remove" id="rmv-bi2026" onclick="removeImg(event,'bi2026')">✕</button>
+      </div>
+    </div>
+    <div style="font-size:.7rem;color:var(--muted)">Esses prints aparecerão no slide de Panorama, antes dos projetos.</div>
+  `)}
   `;
 }
 
-// ─────────────────────────────────────────────
-// REPEATER TEMPLATES
-// ─────────────────────────────────────────────
-function etapaTemplate(id, n) {
+function buildSection(p, key, label, open, bodyHtml) {
+  const blk = G.blocks[key];
+  const isEnabled = blk ? blk.enabled : true;
   return `
-    <div class="repeater-item">
-      <div class="repeater-item-header">
-        <span class="repeater-badge">FASE ${n}</span>
-        <button class="repeater-remove" onclick="this.closest('.repeater-item').remove()">✕ remover</button>
-      </div>
-      <div class="form-grid form-grid-2">
-        <div class="field">
-          <label>Nome da Fase</label>
-          <input type="text" placeholder="Ex: Diagnóstico e Planejamento">
-        </div>
-        <div class="field">
-          <label>Período</label>
-          <input type="text" placeholder="Ex: Jan–Mar 2024">
-        </div>
-        <div class="field" style="grid-column:1/-1">
-          <label>Descrição resumida</label>
-          <input type="text" placeholder="O que aconteceu nesta fase...">
-        </div>
-      </div>
-    </div>`;
+  <div class="section-wrap">
+    <div class="section-head ${isEnabled||!blk?'enabled':''} ${open?'open':''}" onclick="toggleSection(this)">
+      <div class="block-enabled-dot"></div>
+      <span style="font-size:.85rem;font-weight:600;flex:1">${label}</span>
+      ${blk ? (blk.required ? '<span class="block-badge required">obrigatório</span>' : '<span class="block-badge">opcional</span>') : ''}
+      <span class="section-toggle-icon">▼</span>
+    </div>
+    <div class="section-body ${open?'open':''}">
+      ${bodyHtml}
+    </div>
+  </div>`;
 }
 
-function marcoTemplate(id, n) {
-  return `
-    <div class="repeater-item">
-      <div class="repeater-item-header">
-        <span class="repeater-badge">MARCO ${n}</span>
-        <button class="repeater-remove" onclick="this.closest('.repeater-item').remove()">✕ remover</button>
-      </div>
-      <div class="form-grid form-grid-2">
-        <div class="field">
-          <label>Data / Período</label>
-          <input type="text" placeholder="Ex: Março 2024">
-        </div>
-        <div class="field">
-          <label>Entrega / Conclusão</label>
-          <input type="text" placeholder="Ex: Implantação do sistema de faturamento">
-        </div>
-      </div>
-    </div>`;
+function toggleSection(head) {
+  head.classList.toggle('open');
+  const body = head.nextElementSibling;
+  body.classList.toggle('open');
 }
 
-function kpiTemplate(id, n) {
-  return `
-    <div class="repeater-item">
-      <div class="repeater-item-header">
-        <span class="repeater-badge">KPI ${n}</span>
-        <button class="repeater-remove" onclick="this.closest('.repeater-item').remove()">✕ remover</button>
-      </div>
-      <div class="kpi-grid">
-        <div class="field">
-          <label>Nome do Indicador</label>
-          <input type="text" placeholder="Ex: Taxa de aprovação de contas">
-        </div>
-        <div class="field">
-          <label>Meta</label>
-          <input type="text" placeholder="Ex: 95%">
-        </div>
-        <div class="field">
-          <label>Realizado</label>
-          <input type="text" placeholder="Ex: 93%">
-        </div>
-      </div>
-    </div>`;
+// ─── Sub-item builders ───
+function buildTeamItem(pid, i) {
+  const t = getProj(pid).team[i]||{nome:'',cargo:''};
+  return `<div class="rep-item" id="team-item-${pid}-${i}">
+    <div class="rep-item-num">${i+1}</div>
+    <div class="field-row c2">
+      <div class="field"><label>Nome</label><input value="${esc(t.nome)}" placeholder="Nome completo" oninput="setRepItem('${pid}','team',${i},'nome',this.value)"></div>
+      <div class="field"><label>Cargo / Papel</label><input value="${esc(t.cargo)}" placeholder="Ex: Gestora de Projetos" oninput="setRepItem('${pid}','team',${i},'cargo',this.value)"></div>
+    </div>
+    <button class="rep-remove" onclick="removeRep('${pid}','team',${i})">✕</button>
+  </div>`;
+}
+function buildEtapaItem(pid, i) {
+  const e = getProj(pid).etapas[i]||{titulo:'',descricao:''};
+  return `<div class="rep-item" id="etapas-item-${pid}-${i}">
+    <div class="rep-item-num">${i+1}</div>
+    <div class="field-row c2">
+      <div class="field"><label>Título da etapa</label><input value="${esc(e.titulo)}" placeholder="Ex: Diagnóstico" oninput="setRepItem('${pid}','etapas',${i},'titulo',this.value)"></div>
+      <div class="field"><label>Descrição breve</label><input value="${esc(e.descricao)}" placeholder="O que aconteceu nesta fase..." oninput="setRepItem('${pid}','etapas',${i},'descricao',this.value)"></div>
+    </div>
+    <button class="rep-remove" onclick="removeRep('${pid}','etapas',${i})">✕</button>
+  </div>`;
+}
+function buildMarcoItem(pid, i) {
+  const m = getProj(pid).marcos[i]||{data:'',entrega:''};
+  return `<div class="rep-item" id="marcos-item-${pid}-${i}">
+    <div class="rep-item-num">${i+1}</div>
+    <div class="field-row c2">
+      <div class="field"><label>Data</label><input type="date" value="${m.data}" oninput="setRepItem('${pid}','marcos',${i},'data',this.value)"></div>
+      <div class="field"><label>Entrega / Milestone</label><input value="${esc(m.entrega)}" placeholder="Ex: Sistema homologado" oninput="setRepItem('${pid}','marcos',${i},'entrega',this.value)"></div>
+    </div>
+    <button class="rep-remove" onclick="removeRep('${pid}','marcos',${i})">✕</button>
+  </div>`;
+}
+function buildIndicItem(pid, i) {
+  const ind = getProj(pid).indicadores[i]||{nome:'',meta:'',realizado:''};
+  return `<div class="rep-item" id="indicadores-item-${pid}-${i}">
+    <div class="rep-item-num">${i+1}</div>
+    <div class="field-row c3">
+      <div class="field"><label>KPI</label><input value="${esc(ind.nome)}" placeholder="Ex: NPS" oninput="setRepItem('${pid}','indicadores',${i},'nome',this.value)"></div>
+      <div class="field"><label>Meta</label><input value="${esc(ind.meta)}" placeholder="Ex: 90%" oninput="setRepItem('${pid}','indicadores',${i},'meta',this.value)"></div>
+      <div class="field"><label>Realizado</label><input value="${esc(ind.realizado)}" placeholder="Ex: 93%" oninput="setRepItem('${pid}','indicadores',${i},'realizado',this.value)"></div>
+    </div>
+    <button class="rep-remove" onclick="removeRep('${pid}','indicadores',${i})">✕</button>
+  </div>`;
+}
+function buildResultItem(pid, i) {
+  const r = getProj(pid).resultados[i]||{metrica:'',absoluto:'',percentual:''};
+  return `<div class="rep-item" id="resultados-item-${pid}-${i}">
+    <div class="rep-item-num">${i+1}</div>
+    <div class="field-row c3">
+      <div class="field"><label>Métrica</label><input value="${esc(r.metrica)}" placeholder="Ex: Novos leitos" oninput="setRepItem('${pid}','resultados',${i},'metrica',this.value)"></div>
+      <div class="field"><label>Absoluto</label><input value="${esc(r.absoluto)}" placeholder="Ex: 20 ou R$50M" oninput="setRepItem('${pid}','resultados',${i},'absoluto',this.value)"></div>
+      <div class="field"><label>Percentual</label><input value="${esc(r.percentual)}" placeholder="Ex: +56%" oninput="setRepItem('${pid}','resultados',${i},'percentual',this.value)"></div>
+    </div>
+    <button class="rep-remove" onclick="removeRep('${pid}','resultados',${i})">✕</button>
+  </div>`;
+}
+function buildTextoItem(pid, field, i, ph) {
+  const item = getProj(pid)[field][i]||{texto:''};
+  return `<div class="rep-item" id="${field}-item-${pid}-${i}">
+    <div class="rep-item-num">${i+1}</div>
+    <div class="field"><textarea rows="2" placeholder="${ph}" oninput="setRepItem('${pid}','${field}',${i},'texto',this.value)">${esc(item.texto)}</textarea></div>
+    <button class="rep-remove" onclick="removeRep('${pid}','${field}',${i})">✕</button>
+  </div>`;
 }
 
-function resultadoTemplate(id, n) {
-  return `
-    <div class="repeater-item">
-      <div class="repeater-item-header">
-        <span class="repeater-badge">RESULTADO ${n}</span>
-        <button class="repeater-remove" onclick="this.closest('.repeater-item').remove()">✕ remover</button>
-      </div>
-      <div class="form-grid form-grid-3">
-        <div class="field">
-          <label>Métrica</label>
-          <input type="text" placeholder="Ex: Redução de glosas">
-        </div>
-        <div class="field">
-          <label>Valor absoluto</label>
-          <input type="text" placeholder="Ex: R$ 1,2M">
-        </div>
-        <div class="field">
-          <label>Variação %</label>
-          <input type="text" placeholder="Ex: -42%">
-        </div>
-      </div>
-    </div>`;
+// ════════════════════════════════════════════════════
+// DATA HELPERS
+// ════════════════════════════════════════════════════
+function getProj(id){ return G.projects.find(p=>p.id===id); }
+function pset(id,k,v){ const p=getProj(id); if(p) p[k]=v; }
+function psetDeep(id,obj,k,v){ const p=getProj(id); if(p) p[obj][k]=v; }
+function setRepItem(pid,field,i,k,v){ const p=getProj(pid); if(p&&p[field][i]) p[field][i][k]=v; }
+function esc(s){ return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+function addRep(pid, field, template) {
+  const p = getProj(pid); if(!p) return;
+  p[field].push({...template});
+  const list = document.getElementById(field+'-'+pid);
+  if(!list) return;
+  const i = p[field].length-1;
+  let html='';
+  if(field==='team') html=buildTeamItem(pid,i);
+  else if(field==='etapas') html=buildEtapaItem(pid,i);
+  else if(field==='marcos') html=buildMarcoItem(pid,i);
+  else if(field==='indicadores') html=buildIndicItem(pid,i);
+  else if(field==='resultados') html=buildResultItem(pid,i);
+  else if(field==='riscos') html=buildTextoItem(pid,'riscos',i,'Risco ou ponto de atenção...');
+  else if(field==='licoes') html=buildTextoItem(pid,'licoes',i,'Lição aprendida...');
+  list.insertAdjacentHTML('beforeend',html);
 }
 
-function riscoTemplate(id, n) {
-  return `
-    <div class="repeater-item">
-      <div class="repeater-item-header">
-        <span class="repeater-badge">RISCO ${n}</span>
-        <button class="repeater-remove" onclick="this.closest('.repeater-item').remove()">✕ remover</button>
-      </div>
-      <div class="form-grid form-grid-2">
-        <div class="field">
-          <label>Descrição do risco / ponto</label>
-          <input type="text" placeholder="Ex: Resistência da equipe à mudança de processo">
-        </div>
-        <div class="field">
-          <label>Como foi tratado</label>
-          <input type="text" placeholder="Ex: Treinamento intensivo + comunicação constante">
-        </div>
-      </div>
-    </div>`;
-}
-
-function licaoTemplate(id, n) {
-  return `
-    <div class="repeater-item">
-      <div class="repeater-item-header">
-        <span class="repeater-badge">LIÇÃO ${n}</span>
-        <button class="repeater-remove" onclick="this.closest('.repeater-item').remove()">✕ remover</button>
-      </div>
-      <div class="field">
-        <label>Aprendizado</label>
-        <input type="text" placeholder="Ex: Engajar a liderança desde o início acelera a adesão da equipe operacional">
-      </div>
-    </div>`;
-}
-
-let repeaterCounts = {};
-function addRepeaterItem(containerId, templateFn) {
-  repeaterCounts[containerId] = (repeaterCounts[containerId] || 0) + 1;
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  const div = document.createElement('div');
-  div.innerHTML = templateFn(containerId, repeaterCounts[containerId]);
-  container.appendChild(div.firstElementChild);
-}
-
-// ─────────────────────────────────────────────
-// NAVIGATION
-// ─────────────────────────────────────────────
-function showPanel(id) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  const panel = document.getElementById(`panel-${id}`);
-  const tab = document.getElementById(`tab-${id}`);
-  if (panel) panel.classList.add('active');
-  if (tab) tab.classList.add('active');
-  if (id === 'preview') buildPreview();
-  if (id === 'generate') buildGenList();
-  window.scrollTo(0,0);
-}
-
-// ─────────────────────────────────────────────
-// UPLOAD HANDLER
-// ─────────────────────────────────────────────
-function handleUpload(input, key, zoneId) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    uploads[key] = e.target.result;
-    const zone = document.getElementById(zoneId);
-    // Show preview
-    let img = zone.querySelector('.upload-preview');
-    if (!img) { img = document.createElement('img'); img.className = 'upload-preview'; zone.appendChild(img); }
-    img.src = e.target.result;
-    zone.querySelector('.upload-icon').style.display = 'none';
-    zone.querySelector('.upload-label').style.display = 'none';
-    // Update header logo if it's the main logo
-    if (key === 'logoNavega') {
-      const hl = document.getElementById('headerLogo');
-      hl.innerHTML = `<img src="${e.target.result}" alt="logo">`;
-    }
-    updateProgress();
-    showToast('📁 Imagem carregada!', 'success');
+function removeRep(pid, field, idx) {
+  const p = getProj(pid); if(!p) return;
+  if(p[field].length<=1) return;
+  p[field].splice(idx,1);
+  const list = document.getElementById(field+'-'+pid);
+  if(!list) return;
+  const builders = {
+    team:buildTeamItem, etapas:buildEtapaItem, marcos:buildMarcoItem,
+    indicadores:buildIndicItem, resultados:buildResultItem,
   };
-  reader.readAsDataURL(file);
+  if(builders[field]) list.innerHTML = p[field].map((_,i)=>builders[field](pid,i)).join('');
+  else if(field==='riscos') list.innerHTML = p.riscos.map((_,i)=>buildTextoItem(pid,'riscos',i,'Risco...')).join('');
+  else if(field==='licoes') list.innerHTML = p.licoes.map((_,i)=>buildTextoItem(pid,'licoes',i,'Lição...')).join('');
 }
 
-// ─────────────────────────────────────────────
-// STATUS SELECTOR
-// ─────────────────────────────────────────────
-function selectStatus(pid, el) {
-  el.closest('.status-row').querySelectorAll('.status-opt').forEach(o => o.classList.remove('selected'));
-  el.classList.add('selected');
-  document.getElementById(`${pid}_status`).value = el.dataset.val;
+// ════════════════════════════════════════════════════
+// UPLOADS
+// ════════════════════════════════════════════════════
+function triggerUpload(id){ document.getElementById(id)?.click(); }
+
+function handleUpload(key, input) {
+  const file = input.files[0]; if(!file) return;
+  const r = new FileReader();
+  r.onload = e => {
+    G.identity[key] = e.target.result;
+    const prev = document.getElementById('prev-'+key);
+    if(prev){ prev.src=e.target.result; prev.classList.add('show'); }
+    const rmv = document.getElementById('rmv-'+key);
+    if(rmv) rmv.classList.add('show');
+    toast(file.name+' carregado','ok');
+  };
+  r.readAsDataURL(file);
 }
 
-// ─────────────────────────────────────────────
-// PROGRESS
-// ─────────────────────────────────────────────
-function updateProgress() {
-  let filled = 0, total = PROJECTS.length * 3;
-  PROJECTS.forEach(p => {
-    if (val(`${p.id}_nome`)) filled++;
-    if (val(`${p.id}_objetivo`)) filled++;
-    if (val(`${p.id}_lider`)) filled++;
+function handleGlobal(key, input) {
+  handleUpload(key, input);
+}
+
+function removeImg(evt, key) {
+  evt.stopPropagation();
+  G.identity[key]=null;
+  const prev=document.getElementById('prev-'+key);
+  if(prev){ prev.src=''; prev.classList.remove('show'); }
+  const rmv=document.getElementById('rmv-'+key);
+  if(rmv) rmv.classList.remove('show');
+}
+
+function handleEvImg(pid, idx, input) {
+  const p=getProj(pid); if(!p) return;
+  const file=input.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=e=>{
+    p.evidencias[idx]=e.target.result;
+    const prev=document.getElementById(`prev-ev-${pid}-${idx}`);
+    if(prev){prev.src=e.target.result;prev.classList.add('show');}
+    const rmv=document.getElementById(`rmv-ev-${pid}-${idx}`);
+    if(rmv) rmv.classList.add('show');
+  };
+  r.readAsDataURL(file);
+}
+function removeEvImg(evt,pid,idx){
+  evt.stopPropagation();
+  const p=getProj(pid);if(!p)return;
+  p.evidencias[idx]=null;
+  const prev=document.getElementById(`prev-ev-${pid}-${idx}`);
+  if(prev){prev.src='';prev.classList.remove('show');}
+  const rmv=document.getElementById(`rmv-ev-${pid}-${idx}`);
+  if(rmv)rmv.classList.remove('show');
+}
+function handleBAImg(pid,side,input){
+  const p=getProj(pid);if(!p)return;
+  const file=input.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    p.antesdepois[side+'_img']=e.target.result;
+    const prev=document.getElementById(`prev-BA-${side}-${pid}`);
+    if(prev){prev.src=e.target.result;prev.classList.add('show');}
+    const rmv=document.getElementById(`rmv-BA-${side}-${pid}`);
+    if(rmv)rmv.classList.add('show');
+  };
+  r.readAsDataURL(file);
+}
+function removeBAImg(evt,pid,side){
+  evt.stopPropagation();
+  const p=getProj(pid);if(!p)return;
+  p.antesdepois[side+'_img']=null;
+  const prev=document.getElementById(`prev-BA-${side}-${pid}`);
+  if(prev){prev.src='';prev.classList.remove('show');}
+  const rmv=document.getElementById(`rmv-BA-${side}-${pid}`);
+  if(rmv)rmv.classList.remove('show');
+}
+
+// ════════════════════════════════════════════════════
+// BLOCK TOGGLES
+// ════════════════════════════════════════════════════
+function renderBlockToggles() {
+  const el = document.getElementById('blockToggleList');
+  if(!el) return;
+  el.innerHTML = Object.entries(G.blocks).map(([key,blk])=>`
+    <div class="toggle-wrap" style="padding:.5rem 0;border-bottom:1px solid var(--border)">
+      <div class="toggle ${blk.enabled?'on':''} ${blk.required?'opacity-50':''}" onclick="${blk.required?'':''} toggleBlock('${key}',this)" id="toggle-${key}"></div>
+      <div style="flex:1">
+        <div style="font-size:.8rem;font-weight:500">${blk.icon} ${blk.label}</div>
+        ${blk.required?'<div style="font-size:.62rem;color:var(--a2);margin-top:.1rem">obrigatório</div>':''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleBlock(key, el) {
+  const blk = G.blocks[key];
+  if(blk.required) return;
+  blk.enabled = !blk.enabled;
+  el.classList.toggle('on', blk.enabled);
+  updateGenChecklist();
+}
+
+// ════════════════════════════════════════════════════
+// PALETTES
+// ════════════════════════════════════════════════════
+function renderPalettes() {
+  const el = document.getElementById('paletteGrid');
+  if(!el) return;
+  el.innerHTML = Object.values(MODELS).map(m=>`
+    <div class="palette-card ${G.theme===m.id?'selected':''}" onclick="selectTheme('${m.id}')" id="pal-${m.id}">
+      <div class="palette-preview">${m.preview.map(c=>`<span style="background:${c}"></span>`).join('')}</div>
+      <div class="palette-name">${m.name}</div>
+      <div class="palette-desc">${m.desc}</div>
+    </div>
+  `).join('');
+}
+
+function renderThemeBig() {
+  const el = document.getElementById('themeBigGrid');
+  if(!el) return;
+  el.innerHTML = Object.values(MODELS).map(m=>`
+    <div class="palette-card ${G.theme===m.id?'selected':''}" onclick="selectTheme('${m.id}')" id="bigpal-${m.id}" style="border-radius:14px;overflow:hidden;cursor:pointer;border:2px solid ${G.theme===m.id?'var(--a3)':'var(--border)'}">
+      <div class="palette-preview" style="height:60px">${m.preview.map(c=>`<span style="background:${c}"></span>`).join('')}</div>
+      <div style="padding:.75rem 1rem;background:var(--bg2)">
+        <div class="font-syne" style="font-size:.9rem;font-weight:700;margin-bottom:.2rem">${m.name}</div>
+        <div style="font-size:.72rem;color:var(--muted)">${m.desc}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectTheme(id) {
+  G.theme = id;
+  renderPalettes();
+  renderThemeBig();
+  renderSelectedTheme();
+  toast('Tema "'+MODELS[id].name+'" selecionado','ok');
+}
+
+function renderSelectedTheme() {
+  const el = document.getElementById('selectedThemeInfo');
+  if(!el) return;
+  const m = MODELS[G.theme];
+  if(!m) return;
+  el.innerHTML = `
+    <div class="palette-preview" style="height:24px;border-radius:6px;overflow:hidden;margin-bottom:.6rem">${m.preview.map(c=>`<span style="background:${c}"></span>`).join('')}</div>
+    <div class="font-syne" style="font-size:.85rem;font-weight:700">${m.name}</div>
+    <div style="font-size:.72rem;color:var(--muted);margin-top:.2rem">${m.desc}</div>
+  `;
+}
+
+// ════════════════════════════════════════════════════
+// CHECKLIST & STRUCTURE
+// ════════════════════════════════════════════════════
+function updateGenChecklist() {
+  const items = [
+    { label:'Identidade da instituição', ok: !!G.identity.instName },
+    { label:'Título da apresentação', ok: !!G.identity.presTitle },
+    ...G.projects.map(p=>({ label:`Projeto: ${p.name||'(sem nome)'}`, ok: !!(p.name&&p.objetivo) }))
+  ];
+  const render = (id) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.innerHTML = items.map(item=>`
+      <div class="gen-check-item">
+        <span class="gen-check-icon">${item.ok?'✅':'⬜'}</span>
+        <span class="gen-check-text"><strong>${item.label}</strong>${item.ok?' · ok':' · pendente'}</span>
+      </div>
+    `).join('');
+  };
+  render('sideGenCheck');
+  render('bigChecklist');
+}
+
+function renderSlideStructure() {
+  const el = document.getElementById('slideStructure');
+  if(!el) return;
+  const B = G.blocks;
+  const lines = ['📄 Capa'];
+  if(G.mode!=='single') lines.push('📋 Sumário');
+  if(B.panorama?.enabled) lines.push('📊 Panorama BI (Antes/Atual)');
+  G.projects.forEach((p,i)=>{
+    const num = String(i+1).padStart(2,'0');
+    lines.push(`— Divisor Projeto ${num}: ${p.name||'Sem nome'}`);
+    if(B.objetivo?.enabled) lines.push(`  🎯 Objetivo`);
+    if(B.team?.enabled) lines.push(`  👥 Equipe`);
+    if(B.etapas?.enabled) lines.push(`  🪜 Etapas`);
+    if(B.marcos?.enabled) lines.push(`  📍 Marcos`);
+    if(B.indicadores?.enabled) lines.push(`  📊 Indicadores`);
+    if(B.resultados?.enabled) lines.push(`  🏆 Resultados`);
+    if(B.antesdepois?.enabled) lines.push(`  🔄 Antes & Depois`);
+    if(B.evidencias?.enabled) lines.push(`  📸 Evidências`);
+    if(B.riscos?.enabled) lines.push(`  ⚠️ Riscos`);
+    if(B.licoes?.enabled) lines.push(`  💡 Lições`);
+    if(B.desafios?.enabled) lines.push(`  🚀 Desafios Futuros`);
   });
-  const pct = Math.round((filled/total)*100);
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressPct').textContent = pct + '%';
+  if(B.closing?.enabled) lines.push('🙏 Encerramento');
+  el.innerHTML = lines.map(l=>`<div>${l}</div>`).join('');
 }
 
-function val(id) {
-  const el = document.getElementById(id);
-  return el ? el.value.trim() : '';
-}
-
-function getRepeaterData(containerId) {
-  const container = document.getElementById(containerId);
-  if (!container) return [];
-  const items = container.querySelectorAll('.repeater-item');
-  return Array.from(items).map(item => {
-    const inputs = item.querySelectorAll('input[type=text],input[type=date],textarea');
-    return Array.from(inputs).map(i => i.value.trim());
-  }).filter(arr => arr.some(v => v));
-}
-
-function collectProject(p) {
-  return {
-    id: p.id,
-    nome:      val(`${p.id}_nome`)     || p.name,
-    lider:     val(`${p.id}_lider`)    || p.leader,
-    inicio:    val(`${p.id}_inicio`),
-    fim:       val(`${p.id}_fim`),
-    status:    val(`${p.id}_status`)   || 'Concluído',
-    objetivo:  val(`${p.id}_objetivo`),
-    etapas:    getRepeaterData(`etapas_${p.id}`),
-    marcos:    getRepeaterData(`marcos_${p.id}`),
-    kpis:      getRepeaterData(`kpis_${p.id}`),
-    resultados:getRepeaterData(`resultados_${p.id}`),
-    riscos:    getRepeaterData(`riscos_${p.id}`),
-    licoes:    getRepeaterData(`licoes_${p.id}`),
-    futuros:   val(`${p.id}_futuros`),
-    color:     p.color,
-    evidencias:[1,2,3,4].map(n => uploads[`ev_${p.id}_${n}`]).filter(Boolean),
-  };
-}
-
-// ─────────────────────────────────────────────
-// PREVIEW
-// ─────────────────────────────────────────────
-function buildPreview() {
-  const out = document.getElementById('previewContent');
-  const genOut = document.getElementById('genSlideList');
-  let slides = [], num = 1;
-
-  const addSlide = (label, sep=false) => {
-    slides.push({ n: num++, label, sep });
-  };
-
-  addSlide('Capa — Navega Baleia 2026');
-  addSlide('Sumário dos Projetos');
-  addSlide('Dashboard BI 2025');
-  addSlide('Dashboard BI 2026');
-
-  PROJECTS.forEach((p, i) => {
-    addSlide(`── Projeto ${i+1}: ${p.name}`, true);
-    addSlide(`Capa do Projeto · ${p.leader}`);
-    addSlide('Objetivo');
-    addSlide('Etapas do Projeto');
-    addSlide('Marcos');
-    addSlide('Indicadores (KPIs)');
-    addSlide('Resultados');
-    addSlide('Riscos e Pontos de Atenção');
-    addSlide('Lições Aprendidas');
-    addSlide('Evidências');
-    addSlide('Desafios Futuros');
-  });
-
-  addSlide('Encerramento — Obrigado');
-
-  const html = slides.map(s => `
-    <div class="preview-slide${s.sep?' slide-sep':''}">
-      <span class="slide-n">${s.sep ? '': String(s.n).padStart(2,'0')}</span>
-      ${s.label}
-    </div>`).join('');
-
-  out.innerHTML = `<div class="preview-card"><div class="preview-title">📋 ${slides.filter(s=>!s.sep).length} slides no total</div><div class="preview-slide-list">${html}</div></div>`;
-  if (genOut) genOut.innerHTML = `<div class="preview-slide-list">${html}</div>`;
-}
-
-function buildGenList() { buildPreview(); }
-
-// ─────────────────────────────────────────────
+// ════════════════════════════════════════════════════
 // PPTX GENERATOR
-// ─────────────────────────────────────────────
-async function generatePPTX() {
-  showToast('⏳ Gerando PPTX…', 'info');
-  await new Promise(r => setTimeout(r, 100));
+// ════════════════════════════════════════════════════
+async function generatePptx() {
+  updateGenChecklist();
+  const C = MODELS[G.theme]?.pptx || MODELS.default.pptx;
+  const W=10, H=5.625;
 
-  try {
-    const pptx = new PptxGenJS();
-    pptx.layout = 'LAYOUT_16x9';
-    pptx.title = 'Navega Baleia — Portfólio de Projetos';
+  setProgress(true,0,'Iniciando...');
+  const pres = new PptxGenJS();
+  pres.layout='LAYOUT_16x9';
+  pres.title = G.identity.presTitle||'Apresentação Wren';
 
-    const W = 10, H = 5.625;
-    const C = { dark:'060810', surface:'0e1220', ocean:'0d2d6b', cobalt:'1d4ed8',
-                electric:'3b82f6', aqua:'06b6d4', mint:'10ffcb', white:'FFFFFF',
-                mist:'94a3b8', teal:'0d9488', gold:'fbbf24', danger:'f87171' };
+  setProgress(true,5,'Capa...');
+  buildCover(pres,C,W,H);
 
-    const addBg = (slide, color='060810') => {
-      slide.background = { color };
-    };
-    const addLogo = (slide) => {
-      if (uploads.logoNavega) {
-        slide.addImage({ data: uploads.logoNavega, x: W-1.4, y: H-0.7, w: 0.9, h: 0.4, sizing:{type:'contain',w:.9,h:.4} });
-      } else {
-        slide.addText('Navega Baleia', { x: W-1.8, y: H-0.55, w: 1.6, h: 0.3, fontSize: 7, color: C.aqua, fontFace:'Arial', bold:true });
-      }
-    };
-    const slideNum = (slide, n, total) => {
-      slide.addText(`${String(n).padStart(2,'0')} / ${String(total).padStart(2,'0')}`, {
-        x:0.35, y:H-0.45, w:1.2, h:0.3, fontSize:7, color:C.mist, fontFace:'Courier New'
-      });
-    };
-    const makeGradBg = (slide) => {
-      slide.addShape(pptx.shapes.RECTANGLE, { x:0, y:0, w:W, h:H, fill:{color:C.dark} });
-      slide.addShape(pptx.shapes.RECTANGLE, { x:0, y:H-1.2, w:W, h:1.2, fill:{color:C.ocean} });
-    };
+  if(G.mode!=='single') { setProgress(true,10,'Sumário...'); buildSummary(pres,C,W,H); }
+  if(G.blocks.panorama?.enabled) { setProgress(true,14,'Panorama...'); buildPanorama(pres,C,W,H); }
 
-    const evento = val('g_evento') || 'Navega Baleia';
-    const orgName = val('g_org') || 'Hospital da Baleia';
-    const dataEvt = val('g_data') ? new Date(val('g_data')).toLocaleDateString('pt-BR') : '18/03/2026';
-
-    // ── SLIDE 1: CAPA ──
-    let s = pptx.addSlide();
-    addBg(s, C.dark);
-    s.addShape(pptx.shapes.RECTANGLE, {x:0,y:0,w:W*0.45,h:H,fill:{color:C.dark}});
-    s.addShape(pptx.shapes.RECTANGLE, {x:W*0.45,y:0,w:W*0.55,h:H,fill:{color:C.ocean}});
-    s.addShape(pptx.shapes.RECTANGLE, {x:0,y:H-0.06,w:W,h:0.06,fill:{color:C.cobalt}});
-    s.addText('APRESENTAÇÃO DE RESULTADOS', {x:.5,y:1.2,w:4,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:3});
-    s.addText(evento, {x:.5,y:1.6,w:4.2,h:1.1,fontSize:36,color:C.white,fontFace:'Arial',bold:true});
-    s.addText('Portfólio de Projetos Estratégicos\n2024 – 2026', {x:.5,y:2.8,w:4,h:.9,fontSize:14,color:C.mist,fontFace:'Arial'});
-    s.addText(orgName, {x:.5,y:3.9,w:3,h:.35,fontSize:9,color:C.aqua,fontFace:'Arial',bold:true});
-    s.addText(dataEvt, {x:.5,y:4.3,w:2,h:.3,fontSize:8,color:C.mist,fontFace:'Arial'});
-    if (uploads.logoNavega) s.addImage({data:uploads.logoNavega,x:5.2,y:1.6,w:3.5,h:2,sizing:{type:'contain',w:3.5,h:2}});
-    if (uploads.logoHospital) s.addImage({data:uploads.logoHospital,x:5.5,y:3.9,w:2,h:.7,sizing:{type:'contain',w:2,h:.7}});
-
-    // ── SLIDE 2: SUMÁRIO ──
-    s = pptx.addSlide();
-    addBg(s, C.surface);
-    s.addText('SUMÁRIO', {x:.5,y:.4,w:9,h:.4,fontSize:8,color:C.aqua,fontFace:'Courier New',charSpacing:4});
-    s.addText('Projetos Estratégicos', {x:.5,y:.85,w:9,h:.7,fontSize:26,color:C.white,fontFace:'Arial',bold:true});
-    PROJECTS.forEach((p,i) => {
-      const col = i < 3 ? 0 : 1;
-      const row = i % 3;
-      const x = .5 + col*4.8;
-      const y = 1.8 + row*.85;
-      s.addShape(pptx.shapes.RECTANGLE, {x,y,w:4.4,h:.7,fill:{color:C.dark},line:{color:C.cobalt,width:.5}});
-      s.addText(`0${i+1}`, {x:x+.15,y:y+.18,w:.4,h:.35,fontSize:9,color:C.electric,fontFace:'Courier New',bold:true});
-      s.addText(p.name, {x:x+.65,y:y+.08,w:3,h:.3,fontSize:10,color:C.white,fontFace:'Arial',bold:true});
-      s.addText(p.leader, {x:x+.65,y:y+.38,w:2.5,h:.22,fontSize:8,color:C.mist,fontFace:'Arial'});
-    });
-    addLogo(s);
-
-    // ── SLIDES BI ──
-    ['bi2025','bi2026'].forEach((key,i) => {
-      s = pptx.addSlide();
-      addBg(s, C.dark);
-      s.addText(i===0 ? 'DASHBOARD BI 2025' : 'DASHBOARD BI 2026', {x:.5,y:.35,w:9,h:.4,fontSize:9,color:C.aqua,fontFace:'Courier New',charSpacing:3});
-      s.addText(i===0 ? 'Panorama Anterior — Base de Comparação' : 'Panorama Atual — Resultados do Portfólio', {x:.5,y:.8,w:9,h:.55,fontSize:20,color:C.white,fontFace:'Arial',bold:true});
-      if (uploads[key]) {
-        s.addImage({data:uploads[key],x:.5,y:1.5,w:9,h:3.7,sizing:{type:'contain',w:9,h:3.7}});
-      } else {
-        s.addShape(pptx.shapes.RECTANGLE, {x:.5,y:1.5,w:9,h:3.7,fill:{color:C.ocean},line:{color:C.cobalt,width:.5}});
-        s.addText(`[ Inserir print do Dashboard BI ${2025+i} ]`, {x:.5,y:2.8,w:9,h:.8,align:'center',fontSize:13,color:C.mist,fontFace:'Arial'});
-      }
-      addLogo(s);
-    });
-
-    // ── PROJETOS ──
-    const totalSlides = 4 + PROJECTS.length * 10 + 1;
-    let slideN = 5;
-
-    for (const p of PROJECTS) {
-      const d = collectProject(p);
-      const colorHex = p.color;
-      const statusColor = d.status==='Concluído' ? C.teal : d.status==='Em andamento' ? C.gold : C.danger;
-
-      // CAPA DO PROJETO
-      s = pptx.addSlide();
-      addBg(s, C.dark);
-      s.addShape(pptx.shapes.RECTANGLE, {x:0,y:0,w:.08,h:H,fill:{color:colorHex}});
-      s.addShape(pptx.shapes.RECTANGLE, {x:0,y:H-1.1,w:W,h:1.1,fill:{color:C.surface}});
-      s.addText(`PROJETO`, {x:.35,y:1.1,w:3,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:4});
-      s.addText(d.nome, {x:.35,y:1.45,w:9,h:1.2,fontSize:28,color:C.white,fontFace:'Arial',bold:true});
-      s.addShape(pptx.shapes.RECTANGLE, {x:.35,y:2.85,w:1.2,h:.32,fill:{color:statusColor}});
-      s.addText(d.status, {x:.35,y:2.85,w:1.2,h:.32,align:'center',fontSize:8,color:C.dark,fontFace:'Arial',bold:true});
-      s.addText(`Líder: ${d.lider}`, {x:.35,y:3.3,w:4,h:.3,fontSize:11,color:C.mist,fontFace:'Arial'});
-      if (d.inicio||d.fim) s.addText(`${d.inicio||'--'} → ${d.fim||'--'}`, {x:.35,y:3.65,w:4,h:.3,fontSize:10,color:C.mist,fontFace:'Arial'});
-      slideNum(s, slideN++, totalSlides); addLogo(s);
-
-      // OBJETIVO
-      s = pptx.addSlide();
-      addBg(s, C.surface);
-      s.addText('OBJETIVO DO PROJETO', {x:.5,y:.35,w:9,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:3});
-      s.addText(d.nome, {x:.5,y:.7,w:9,h:.55,fontSize:18,color:C.white,fontFace:'Arial',bold:true});
-      s.addShape(pptx.shapes.RECTANGLE, {x:.5,y:1.45,w:9,h:3.3,fill:{color:C.dark},line:{color:C.cobalt,width:.5}});
-      s.addText(d.objetivo||'[ Descreva o objetivo do projeto ]', {x:.75,y:1.65,w:8.5,h:2.9,fontSize:13,color:d.objetivo?C.white:C.mist,fontFace:'Arial',valign:'top',wrap:true});
-      slideNum(s, slideN++, totalSlides); addLogo(s);
-
-      // ETAPAS
-      s = pptx.addSlide();
-      addBg(s, C.dark);
-      s.addText('ETAPAS DO PROJETO', {x:.5,y:.35,w:9,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:3});
-      s.addText(d.nome, {x:.5,y:.7,w:9,h:.5,fontSize:18,color:C.white,fontFace:'Arial',bold:true});
-      const etapas = d.etapas.length ? d.etapas : [['Fase placeholder','Período','Descrição']];
-      const ew = (W-1.0)/(etapas.length);
-      etapas.forEach((e,i) => {
-        const x = .5+i*ew;
-        s.addShape(pptx.shapes.RECTANGLE, {x,y:1.5,w:ew-.15,h:3.2,fill:{color:C.surface},line:{color:C.cobalt,width:.5}});
-        s.addShape(pptx.shapes.RECTANGLE, {x,y:1.5,w:ew-.15,h:.32,fill:{color:colorHex}});
-        s.addText(`FASE ${i+1}`, {x,y:1.5,w:ew-.15,h:.32,align:'center',fontSize:7,color:C.white,fontFace:'Courier New',bold:true});
-        s.addText(e[0]||'', {x:x+.1,y:1.9,w:ew-.35,h:.5,fontSize:9,color:C.white,fontFace:'Arial',bold:true,wrap:true});
-        s.addText(e[1]||'', {x:x+.1,y:2.5,w:ew-.35,h:.25,fontSize:7,color:C.aqua,fontFace:'Arial'});
-        s.addText(e[2]||'', {x:x+.1,y:2.85,w:ew-.35,h:1.6,fontSize:8,color:C.mist,fontFace:'Arial',wrap:true,valign:'top'});
-      });
-      slideNum(s, slideN++, totalSlides); addLogo(s);
-
-      // MARCOS
-      s = pptx.addSlide();
-      addBg(s, C.surface);
-      s.addText('MARCOS DO PROJETO', {x:.5,y:.35,w:9,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:3});
-      s.addText(d.nome, {x:.5,y:.7,w:9,h:.5,fontSize:18,color:C.white,fontFace:'Arial',bold:true});
-      const marcos = d.marcos.length ? d.marcos : [['Jan 2024','Marco placeholder']];
-      marcos.slice(0,5).forEach((m,i) => {
-        const y = 1.5+i*.7;
-        s.addShape(pptx.shapes.OVAL, {x:.5,y:y+.05,w:.22,h:.22,fill:{color:colorHex}});
-        if (i<marcos.length-1) s.addShape(pptx.shapes.LINE, {x:.61,y:y+.27,w:0,h:.5,line:{color:C.cobalt,width:1.5}});
-        s.addText(m[0]||'', {x:.85,y:y,w:1.8,h:.32,fontSize:8,color:C.aqua,fontFace:'Courier New',bold:true});
-        s.addText(m[1]||'', {x:2.75,y:y,w:6.8,h:.32,fontSize:10,color:C.white,fontFace:'Arial'});
-      });
-      slideNum(s, slideN++, totalSlides); addLogo(s);
-
-      // KPIs
-      s = pptx.addSlide();
-      addBg(s, C.dark);
-      s.addText('INDICADORES DE ACOMPANHAMENTO', {x:.5,y:.35,w:9,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:3});
-      s.addText(d.nome, {x:.5,y:.7,w:9,h:.5,fontSize:18,color:C.white,fontFace:'Arial',bold:true});
-      const kpis = d.kpis.length ? d.kpis : [['Indicador placeholder','100%','—']];
-      kpis.slice(0,5).forEach((k,i) => {
-        const y = 1.5+i*.72;
-        s.addShape(pptx.shapes.RECTANGLE, {x:.5,y,w:6.5,h:.55,fill:{color:C.surface},line:{color:C.cobalt,width:.5}});
-        s.addShape(pptx.shapes.RECTANGLE, {x:.5,y,w:.06,h:.55,fill:{color:colorHex}});
-        s.addText(k[0]||'', {x:.72,y:y+.12,w:4.5,h:.32,fontSize:10,color:C.white,fontFace:'Arial'});
-        s.addShape(pptx.shapes.RECTANGLE, {x:7.2,y,w:1.2,h:.55,fill:{color:C.ocean},line:{color:C.cobalt,width:.5}});
-        s.addText('META', {x:7.2,y:y+.03,w:1.2,h:.2,align:'center',fontSize:6,color:C.mist,fontFace:'Courier New'});
-        s.addText(k[1]||'—', {x:7.2,y:y+.22,w:1.2,h:.26,align:'center',fontSize:11,color:C.aqua,fontFace:'Arial',bold:true});
-        s.addShape(pptx.shapes.RECTANGLE, {x:8.55,y,w:1.2,h:.55,fill:{color:colorHex},line:{color:colorHex,width:.5}});
-        s.addText('REAL', {x:8.55,y:y+.03,w:1.2,h:.2,align:'center',fontSize:6,color:'FFFFFF80',fontFace:'Courier New'});
-        s.addText(k[2]||'—', {x:8.55,y:y+.22,w:1.2,h:.26,align:'center',fontSize:11,color:C.white,fontFace:'Arial',bold:true});
-      });
-      slideNum(s, slideN++, totalSlides); addLogo(s);
-
-      // RESULTADOS
-      s = pptx.addSlide();
-      addBg(s, C.surface);
-      s.addText('RESULTADOS DO PROJETO', {x:.5,y:.35,w:9,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:3});
-      s.addText(d.nome, {x:.5,y:.7,w:9,h:.5,fontSize:18,color:C.white,fontFace:'Arial',bold:true});
-      const resultados = d.resultados.length ? d.resultados : [['Métrica','Valor','%']];
-      const cols = Math.min(resultados.length, 4);
-      const rw = (W-1.0)/cols;
-      resultados.slice(0,4).forEach((r,i) => {
-        const x = .5+i*rw;
-        s.addShape(pptx.shapes.RECTANGLE, {x,y:1.45,w:rw-.15,h:3.3,fill:{color:C.dark},line:{color:C.cobalt,width:.5}});
-        s.addShape(pptx.shapes.RECTANGLE, {x,y:4.45,w:rw-.15,h:.3,fill:{color:colorHex}});
-        s.addText(r[0]||'Métrica', {x:x+.12,y:1.65,w:rw-.4,h:.5,fontSize:8,color:C.mist,fontFace:'Arial',wrap:true});
-        s.addText(r[1]||'—', {x:x+.1,y:2.3,w:rw-.3,h:.8,fontSize:22,color:C.white,fontFace:'Arial',bold:true,wrap:true});
-        s.addText(r[2]||'', {x:x+.1,y:3.2,w:rw-.3,h:.5,fontSize:14,color:C.mint,fontFace:'Arial',bold:true});
-      });
-      slideNum(s, slideN++, totalSlides); addLogo(s);
-
-      // RISCOS
-      s = pptx.addSlide();
-      addBg(s, C.dark);
-      s.addText('RISCOS E PONTOS DE ATENÇÃO', {x:.5,y:.35,w:9,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:3});
-      s.addText(d.nome, {x:.5,y:.7,w:9,h:.5,fontSize:18,color:C.white,fontFace:'Arial',bold:true});
-      const riscos = d.riscos.length ? d.riscos : [['Ponto de atenção placeholder','Tratativa']];
-      riscos.slice(0,5).forEach((r,i) => {
-        const y = 1.5+i*.72;
-        s.addShape(pptx.shapes.RECTANGLE, {x:.5,y,w:9,h:.6,fill:{color:C.surface},line:{color:'f8713130',width:.5}});
-        s.addText('⚠', {x:.6,y:y+.1,w:.4,h:.4,fontSize:12,color:C.gold,fontFace:'Arial'});
-        s.addText(r[0]||'', {x:1.15,y:y+.05,w:4.2,h:.25,fontSize:9,color:C.white,fontFace:'Arial',bold:true});
-        s.addText(r[1]||'', {x:1.15,y:y+.32,w:4.2,h:.22,fontSize:8,color:C.mist,fontFace:'Arial'});
-        if(r[1]) { s.addShape(pptx.shapes.RECTANGLE, {x:5.6,y:y+.05,w:.06,h:.5,fill:{color:C.cobalt}}); s.addText('Tratativa: '+r[1], {x:5.8,y:y+.1,w:3.5,h:.4,fontSize:8,color:C.mist,fontFace:'Arial',wrap:true}); }
-      });
-      slideNum(s, slideN++, totalSlides); addLogo(s);
-
-      // LIÇÕES
-      s = pptx.addSlide();
-      addBg(s, C.surface);
-      s.addText('LIÇÕES APRENDIDAS', {x:.5,y:.35,w:9,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:3});
-      s.addText(d.nome, {x:.5,y:.7,w:9,h:.5,fontSize:18,color:C.white,fontFace:'Arial',bold:true});
-      const licoes = d.licoes.length ? d.licoes : [['Lição aprendida placeholder']];
-      licoes.slice(0,5).forEach((l,i) => {
-        const y = 1.5+i*.7;
-        s.addShape(pptx.shapes.RECTANGLE, {x:.5,y,w:9,h:.58,fill:{color:C.dark},line:{color:C.cobalt,width:.5}});
-        s.addShape(pptx.shapes.RECTANGLE, {x:.5,y,w:.06,h:.58,fill:{color:colorHex}});
-        s.addText(`${i+1}`, {x:.7,y:y+.08,w:.3,h:.42,fontSize:10,color:colorHex,fontFace:'Courier New',bold:true});
-        s.addText(l[0]||'', {x:1.15,y:y+.1,w:8.1,h:.38,fontSize:10,color:C.white,fontFace:'Arial',wrap:true});
-      });
-      slideNum(s, slideN++, totalSlides); addLogo(s);
-
-      // EVIDÊNCIAS
-      s = pptx.addSlide();
-      addBg(s, C.dark);
-      s.addText('EVIDÊNCIAS DO PROJETO', {x:.5,y:.35,w:9,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:3});
-      s.addText(d.nome, {x:.5,y:.7,w:9,h:.5,fontSize:18,color:C.white,fontFace:'Arial',bold:true});
-      if (d.evidencias.length) {
-        const positions = [[.5,1.4,4.5,3.7],[5.1,1.4,4.4,3.7],[.5,1.4,2.1,3.7],[2.7,1.4,2.1,1.8],[5,1.4,2.1,1.8],[2.7,3.3,4.4,1.8]];
-        const layout2 = [[.5,1.4,4.4,3.7],[5.1,1.4,4.4,3.7]];
-        const layout3 = [[.5,1.4,2.9,3.7],[3.55,1.4,2.9,3.7],[6.6,1.4,2.9,3.7]];
-        const layout4 = [[.5,1.4,4.4,1.75],[5.1,1.4,4.4,1.75],[.5,3.25,4.4,1.75],[5.1,3.25,4.4,1.75]];
-        const layout = d.evidencias.length===1?[[.5,1.4,9,3.7]]:d.evidencias.length===2?layout2:d.evidencias.length===3?layout3:layout4;
-        d.evidencias.forEach((ev,i) => {
-          if(i>=layout.length) return;
-          const [x,y,w,h] = layout[i];
-          s.addImage({data:ev,x,y,w,h,sizing:{type:'cover',w,h}});
-        });
-      } else {
-        s.addShape(pptx.shapes.RECTANGLE, {x:.5,y:1.4,w:9,h:3.7,fill:{color:C.surface},line:{color:C.cobalt,width:.5}});
-        s.addText('[ Evidências serão inseridas após upload ]', {x:.5,y:2.8,w:9,h:.8,align:'center',fontSize:12,color:C.mist,fontFace:'Arial'});
-      }
-      slideNum(s, slideN++, totalSlides); addLogo(s);
-
-      // DESAFIOS FUTUROS
-      s = pptx.addSlide();
-      addBg(s, C.surface);
-      s.addText('DESAFIOS FUTUROS', {x:.5,y:.35,w:9,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:3});
-      s.addText(d.nome, {x:.5,y:.7,w:9,h:.5,fontSize:18,color:C.white,fontFace:'Arial',bold:true});
-      const futItems = [
-        { label:'Continuidade', icon:'🔄', text: d.futuros||'[ Descreva os próximos passos ]' },
-        { label:'Acompanhamento', icon:'📊', text:'Indicadores e métricas de controle a monitorar.' },
-        { label:'Desdobramentos', icon:'🚀', text:'Possíveis novos projetos estratégicos derivados.' },
-      ];
-      futItems.forEach((f,i) => {
-        const x = .5+i*3.2;
-        s.addShape(pptx.shapes.RECTANGLE, {x,y:1.45,w:3.05,h:3.5,fill:{color:C.dark},line:{color:C.cobalt,width:.5}});
-        s.addShape(pptx.shapes.RECTANGLE, {x,y:1.45,w:3.05,h:.45,fill:{color:colorHex}});
-        s.addText(`${f.icon} ${f.label}`, {x:x+.12,y:1.48,w:2.8,h:.38,fontSize:10,color:C.white,fontFace:'Arial',bold:true});
-        s.addText(i===0?f.text:f.text, {x:x+.15,y:2.05,w:2.75,h:2.7,fontSize:9,color:C.mist,fontFace:'Arial',wrap:true,valign:'top'});
-      });
-      slideNum(s, slideN++, totalSlides); addLogo(s);
-    }
-
-    // ENCERRAMENTO
-    s = pptx.addSlide();
-    addBg(s, C.dark);
-    s.addShape(pptx.shapes.RECTANGLE, {x:0,y:0,w:W,h:H,fill:{color:C.dark}});
-    s.addShape(pptx.shapes.RECTANGLE, {x:0,y:H-0.06,w:W,h:0.06,fill:{color:C.cobalt}});
-    s.addText('PORTFÓLIO DE PROJETOS ESTRATÉGICOS', {x:.5,y:1.3,w:9,h:.35,align:'center',fontSize:8,color:C.aqua,fontFace:'Courier New',charSpacing:3});
-    s.addText('Obrigado!', {x:.5,y:1.8,w:9,h:1.3,align:'center',fontSize:48,color:C.white,fontFace:'Arial',bold:true});
-    s.addText(orgName + ' · ' + evento, {x:.5,y:3.3,w:9,h:.4,align:'center',fontSize:11,color:C.mist,fontFace:'Arial'});
-    if (uploads.logoHospital) s.addImage({data:uploads.logoHospital,x:4,y:4,w:2,h:.7,sizing:{type:'contain',w:2,h:.7}});
-
-    await pptx.writeFile({ fileName: `NavegaBaleia_Apresentacao_${new Date().toISOString().slice(0,10)}.pptx` });
-    showToast('✅ PPTX gerado com sucesso!', 'success');
-  } catch(e) {
-    console.error(e);
-    showToast('❌ Erro ao gerar PPTX. Veja o console.', 'error');
+  const step = 80/Math.max(G.projects.length,1);
+  for(let i=0;i<G.projects.length;i++){
+    const p=G.projects[i];
+    setProgress(true,18+i*step,`Projeto: ${p.name||'Sem nome'}...`);
+    buildProjectDivider(pres,C,W,H,p,i+1);
+    if(G.blocks.objetivo?.enabled)    buildObjSlide(pres,C,W,H,p);
+    if(G.blocks.team?.enabled)        buildTeamSlide(pres,C,W,H,p);
+    if(G.blocks.etapas?.enabled)      buildEtapasSlide(pres,C,W,H,p);
+    if(G.blocks.marcos?.enabled)      buildMarcosSlide(pres,C,W,H,p);
+    if(G.blocks.indicadores?.enabled) buildIndicSlide(pres,C,W,H,p);
+    if(G.blocks.resultados?.enabled)  buildResultSlide(pres,C,W,H,p);
+    if(G.blocks.antesdepois?.enabled) buildBASlide(pres,C,W,H,p);
+    if(G.blocks.evidencias?.enabled)  buildEvSlide(pres,C,W,H,p);
+    if(G.blocks.riscos?.enabled)      buildRiscosSlide(pres,C,W,H,p);
+    if(G.blocks.licoes?.enabled)      buildLicoesSlide(pres,C,W,H,p);
+    if(G.blocks.desafios?.enabled)    buildDesafiosSlide(pres,C,W,H,p);
   }
+
+  if(G.blocks.closing?.enabled) { setProgress(true,96,'Encerramento...'); buildClosing(pres,C,W,H); }
+
+  setProgress(true,99,'Escrevendo arquivo...');
+  const fname = (G.identity.presTitle||'Wren-Apresentacao').replace(/\s+/g,'-')+'.pptx';
+  await pres.writeFile({fileName:fname});
+  setProgress(true,100,'Concluído! ✓');
+  toast('PPTX gerado com sucesso!','ok');
+  setTimeout(()=>setProgress(false),2500);
 }
 
-// ─────────────────────────────────────────────
-// PDF GENERATOR
-// ─────────────────────────────────────────────
-async function generatePDF() {
-  showToast('⏳ Gerando PDF…', 'info');
-  await new Promise(r => setTimeout(r, 100));
+// ─── Slide builders ───
+function base(pres,C){ const s=pres.addSlide(); s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:10,h:5.625,fill:{color:C.bg}}); return s; }
 
-  try {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation:'landscape', unit:'pt', format:[960,540] });
-    const W=960, H=540;
-    const C = {
-      dark:[6,8,16], surface:[14,18,32], ocean:[13,45,107],
-      cobalt:[29,78,216], electric:[59,130,246], aqua:[6,182,212],
-      mint:[16,255,203], white:[255,255,255], mist:[148,163,184],
-      teal:[13,148,136], gold:[251,191,36], danger:[248,113,113],
-    };
-    const hex2rgb = hex => { const r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16); return [r,g,b]; };
-
-    const rgb = (arr) => ({ r:arr[0], g:arr[1], b:arr[2] });
-    const fill = (arr) => doc.setFillColor(arr[0],arr[1],arr[2]);
-    const stroke = (arr) => doc.setDrawColor(arr[0],arr[1],arr[2]);
-    const text = (t,x,y,opts={}) => {
-      doc.setFontSize(opts.size||10);
-      doc.setTextColor(...(opts.color||C.white));
-      if(opts.bold) doc.setFont('helvetica','bold'); else doc.setFont('helvetica','normal');
-      if(opts.align==='center') doc.text(t,x,y,{align:'center'});
-      else doc.text(t,x,y,{maxWidth:opts.maxW||undefined});
-    };
-    const rect = (x,y,w,h,fillC,strokeC) => {
-      fill(fillC||C.dark); stroke(strokeC||fillC||C.dark);
-      doc.rect(x,y,w,h,'F');
-    };
-    const newSlide = (bg=C.dark) => {
-      doc.addPage([W,H],'landscape');
-      rect(0,0,W,H,bg);
-    };
-    const logo = () => {
-      if(uploads.logoNavega) { try { doc.addImage(uploads.logoNavega,'PNG',W-90,H-40,70,25,'','FAST'); } catch(e){} }
-      else { text('Navega Baleia',W-90,H-20,{size:7,color:C.aqua}); }
-    };
-    const slideN = (n,tot) => {
-      text(`${String(n).padStart(2,'0')} / ${String(tot).padStart(2,'0')}`,30,H-18,{size:7,color:C.mist});
-    };
-
-    const evento = val('g_evento')||'Navega Baleia';
-    const orgName = val('g_org')||'Hospital da Baleia';
-    const dataEvt = val('g_data') ? new Date(val('g_data')).toLocaleDateString('pt-BR') : '18/03/2026';
-
-    // Remove first blank page
-    doc.deletePage(1);
-
-    // CAPA
-    doc.addPage([W,H],'landscape');
-    rect(0,0,W,H,C.dark);
-    rect(0,0,W*0.45,H,C.dark);
-    rect(W*0.45,0,W*0.55,H,C.ocean);
-    rect(0,H-4,W,4,C.cobalt);
-    text('APRESENTAÇÃO DE RESULTADOS',42,80,{size:7,color:C.aqua});
-    text(evento,42,145,{size:36,bold:true});
-    text('Portfólio de Projetos Estratégicos 2024–2026',42,185,{size:13,color:C.mist});
-    text(orgName,42,320,{size:10,color:C.aqua,bold:true});
-    text(dataEvt,42,345,{size:9,color:C.mist});
-    if(uploads.logoNavega){try{doc.addImage(uploads.logoNavega,'PNG',480,120,340,190,'','FAST');}catch(e){}}
-    if(uploads.logoHospital){try{doc.addImage(uploads.logoHospital,'PNG',490,350,200,70,'','FAST');}catch(e){}}
-
-    const totalSlides = 4 + PROJECTS.length * 10 + 1;
-    let sn = 2;
-
-    // SUMÁRIO
-    newSlide(C.surface);
-    text('SUMÁRIO',48,55,{size:7,color:C.aqua});
-    text('Projetos Estratégicos',48,95,{size:22,bold:true});
-    PROJECTS.forEach((p,i) => {
-      const col=i<3?0:1, row=i%3;
-      const x=48+col*455, y=125+row*105;
-      rect(x,y,430,88,C.dark); fill(C.cobalt); doc.setDrawColor(...C.cobalt); doc.rect(x,y,430,88,'S');
-      text(`0${i+1}`,x+12,y+36,{size:9,color:C.electric});
-      text(p.name,x+42,y+30,{size:10,bold:true});
-      text(p.leader,x+42,y+55,{size:8,color:C.mist});
-    });
-    logo(); slideN(sn++,totalSlides);
-
-    // BI slides
-    ['bi2025','bi2026'].forEach((key,i) => {
-      newSlide(C.dark);
-      text(i===0?'DASHBOARD BI 2025':'DASHBOARD BI 2026',48,50,{size:7,color:C.aqua});
-      text(i===0?'Panorama Anterior':'Panorama Atual',48,80,{size:20,bold:true});
-      if(uploads[key]){
-        try{doc.addImage(uploads[key],'PNG',48,100,W-96,H-120,'','FAST');}catch(e){
-          rect(48,100,W-96,H-120,C.ocean);
-          text('[ Print do BI será exibido aqui ]',W/2,H/2,{size:12,color:C.mist,align:'center'});
-        }
-      } else {
-        rect(48,100,W-96,H-120,C.ocean);
-        text(`[ Inserir print do Dashboard BI ${2025+i} ]`,W/2,H/2,{size:12,color:C.mist,align:'center'});
-      }
-      logo(); slideN(sn++,totalSlides);
-    });
-
-    // PROJETOS
-    for (const p of PROJECTS) {
-      const d = collectProject(p);
-      const pColor = hex2rgb(p.color);
-
-      // CAPA PROJETO
-      newSlide(C.dark);
-      doc.setFillColor(...pColor); doc.rect(0,0,6,H,'F');
-      rect(0,H-88,W,88,C.surface);
-      text('PROJETO',36,90,{size:7,color:C.aqua});
-      text(d.nome,36,140,{size:24,bold:true,maxW:850});
-      doc.setFillColor(...hex2rgb(d.status==='Concluído'?'0d9488':d.status==='Em andamento'?'fbbf24':'f87171'));
-      doc.rect(36,165,100,24,'F');
-      text(d.status,42,181,{size:7,color:C.dark,bold:true});
-      text(`Líder: ${d.lider}`,36,220,{size:10,color:C.mist});
-      if(d.inicio||d.fim) text(`${d.inicio||'--'} → ${d.fim||'--'}`,36,245,{size:9,color:C.mist});
-      logo(); slideN(sn++,totalSlides);
-
-      // OBJETIVO
-      newSlide(C.surface);
-      text('OBJETIVO DO PROJETO',48,50,{size:7,color:C.aqua});
-      text(d.nome,48,80,{size:16,bold:true,maxW:850});
-      rect(48,100,W-96,H-140,C.dark);
-      text(d.objetivo||'[ Descreva o objetivo ]',70,135,{size:11,color:d.objetivo?C.white:C.mist,maxW:W-160});
-      logo(); slideN(sn++,totalSlides);
-
-      // ETAPAS
-      newSlide(C.dark);
-      text('ETAPAS DO PROJETO',48,50,{size:7,color:C.aqua});
-      text(d.nome,48,80,{size:16,bold:true,maxW:850});
-      const etapas = d.etapas.length?d.etapas:[['Fase','Período','Desc']];
-      const ew2=(W-96)/etapas.length;
-      etapas.forEach((e,i)=>{
-        const x=48+i*ew2;
-        rect(x,100,ew2-8,H-140,C.surface); doc.setDrawColor(...C.cobalt); doc.rect(x,100,ew2-8,H-140,'S');
-        doc.setFillColor(...pColor); doc.rect(x,100,ew2-8,28,'F');
-        text(`FASE ${i+1}`,x+(ew2-8)/2,117,{size:7,color:C.white,bold:true,align:'center'});
-        text(e[0]||'',x+10,148,{size:8,bold:true,maxW:ew2-28});
-        text(e[1]||'',x+10,168,{size:7,color:C.aqua,maxW:ew2-28});
-        text(e[2]||'',x+10,192,{size:7.5,color:C.mist,maxW:ew2-28});
-      });
-      logo(); slideN(sn++,totalSlides);
-
-      // MARCOS
-      newSlide(C.surface);
-      text('MARCOS DO PROJETO',48,50,{size:7,color:C.aqua});
-      text(d.nome,48,80,{size:16,bold:true,maxW:850});
-      const marcos=(d.marcos.length?d.marcos:[['Data','Marco']]).slice(0,5);
-      marcos.forEach((m,i)=>{
-        const y=108+i*72;
-        doc.setFillColor(...pColor); doc.circle(60,y+10,8,'F');
-        if(i<marcos.length-1){doc.setDrawColor(...C.cobalt);doc.setLineWidth(1.5);doc.line(60,y+18,60,y+72);}
-        text(m[0]||'',80,y+5,{size:7,color:C.aqua,bold:true});
-        text(m[1]||'',220,y+5,{size:9,maxW:680});
-      });
-      logo(); slideN(sn++,totalSlides);
-
-      // KPIs
-      newSlide(C.dark);
-      text('INDICADORES DE ACOMPANHAMENTO',48,50,{size:7,color:C.aqua});
-      text(d.nome,48,80,{size:16,bold:true,maxW:850});
-      const kpis=(d.kpis.length?d.kpis:[['Indicador','Meta','Real']]).slice(0,5);
-      kpis.forEach((k,i)=>{
-        const y=105+i*72;
-        rect(48,y,W-196,60,C.surface); doc.setFillColor(...pColor); doc.rect(48,y,5,60,'F');
-        text(k[0]||'',65,y+25,{size:9,maxW:520});
-        rect(W-144,y,90,60,C.ocean); text('META',W-99,y+18,{size:6,color:C.mist,align:'center'}); text(k[1]||'—',W-99,y+40,{size:11,color:C.aqua,bold:true,align:'center'});
-        doc.setFillColor(...pColor); doc.rect(W-48,y,45,60,'F'); text('REAL',W-25,y+18,{size:6,color:C.white,align:'center'}); text(k[2]||'—',W-25,y+40,{size:11,color:C.white,bold:true,align:'center'});
-      });
-      logo(); slideN(sn++,totalSlides);
-
-      // RESULTADOS
-      newSlide(C.surface);
-      text('RESULTADOS DO PROJETO',48,50,{size:7,color:C.aqua});
-      text(d.nome,48,80,{size:16,bold:true,maxW:850});
-      const res=(d.resultados.length?d.resultados:[['Métrica','Valor','%']]).slice(0,4);
-      const rw2=(W-96)/res.length;
-      res.forEach((r,i)=>{
-        const x=48+i*rw2;
-        rect(x,100,rw2-10,H-140,C.dark); doc.setFillColor(...pColor); doc.rect(x,H-48,rw2-10,8,'F');
-        text(r[0]||'Métrica',x+12,130,{size:8,color:C.mist,maxW:rw2-30});
-        text(r[1]||'—',x+12,200,{size:20,bold:true,maxW:rw2-24});
-        text(r[2]||'',x+12,240,{size:14,color:C.mint,bold:true});
-      });
-      logo(); slideN(sn++,totalSlides);
-
-      // RISCOS
-      newSlide(C.dark);
-      text('RISCOS E PONTOS DE ATENÇÃO',48,50,{size:7,color:C.aqua});
-      text(d.nome,48,80,{size:16,bold:true,maxW:850});
-      const riscos=(d.riscos.length?d.riscos:[['Risco','Tratativa']]).slice(0,5);
-      riscos.forEach((r,i)=>{
-        const y=105+i*72;
-        rect(48,y,W-96,60,C.surface);
-        text('⚠',55,y+22,{size:12,color:C.gold});
-        text(r[0]||'',82,y+18,{size:9,bold:true,maxW:400});
-        text(r[1]||'',82,y+40,{size:8,color:C.mist,maxW:400});
-        if(r[1]){ doc.setDrawColor(...C.cobalt); doc.line(510,y+5,510,y+55); text('Tratativa: '+r[1],525,y+28,{size:7.5,color:C.mist,maxW:360}); }
-      });
-      logo(); slideN(sn++,totalSlides);
-
-      // LIÇÕES
-      newSlide(C.surface);
-      text('LIÇÕES APRENDIDAS',48,50,{size:7,color:C.aqua});
-      text(d.nome,48,80,{size:16,bold:true,maxW:850});
-      const licoes=(d.licoes.length?d.licoes:[['Lição aprendida']]).slice(0,5);
-      licoes.forEach((l,i)=>{
-        const y=105+i*72;
-        rect(48,y,W-96,60,C.dark); doc.setFillColor(...pColor); doc.rect(48,y,5,60,'F');
-        text(`${i+1}`,62,y+26,{size:10,color:pColor,bold:true});
-        text(l[0]||'',85,y+28,{size:10,maxW:W-180});
-      });
-      logo(); slideN(sn++,totalSlides);
-
-      // EVIDÊNCIAS
-      newSlide(C.dark);
-      text('EVIDÊNCIAS DO PROJETO',48,50,{size:7,color:C.aqua});
-      text(d.nome,48,80,{size:16,bold:true,maxW:850});
-      if(d.evidencias.length){
-        const layouts={1:[[48,100,W-96,H-140]],2:[[48,100,(W-100)/2,H-140],[(W+4)/2,100,(W-100)/2,H-140]],3:[[48,100,(W-108)/3,H-140],[(W+4-((W-108)/3)*2)/2+(W-108)/3,100,(W-108)/3,H-140],[W-48-(W-108)/3,100,(W-108)/3,H-140]],4:[[48,100,(W-104)/2,(H-140)/2],[W-46-(W-104)/2,100,(W-104)/2,(H-140)/2],[48,H/2+10,(W-104)/2,(H-140)/2],[W-46-(W-104)/2,H/2+10,(W-104)/2,(H-140)/2]]};
-        const layout=layouts[Math.min(d.evidencias.length,4)]||layouts[1];
-        d.evidencias.forEach((ev,i)=>{
-          if(i>=layout.length)return;
-          const [x,y,w,h]=layout[i];
-          try{doc.addImage(ev,'PNG',x,y,w,h,'','FAST');}catch(e){}
-        });
-      } else {
-        rect(48,100,W-96,H-140,C.surface);
-        text('[ Evidências serão exibidas após upload ]',W/2,H/2,{size:12,color:C.mist,align:'center'});
-      }
-      logo(); slideN(sn++,totalSlides);
-
-      // DESAFIOS FUTUROS
-      newSlide(C.surface);
-      text('DESAFIOS FUTUROS',48,50,{size:7,color:C.aqua});
-      text(d.nome,48,80,{size:16,bold:true,maxW:850});
-      const futCards=['Continuidade','Acompanhamento','Desdobramentos'];
-      futCards.forEach((fc,i)=>{
-        const x=48+i*300;
-        rect(x,100,290,H-140,C.dark);
-        doc.setFillColor(...pColor); doc.rect(x,100,290,36,'F');
-        text(fc,x+145,123,{size:10,color:C.white,bold:true,align:'center'});
-        const txt = i===0 ? (d.futuros||'[ Preencher ]') : i===1?'Indicadores e métricas de controle a monitorar.':'Possíveis novos projetos estratégicos derivados.';
-        text(txt,x+14,155,{size:8,color:C.mist,maxW:262});
-      });
-      logo(); slideN(sn++,totalSlides);
-    }
-
-    // ENCERRAMENTO
-    newSlide(C.dark);
-    rect(0,H-4,W,4,C.cobalt);
-    text('PORTFÓLIO DE PROJETOS ESTRATÉGICOS',W/2,140,{size:8,color:C.aqua,align:'center'});
-    text('Obrigado!',W/2,270,{size:52,bold:true,align:'center'});
-    text(`${orgName} · ${evento}`,W/2,330,{size:11,color:C.mist,align:'center'});
-    if(uploads.logoHospital){try{doc.addImage(uploads.logoHospital,'PNG',W/2-80,380,160,55,'','FAST');}catch(e){}}
-
-    doc.save(`NavegaBaleia_Apresentacao_${new Date().toISOString().slice(0,10)}.pdf`);
-    showToast('✅ PDF gerado com sucesso!', 'success');
-  } catch(e) {
-    console.error(e);
-    showToast('❌ Erro ao gerar PDF. Veja o console.', 'error');
-  }
+function footer(s,pres,C,W,H,name){
+  s.addShape(pres.shapes.RECTANGLE,{x:0,y:H-.26,w:W,h:.26,fill:{color:C.bg2}});
+  const inst = G.identity.instName||'Wren Presentation';
+  const title = G.identity.presTitle||'';
+  s.addText(`${inst}${title?' · '+title:''}`,{x:.35,y:H-.24,w:6,h:.2,fontSize:6,color:C.muted,fontFace:'Calibri',margin:0});
+  if(name) s.addText(name,{x:W-4,y:H-.24,w:3.6,h:.2,fontSize:6,color:C.a2,fontFace:'Calibri',align:'right',margin:0});
+  if(G.identity.logoInst) s.addImage({data:G.identity.logoInst,x:W-.62,y:H-.24,w:.24,h:.18,sizing:{type:'contain',w:.24,h:.18}});
 }
 
-// ─────────────────────────────────────────────
-// SAVE / LOAD
-// ─────────────────────────────────────────────
-function saveData() {
-  const data = { global:{}, projects:{}, uploads:{} };
-  ['g_evento','g_data','g_org','g_subtitle'].forEach(id => { data.global[id]=val(id); });
-  PROJECTS.forEach(p => {
-    data.projects[p.id] = collectProject(p);
+function tag(s,txt,C,x,y){ s.addText(txt,{x,y,w:5,h:.18,fontSize:7,color:C.a2,fontFace:'Calibri Light',charSpacing:3,margin:0}); }
+
+function buildCover(pres,C,W,H){
+  const s=pres.addSlide();
+  s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:W,h:H,fill:{color:C.cover||C.bg}});
+  s.addShape(pres.shapes.RECTANGLE,{x:W*.52,y:0,w:W*.48,h:H,fill:{color:C.bg2}});
+  s.addShape(pres.shapes.RECTANGLE,{x:W*.52,y:0,w:.05,h:H,fill:{color:C.a1}});
+  // eyebrow
+  const modeLabel = G.mode==='single'?'APRESENTAÇÃO DE PROJETO':G.mode==='portfolio'?'PORTFÓLIO DE PROJETOS':'PROGRAMA ESTRATÉGICO';
+  s.addText(modeLabel,{x:.6,y:1.1,w:4.8,h:.22,fontSize:7,color:C.a2,fontFace:'Calibri Light',charSpacing:4,margin:0});
+  // title
+  const title = G.identity.presTitle||'Apresentação';
+  s.addText(title,{x:.6,y:1.4,w:4.8,h:1.2,fontSize:40,color:C.txt,fontFace:'Calibri',bold:true,lineSpacingMultiple:.85,margin:0});
+  if(G.identity.presSub) s.addText(G.identity.presSub,{x:.6,y:2.75,w:4.8,h:.3,fontSize:12,color:C.muted,fontFace:'Calibri Light',margin:0});
+  // inst + date
+  const meta = [G.identity.instName,G.identity.instDept,G.identity.presDate].filter(Boolean).join(' · ');
+  if(meta) s.addText(meta,{x:.6,y:3.2,w:4.8,h:.22,fontSize:9,color:C.muted,fontFace:'Calibri Light',margin:0});
+  // project list (portfolio)
+  if(G.mode!=='single'&&G.projects.length>0){
+    G.projects.slice(0,6).forEach((p,i)=>{
+      const x=W*.57, y=.9+i*.58;
+      s.addShape(pres.shapes.RECTANGLE,{x,y,w:.04,h:.28,fill:{color:p.color||C.a1}});
+      s.addText(`${String(i+1).padStart(2,'0')}  ${p.name||'Projeto'}`,{x:x+.12,y:y+.02,w:4,h:.2,fontSize:9,color:C.txt,fontFace:'Calibri',margin:0});
+      if(p.leader) s.addText(p.leader,{x:x+.12,y:y+.2,w:4,h:.18,fontSize:7,color:C.muted,fontFace:'Calibri Light',margin:0});
+    });
+  }
+  // logos
+  if(G.identity.logoInst) s.addImage({data:G.identity.logoInst,x:.6,y:H-1.1,w:1.4,h:.65,sizing:{type:'contain',w:1.4,h:.65}});
+  if(G.identity.logoProg) s.addImage({data:G.identity.logoProg,x:2.2,y:H-1.1,w:1.4,h:.65,sizing:{type:'contain',w:1.4,h:.65}});
+}
+
+function buildSummary(pres,C,W,H){
+  const s=base(pres,C);
+  s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:C.a1}});
+  tag(s,'SUMÁRIO',C,.35,.3);
+  s.addText('Projetos desta apresentação',{x:.35,y:.5,w:9,h:.6,fontSize:26,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
+  const cols=G.projects.length>3?2:1;
+  const bw=cols===2?4.4:9.0;
+  G.projects.forEach((p,i)=>{
+    const col=i>=3?1:0; const row=i%3;
+    const x=.35+col*(bw+.2); const y=1.45+row*1.05;
+    s.addShape(pres.shapes.RECTANGLE,{x,y,w:bw,h:.85,fill:{color:C.bg2},line:{color:'1A2540',width:.5}});
+    s.addShape(pres.shapes.RECTANGLE,{x,y,w:.05,h:.85,fill:{color:p.color||C.a1}});
+    s.addText(String(i+1).padStart(2,'0'),{x:x+.12,y:y+.08,w:.5,h:.2,fontSize:7,color:p.color||C.a2,fontFace:'Calibri',bold:true,charSpacing:1,margin:0});
+    s.addText(p.name||'Projeto',{x:x+.12,y:y+.26,w:bw-.25,h:.25,fontSize:10,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
+    s.addText('Líder: '+(p.leader||'–'),{x:x+.12,y:y+.54,w:bw-.25,h:.18,fontSize:7.5,color:C.muted,fontFace:'Calibri Light',margin:0});
   });
-  // Save uploads (minus large images to avoid quota)
-  Object.keys(uploads).forEach(k => { if(!k.startsWith('ev_')) data.uploads[k]=uploads[k]; });
-  try {
-    localStorage.setItem('navegaBaleia_draft', JSON.stringify(data));
-    showToast('💾 Rascunho salvo!', 'success');
-  } catch(e) {
-    showToast('⚠️ Rascunho muito grande. Reduza as imagens.', 'error');
+  footer(s,pres,C,W,H);
+}
+
+function buildPanorama(pres,C,W,H){
+  const s=base(pres,C);
+  s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:C.a2}});
+  tag(s,'PANORAMA · VISÃO GERAL',C,.35,.3);
+  s.addText('Dashboard Comparativo',{x:.35,y:.5,w:9,h:.55,fontSize:24,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
+  const imgs=[G.identity.bi2025,G.identity.bi2026];
+  const labels=['Ano Anterior','Atual'];
+  imgs.forEach((img,i)=>{
+    const x=.35+i*4.85;
+    if(img) s.addImage({data:img,x,y:1.25,w:4.6,h:3.9,sizing:{type:'contain',w:4.6,h:3.9}});
+    else {
+      s.addShape(pres.shapes.RECTANGLE,{x,y:1.25,w:4.6,h:3.9,fill:{color:C.bg2},line:{color:'1A2540',width:1}});
+      s.addText(`[ Dashboard ${labels[i]} ]`,{x,y:3.0,w:4.6,h:.35,align:'center',fontSize:11,color:C.muted,fontFace:'Calibri Light',margin:0});
+    }
+    s.addText(labels[i],{x,y:1.1,w:4.6,h:.2,align:'center',fontSize:8,color:C.a2,fontFace:'Calibri',charSpacing:2,margin:0});
+  });
+  footer(s,pres,C,W,H);
+}
+
+function buildProjectDivider(pres,C,W,H,p,num){
+  const s=pres.addSlide();
+  s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:W,h:H,fill:{color:p.color||C.a1}});
+  s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:W,h:H,fill:{color:C.bg,transparency:25}});
+  s.addText(String(num).padStart(2,'0'),{x:5.5,y:.2,w:4.5,h:5,fontSize:200,color:C.txt,fontFace:'Calibri',bold:true,transparency:92,margin:0,valign:'middle'});
+  s.addText('PROJETO',{x:.6,y:1.3,w:6,h:.28,fontSize:9,color:C.txt,fontFace:'Calibri Light',charSpacing:7,transparency:40,margin:0});
+  s.addText(p.name||'Projeto',{x:.6,y:1.65,w:7.5,h:1.3,fontSize:40,color:C.txt,fontFace:'Calibri',bold:true,lineSpacingMultiple:.88,margin:0});
+  if(p.leader) s.addText('Líder: '+p.leader,{x:.6,y:3.1,w:6,h:.28,fontSize:11,color:C.txt,fontFace:'Calibri Light',transparency:30,margin:0});
+  const period=[p.periodo_inicio,p.periodo_fim].filter(Boolean).join(' → ');
+  if(period) s.addText(period,{x:.6,y:3.42,w:6,h:.22,fontSize:9,color:C.txt,fontFace:'Calibri Light',transparency:40,margin:0});
+  s.addShape(pres.shapes.RECTANGLE,{x:.6,y:3.85,w:1.6,h:.32,fill:{color:C.a3,transparency:75}});
+  s.addText(p.status||'Concluído',{x:.6,y:3.85,w:1.6,h:.32,align:'center',fontSize:8,color:C.a3,fontFace:'Calibri',bold:true,margin:0});
+}
+
+function buildObjSlide(pres,C,W,H,p){
+  const s=base(pres,C);
+  s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:p.color||C.a1}});
+  tag(s,'OBJETIVO DO PROJETO',C,.35,.3);
+  s.addText(p.name||'Projeto',{x:.35,y:.5,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
+  s.addShape(pres.shapes.RECTANGLE,{x:.35,y:1.25,w:9.3,h:3.45,fill:{color:C.bg2},line:{color:'1A2540',width:.5}});
+  s.addShape(pres.shapes.RECTANGLE,{x:.35,y:1.25,w:.05,h:3.45,fill:{color:p.color||C.a1}});
+  s.addText('Qual problema ou oportunidade o projeto buscou resolver?',{x:.55,y:1.38,w:9,h:.2,fontSize:8,color:C.a2,fontFace:'Calibri Light',charSpacing:1,margin:0});
+  s.addText(p.objetivo||'[ Objetivo a preencher ]',{x:.55,y:1.65,w:8.9,h:2.8,fontSize:13,color:C.txt,fontFace:'Calibri Light',lineSpacingMultiple:1.4,margin:0});
+  const pills=[{l:'Líder',v:p.leader||'–'},{l:'Início',v:p.periodo_inicio||'–'},{l:'Conclusão',v:p.periodo_fim||'–'},{l:'Status',v:p.status||'–'}];
+  pills.forEach((pl,i)=>{
+    const x=.35+i*2.35;
+    s.addShape(pres.shapes.RECTANGLE,{x,y:H-.98,w:2.2,h:.62,fill:{color:C.bg2},line:{color:'1A2540',width:.5}});
+    s.addText(pl.l.toUpperCase(),{x:x+.1,y:H-.96,w:2,h:.18,fontSize:6,color:C.muted,fontFace:'Calibri',charSpacing:2,margin:0});
+    s.addText(pl.v,{x:x+.1,y:H-.76,w:2,h:.22,fontSize:10,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
+  });
+  footer(s,pres,C,W,H,p.name);
+}
+
+function buildTeamSlide(pres,C,W,H,p){
+  const s=base(pres,C);
+  s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:p.color||C.a1}});
+  tag(s,'EQUIPE',C,.35,.3);
+  s.addText('Gestores Envolvidos',{x:.35,y:.5,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
+  const team=p.team.filter(t=>t.nome||t.cargo);
+  if(!team.length){s.addText('[ Equipe a preencher ]',{x:.35,y:2.5,w:9.3,h:.4,align:'center',fontSize:12,color:C.muted,fontFace:'Calibri Light',margin:0});}
+  else {
+    const cols=Math.min(team.length,4);
+    const bw=(9.3-(cols-1)*.2)/cols;
+    team.slice(0,4).forEach((t,i)=>{
+      const x=.35+i*(bw+.2);
+      s.addShape(pres.shapes.RECTANGLE,{x,y:1.3,w:bw,h:3.5,fill:{color:C.bg2},line:{color:'1A2540',width:.5}});
+      s.addShape(pres.shapes.RECTANGLE,{x,y:1.3,w:bw,h:.05,fill:{color:p.color||C.a1}});
+      const initials=(t.nome||'?').split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+      s.addShape(pres.shapes.OVAL,{x:x+bw/2-.35,y:1.55,w:.7,h:.7,fill:{color:p.color||C.a1}});
+      s.addText(initials,{x:x+bw/2-.35,y:1.55,w:.7,h:.7,align:'center',valign:'middle',fontSize:14,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
+      s.addText(t.nome||'–',{x:x+.1,y:2.38,w:bw-.2,h:.35,align:'center',fontSize:10,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
+      s.addText(t.cargo||'',{x:x+.1,y:2.78,w:bw-.2,h:.35,align:'center',fontSize:8.5,color:C.a2,fontFace:'Calibri Light',margin:0});
+    });
   }
+  footer(s,pres,C,W,H,p.name);
 }
 
-function loadData() {
-  try {
-    const raw = localStorage.getItem('navegaBaleia_draft');
-    if (!raw) { showToast('Nenhum rascunho encontrado.', 'info'); return; }
-    const data = JSON.parse(raw);
-    if (data.global) Object.keys(data.global).forEach(id => { const el=document.getElementById(id); if(el) el.value=data.global[id]; });
-    if (data.uploads) Object.assign(uploads, data.uploads);
-    updateProgress();
-    showToast('📂 Rascunho carregado!', 'success');
-  } catch(e) {
-    showToast('Erro ao carregar rascunho.', 'error');
+function buildEtapasSlide(pres,C,W,H,p){
+  const s=base(pres,C);
+  s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:p.color||C.a1}});
+  tag(s,'ETAPAS DO PROJETO',C,.35,.3);
+  s.addText('Fases de Execução',{x:.35,y:.5,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
+  const etapas=p.etapas.filter(e=>e.titulo);
+  if(!etapas.length){s.addText('[ Etapas a preencher ]',{x:.35,y:2.5,w:9.3,h:.4,align:'center',fontSize:12,color:C.muted,fontFace:'Calibri Light',margin:0});}
+  else {
+    const n=etapas.length;
+    const bw=(9.3-(n-1)*.18)/n;
+    etapas.forEach((e,i)=>{
+      const x=.35+i*(bw+.18);
+      s.addShape(pres.shapes.RECTANGLE,{x,y:1.3,w:bw,h:3.55,fill:{color:C.bg2},line:{color:'1A2540',width:.5}});
+      s.addShape(pres.shapes.RECTANGLE,{x,y:1.3,w:bw,h:.05,fill:{color:p.color||C.a1}});
+      s.addText(String(i+1),{x:x+.12,y:1.45,w:.45,h:.45,fontSize:20,color:p.color||C.a2,fontFace:'Calibri',bold:true,margin:0});
+      s.addText(e.titulo,{x:x+.12,y:2.0,w:bw-.25,h:.55,fontSize:10,color:C.txt,fontFace:'Calibri',bold:true,lineSpacingMultiple:1.1,margin:0});
+      s.addText(e.descricao||'',{x:x+.12,y:2.65,w:bw-.25,h:2.0,fontSize:8.5,color:C.muted,fontFace:'Calibri Light',lineSpacingMultiple:1.4,margin:0});
+    });
   }
+  footer(s,pres,C,W,H,p.name);
 }
 
-// ─────────────────────────────────────────────
-// TOAST
-// ─────────────────────────────────────────────
-let toastTimer;
-function showToast(msg, type='success') {
-  const t = document.getElementById('toast');
-  const icon = {success:'✅',error:'❌',info:'⏳',warning:'⚠️'}[type]||'ℹ️';
-  document.getElementById('toastMsg').textContent = msg;
-  document.getElementById('toastIcon').textContent = icon;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+function buildMarcosSlide(pres,C,W,H,p){
+  const s=base(pres,C);
+  s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:p.color||C.a1}});
+  tag(s,'MARCOS DO PROJETO',C,.35,.3);
+  s.addText('Principais Entregas',{x:.35,y:.5,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
+  const marcos=p.marcos.filter(m=>m.entrega);
+  if(!marcos.length){s.addText('[ Marcos a preencher ]',{x:.35,y:2.5,w:9.3,h:.4,align:'center',fontSize:12,color:C.muted,fontFace:'Calibri Light',margin:0});}
+  else {
+    s.addShape(pres.shapes.RECTANGLE,{x:.35,y:2.52,w:9.3,h:.04,fill:{color:'1A2540'}});
+    const n=marcos.length; const gap=9.3/n;
+    marcos.forEach((m,i)=>{
+      const cx=.35+i*gap+gap/2;
+      s.addShape(pres.shapes.OVAL,{x:cx-.1,y:2.42,w:.18,h:.2,fill:{color:p.color||C.a1}});
+      if(m.data) s.addText(m.data,{x:cx-.85,y:1.65,w:1.7,h:.22,align:'center',fontSize:7.5,color:C.a2,fontFace:'Calibri',charSpacing:1,margin:0});
+      s.addShape(pres.shapes.RECTANGLE,{x:cx-.92,y:2.78,w:1.9,h:1.55,fill:{color:C.bg2},line:{color:'1A2540',width:.5}});
+      s.addShape(pres.shapes.RECTANGLE,{x:cx-.92,y:2.78,w:1.9,h:.04,fill:{color:p.color||C.a1}});
+      s.addText(m.entrega,{x:cx-.88,y:2.9,w:1.82,h:1.35,fontSize:8.5,color:C.txt,fontFace:'Calibri Light',lineSpacingMultiple:1.4,margin:0});
+    });
+  }
+  footer(s,pres,C,W,H,p.name);
 }
 
-// ─────────────────────────────────────────────
-// BOOT
-// ─────────────────────────────────────────────
+function buildIndicSlide(pres,C,W,H,p){
+  const s=base(pres,C);
+  s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:p.color||C.a1}});
+  tag(s,'INDICADORES',C,.35,.3);
+  s.addText('Acompanhamento de KPIs',{x:.35,y:.5,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
+  const inds=p.indicadores.filter(i=>i.nome);
+  if(!inds.length){s.addText('[ Indicadores a preencher ]',{x:.35,y:2.5,w:9.3,h:.4,align:'center',fontSize:12,color:C.muted,fontFace:'Calibri Light',margin:0});}
+  else inds.forEach((ind,i)=>{
+    const y=1.32+i*1.05;
+    s.addShape(pres.shapes.RECTANGLE,{x:.35,y,w:9.3,h:.9,fill:{color:C.bg2},line:{color:'1A2540',width:.5}});
+    s.addShape(pres.shapes.RECTANGLE,{x:.35,y,w:.05,h:.9,fill:{color:p.color||C.a1}});
+    s.addText(ind.nome,{x:.55,y:y+.18,w:4.5,h:.28,fontSize:11,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
+    const meta=parseFloat(ind.meta)||100; const real=parseFloat(ind.realizado)||0;
+    const pct=Math.min(real/meta,1);
+    s.addShape(pres.shapes.RECTANGLE,{x:5.2,y:y+.3,w:4.2,h:.12,fill:{color:'1A2540'}});
+    if(pct>0) s.addShape(pres.shapes.RECTANGLE,{x:5.2,y:y+.3,w:4.2*pct,h:.12,fill:{color:p.color||C.a1}});
+    s.addText('Meta: '+ind.meta,{x:5.2,y:y+.08,w:2,h:.2,fontSize:8,color:C.muted,fontFace:'Calibri',margin:0});
+    s.addText('Realizado: '+ind.realizado,{x:7.2,y:y+.08,w:2.2,h:.2,fontSize:8,color:C.a2,fontFace:'Calibri',bold:true,margin:0,align:'right'});
+  });
+  footer(s,pres,C,W,H,p.name);
+}
+
+function buildResultSlide(pres,C,W,H,p){
+  const s=base(pres,C);
+  s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:p.color||C.a1}});
+  tag(s,'RESULTADOS',C,.35,.3);
+  s.addText('Resultados do Projeto',{x:.35,y:.5,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
+  const results=p.resultados.filter(r=>r.metrica||r.absoluto);
+  if(!results.length){s.addText('[ Resultados a preencher ]',{x:.35,y:2.5,w:9.3,h:.4,align:'center',fontSize:12,color:C.muted,fontFace:'Calibri Light',margin:0});}
+  else {
+    const n=Math.min(results.length,4); const bw=(9.3-(n-1)*.2)/n;
+    results.slice(0,4).forEach((r,i)=>{
+      const x=.35+i*(bw+.2);
+      s.addShape(pres.shapes.RECTANGLE,{x,y:1.3,w:bw,h:3.55,fill:{color:C.bg2},line:{color:'1A2540',width:.5}});
+      s.addShape(pres.shapes.RECTANGLE,{x,y:1.3,w:bw,h:.05,fill:{color:p.color||C.a1}});
+      s.addText(r.absoluto||'–',{x:x+.15,y:1.55,w:bw-.3,h:.95,fontSize:36,color:C.txt,fontFace:'Calibri',bold:true,lineSpacingMultiple:.85,margin:0});
+      if(r.percentual) s.addText(r.percentual,{x:x+.15,y:2.58,w:bw-.3,h:.3,fontSize:13,color:C.a2,fontFace:'Calibri',bold:true,margin:0});
+      s.addText(r.metrica,{x:x+.15,y:3.05,w:bw-.3,h:1.65,fontSize:9,color:C.muted,fontFace:'Calibri Light',lineSpacingMultiple:1.3,margin:0});
+    });
+  }
+  footer(s,pres,C,W,H,p.name);
+}
+
+function buildBASlide(pres,C,W,H,p){
+  const s=base(pres,C);
+  s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:C.a2}});
+  tag(s,'ANTES & DEPOIS',C,.35,.3);
+  s.addText('Evidências de Mudança',{x:.35,y:.5,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
+  const sides=[{key:'antes',label:'← ANTES',col:C.danger},{key:'depois',label:'→ DEPOIS',col:C.teal||C.a2}];
+  sides.forEach((sd,i)=>{
+    const x=.35+i*4.85; const ba=p.antesdepois;
+    s.addShape(pres.shapes.RECTANGLE,{x,y:1.3,w:4.6,h:3.65,fill:{color:C.bg2},line:{color:'1A2540',width:.5}});
+    s.addShape(pres.shapes.RECTANGLE,{x,y:1.3,w:4.6,h:.28,fill:{color:sd.col,transparency:80}});
+    s.addText(sd.label,{x:x+.15,y:1.32,w:4.3,h:.22,fontSize:9,color:sd.col,fontFace:'Calibri',bold:true,charSpacing:1,margin:0});
+    const img=ba[sd.key+'_img'];
+    if(img) s.addImage({data:img,x:x+.1,y:1.65,w:4.4,h:1.8,sizing:{type:'cover',w:4.4,h:1.8}});
+    else {
+      s.addShape(pres.shapes.RECTANGLE,{x:x+.1,y:1.65,w:4.4,h:1.8,fill:{color:C.bg,transparency:30}});
+      s.addText('[ Inserir foto ]',{x:x+.1,y:2.45,w:4.4,h:.3,align:'center',fontSize:9,color:C.muted,fontFace:'Calibri Light',margin:0});
+    }
+    const tit=ba[sd.key+'_titulo'];
+    const desc=ba[sd.key+'_desc'];
+    if(tit) s.addText(tit,{x:x+.15,y:3.55,w:4.3,h:.28,fontSize:10,color:sd.col,fontFace:'Calibri',bold:true,margin:0});
+    if(desc) s.addText(desc,{x:x+.15,y:3.9,w:4.3,h:.9,fontSize:8.5,color:C.muted,fontFace:'Calibri Light',lineSpacingMultiple:1.3,margin:0});
+  });
+  footer(s,pres,C,W,H,p.name);
+}
+
+function buildEvSlide(pres,C,W,H,p){
+  const s=base(pres,C);
+  s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:p.color||C.a1}});
+  tag(s,'EVIDÊNCIAS',C,.35,.3);
+  s.addText('Registros do Projeto',{x:.35,y:.5,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
+  const imgs=p.evidencias.filter(Boolean);
+  if(!imgs.length){
+    s.addShape(pres.shapes.RECTANGLE,{x:.35,y:1.3,w:9.3,h:3.65,fill:{color:C.bg2},line:{color:'1A2540',width:1}});
+    s.addText('[ Inserir fotos/evidências ]',{x:.35,y:3.0,w:9.3,h:.4,align:'center',fontSize:12,color:C.muted,fontFace:'Calibri Light',margin:0});
+  } else {
+    const n=imgs.length;
+    if(n===1) s.addImage({data:imgs[0],x:.35,y:1.3,w:9.3,h:3.65,sizing:{type:'cover',w:9.3,h:3.65}});
+    else if(n===2) imgs.forEach((img,i)=>s.addImage({data:img,x:.35+i*4.85,y:1.3,w:4.6,h:3.65,sizing:{type:'cover',w:4.6,h:3.65}}));
+    else imgs.slice(0,4).forEach((img,i)=>s.addImage({data:img,x:.35+(i%2)*4.85,y:1.3+(Math.floor(i/2)*1.9),w:4.6,h:1.78,sizing:{type:'cover',w:4.6,h:1.78}}));
+  }
+  footer(s,pres,C,W,H,p.name);
+}
+
+function buildRiscosSlide(pres,C,W,H,p){
+  const s=base(pres,C);
+  s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:C.danger}});
+  tag(s,'RISCOS & PONTOS DE ATENÇÃO',C,.35,.3);
+  s.addText('Riscos Identificados',{x:.35,y:.5,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
+  const riscos=p.riscos.filter(r=>r.texto);
+  if(!riscos.length){s.addText('[ Riscos a preencher ]',{x:.35,y:2.5,w:9.3,h:.4,align:'center',fontSize:12,color:C.muted,margin:0});}
+  else riscos.forEach((r,i)=>{
+    const y=1.32+i*.95;
+    s.addShape(pres.shapes.RECTANGLE,{x:.35,y,w:9.3,h:.82,fill:{color:C.bg2},line:{color:'1A2540',width:.5}});
+    s.addShape(pres.shapes.RECTANGLE,{x:.35,y,w:.05,h:.82,fill:{color:C.danger}});
+    s.addText('⚠',{x:.52,y:y+.22,w:.32,h:.3,fontSize:12,color:C.danger,margin:0});
+    s.addText(r.texto,{x:.92,y:y+.1,w:8.5,h:.65,fontSize:10.5,color:C.txt,fontFace:'Calibri Light',lineSpacingMultiple:1.3,margin:0});
+  });
+  footer(s,pres,C,W,H,p.name);
+}
+
+function buildLicoesSlide(pres,C,W,H,p){
+  const s=base(pres,C);
+  s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:C.teal||C.a2}});
+  tag(s,'LIÇÕES APRENDIDAS',C,.35,.3);
+  s.addText('O que aprendemos',{x:.35,y:.5,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
+  const licoes=p.licoes.filter(l=>l.texto);
+  if(!licoes.length){s.addText('[ Lições a preencher ]',{x:.35,y:2.5,w:9.3,h:.4,align:'center',fontSize:12,color:C.muted,margin:0});}
+  else licoes.forEach((l,i)=>{
+    const y=1.32+i*.95;
+    s.addShape(pres.shapes.RECTANGLE,{x:.35,y,w:9.3,h:.82,fill:{color:C.bg2},line:{color:'1A2540',width:.5}});
+    s.addShape(pres.shapes.RECTANGLE,{x:.35,y,w:.05,h:.82,fill:{color:C.teal||C.a2}});
+    s.addText(String(i+1),{x:.52,y:y+.2,w:.32,h:.32,fontSize:13,color:C.teal||C.a2,fontFace:'Calibri',bold:true,margin:0});
+    s.addText(l.texto,{x:.92,y:y+.1,w:8.5,h:.65,fontSize:10.5,color:C.txt,fontFace:'Calibri Light',lineSpacingMultiple:1.3,margin:0});
+  });
+  footer(s,pres,C,W,H,p.name);
+}
+
+function buildDesafiosSlide(pres,C,W,H,p){
+  const s=base(pres,C);
+  s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:C.a3}});
+  tag(s,'PÓS-PROJETO · DESDOBRAMENTOS',C,.35,.3);
+  s.addText('Desafios Futuros',{x:.35,y:.5,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
+  const topics=[{l:'Continuidade',i:'🔄'},{l:'Acompanhamento',i:'📊'},{l:'Novos desdobramentos',i:'🚀'}];
+  topics.forEach((t,i)=>{
+    const x=.35+i*3.15;
+    s.addShape(pres.shapes.RECTANGLE,{x,y:1.3,w:3.0,h:3.65,fill:{color:C.bg2},line:{color:'1A2540',width:.5}});
+    s.addShape(pres.shapes.RECTANGLE,{x,y:1.3,w:3.0,h:.05,fill:{color:C.a3}});
+    s.addText(t.i,{x:x+.18,y:1.5,w:.45,h:.4,fontSize:18,margin:0});
+    s.addText(t.l,{x:x+.15,y:2.02,w:2.7,h:.28,fontSize:10,color:C.a3,fontFace:'Calibri',bold:true,margin:0});
+    s.addText(p.desafios||'[ A preencher ]',{x:x+.15,y:2.42,w:2.7,h:2.4,fontSize:8.5,color:C.muted,fontFace:'Calibri Light',lineSpacingMultiple:1.4,margin:0});
+  });
+  footer(s,pres,C,W,H,p.name);
+}
+
+function buildClosing(pres,C,W,H){
+  const s=pres.addSlide();
+  s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:W,h:H,fill:{color:C.bg}});
+  s.addText(G.identity.presTitle||'',{x:1,y:.6,w:8,h:.35,align:'center',fontSize:10,color:C.a2,fontFace:'Calibri Light',charSpacing:3,margin:0});
+  s.addText('Obrigado!',{x:1,y:1.1,w:8,h:2.2,align:'center',fontSize:72,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
+  if(G.identity.instName) s.addText(G.identity.instName,{x:1,y:3.5,w:8,h:.35,align:'center',fontSize:14,color:C.muted,fontFace:'Calibri Light',margin:0});
+  if(G.identity.presDate) s.addText(G.identity.presDate,{x:1,y:3.9,w:8,h:.28,align:'center',fontSize:10,color:C.muted,fontFace:'Calibri Light',margin:0});
+  if(G.identity.logoInst) s.addImage({data:G.identity.logoInst,x:W/2-.75,y:H-1.1,w:1.5,h:.72,sizing:{type:'contain',w:1.5,h:.72}});
+  if(G.identity.logoProg) s.addImage({data:G.identity.logoProg,x:W/2+.85,y:H-1.1,w:1.5,h:.72,sizing:{type:'contain',w:1.5,h:.72}});
+}
+
+// ════════════════════════════════════════════════════
+// PDF
+// ════════════════════════════════════════════════════
+function generatePdf(){
+  toast('Gere o PPTX e abra no PowerPoint → Arquivo → Exportar → PDF. Ou no Google Slides → Arquivo → Baixar → PDF.','info');
+}
+
+// ════════════════════════════════════════════════════
+// PROGRESS & TOAST
+// ════════════════════════════════════════════════════
+function setProgress(show,pct,msg){
+  ['side','big'].forEach(p=>{
+    const wrap=document.getElementById(p+'Progress');
+    const bar=document.getElementById(p+'Bar');
+    const lbl=document.getElementById(p+'Label');
+    if(wrap) wrap.style.display=show?'block':'none';
+    if(bar) bar.style.width=pct+'%';
+    if(lbl) lbl.textContent=msg||'';
+  });
+}
+
+function toast(msg,type='info'){
+  const w=document.getElementById('toastWrap');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;t.textContent=msg;
+  w.appendChild(t);setTimeout(()=>t.remove(),4200);
+}
+
+// ════════════════════════════════════════════════════
+// DRAFT
+// ════════════════════════════════════════════════════
+function saveDraft(){
+  try{
+    const snap={mode:G.mode,theme:G.theme,identity:{...G.identity,logoInst:null,logoProg:null,bi2025:null,bi2026:null},
+      projects:G.projects.map(p=>({...p,evidencias:[null,null,null,null],antesdepois:{...p.antesdepois,antes_img:null,depois_img:null}})),
+      blocks:G.blocks, ts:new Date().toISOString()};
+    const blob=new Blob([JSON.stringify(snap,null,2)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download='wren-rascunho.json';a.click();
+    toast('Rascunho salvo (imagens não incluídas)','ok');
+  }catch(e){toast('Erro ao salvar','err');}
+}
+
+// ════════════════════════════════════════════════════
+// START
+// ════════════════════════════════════════════════════
 init();
-showPanel('global');
-// Try to restore saved data
-setTimeout(() => {
-  const raw = localStorage.getItem('navegaBaleia_draft');
-  if (raw) showToast('📂 Rascunho anterior encontrado. Clique em "Carregar".', 'info');
-}, 600);
 </script>
 </body>
 </html>
