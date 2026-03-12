@@ -1,1004 +1,855 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wagner Ramos — PMO · Gestão de Projetos · Business Intelligence</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
-<style>
-/* ═══════════════════════════════════════════
-   BLUEPRINT THINKING — Wagner Ramos Portfolio
-   ═══════════════════════════════════════════ */
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wagner Ramos · Estratégia · PMO · Dados</title>
+  <!-- Pré-conexão para otimizar fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Fontes mais refinadas: combinação de Inter (limpa) e Playfair Display (destaque) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    /* ===== RESET & VARIÁVEIS ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-:root {
-  --paper:   #F4F1EB;
-  --trace:   #E8E4DA;
-  --grid:    #D6D0C4;
-  --ink:     #1A1A18;
-  --ink-mid: #3D3D38;
-  --ink-low: #7A7A72;
-  --cyan:    #00B4D8;
-  --cyan-dim:#006E85;
-  --amber:   #D4880A;
-  --line:    rgba(26,26,24,0.12);
+    :root {
+      --bg: #FFFFFF;
+      --paper: #F8F9FA;
+      --ink: #1E1E2F;
+      --ink-light: #4A4A5A;
+      --ink-lighter: #7A7A8A;
+      --accent: #0A66C2;       /* Azul LinkedIn/confiança */
+      --accent-light: #E7F0FF;
+      --border: #E2E4E8;
+      --shadow-sm: 0 4px 12px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.03);
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --transition: all 0.2s ease;
+    }
 
-  --serif:  'DM Serif Display', Georgia, serif;
-  --mono:   'DM Mono', 'Courier New', monospace;
-  --sans:   'DM Sans', system-ui, sans-serif;
-}
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-weight: 300;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
 
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; font-size:16px; }
+    /* ===== UTILITÁRIOS ===== */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 48px;
+    }
 
-body {
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--sans);
-  font-weight: 300;
-  overflow-x: hidden;
-  cursor: crosshair;
-}
+    @media (max-width: 768px) {
+      .container { padding: 0 24px; }
+    }
 
-/* Grid blueprint background */
-body::before {
-  content:'';
-  position:fixed;
-  inset:0;
-  background-image:
-    linear-gradient(var(--line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--line) 1px, transparent 1px);
-  background-size:40px 40px;
-  pointer-events:none;
-  z-index:0;
-}
-body::after {
-  content:'';
-  position:fixed;
-  inset:0;
-  background-image:
-    linear-gradient(var(--line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--line) 1px, transparent 1px);
-  background-size:200px 200px;
-  opacity:0.5;
-  pointer-events:none;
-  z-index:0;
-}
+    /* ===== TIPOGRAFIA REFINADA ===== */
+    h1, h2, h3, .serif {
+      font-family: var(--font-serif);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+    }
 
-/* ── NAV ── */
-nav {
-  position:fixed;
-  top:0; left:0; right:0;
-  z-index:100;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:0 60px;
-  height:64px;
-  background:rgba(244,241,235,0.88);
-  backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--line);
-}
+    .section-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--ink-lighter);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-.nav-mark {
-  font-family:var(--mono);
-  font-size:0.75rem;
-  letter-spacing:0.15em;
-  color:var(--ink-low);
-  text-transform:uppercase;
-}
-.nav-mark span { color:var(--cyan); }
+    .section-label::before {
+      content: '';
+      width: 40px;
+      height: 1px;
+      background: currentColor;
+      opacity: 0.3;
+    }
 
-.nav-links {
-  display:flex;
-  gap:40px;
-  list-style:none;
-}
-.nav-links a {
-  font-family:var(--mono);
-  font-size:0.7rem;
-  letter-spacing:0.12em;
-  text-transform:uppercase;
-  color:var(--ink-low);
-  text-decoration:none;
-  transition:color 0.2s;
-  position:relative;
-}
-.nav-links a::after {
-  content:'';
-  position:absolute;
-  bottom:-4px; left:0; right:100%;
-  height:1px;
-  background:var(--cyan);
-  transition:right 0.3s ease;
-}
-.nav-links a:hover { color:var(--ink); }
-.nav-links a:hover::after { right:0; }
+    .section-title {
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      line-height: 1.1;
+      margin-bottom: 3rem;
+      max-width: 800px;
+    }
 
-/* ── HERO ── */
-.hero {
-  position:relative;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-end;
-  padding:120px 60px 80px;
-  z-index:1;
-  overflow:hidden;
-}
+    .section-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
 
-/* Large background number */
-.hero-bg-num {
-  position:absolute;
-  top:50%; left:50%;
-  transform:translate(-50%,-52%);
-  font-family:var(--serif);
-  font-size:clamp(200px,28vw,420px);
-  color:transparent;
-  -webkit-text-stroke:1px var(--grid);
-  line-height:1;
-  user-select:none;
-  pointer-events:none;
-  white-space:nowrap;
-}
+    /* ===== NAVEGAÇÃO ELEGANTE ===== */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 48px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-.hero-tag {
-  font-family:var(--mono);
-  font-size:0.72rem;
-  letter-spacing:0.18em;
-  text-transform:uppercase;
-  color:var(--cyan);
-  margin-bottom:28px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-.hero-tag::before {
-  content:'';
-  width:40px;
-  height:1px;
-  background:var(--cyan);
-  display:inline-block;
-}
+    .nav-mark {
+      font-weight: 500;
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
 
-.hero h1 {
-  font-family:var(--serif);
-  font-size:clamp(52px,7vw,108px);
-  line-height:0.95;
-  letter-spacing:-0.02em;
-  color:var(--ink);
-  max-width:900px;
-  margin-bottom:48px;
-}
-.hero h1 em {
-  font-style:italic;
-  color:var(--cyan-dim);
-}
+    .nav-mark span { color: var(--accent); }
 
-.hero-meta {
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  flex-wrap:wrap;
-  gap:40px;
-  border-top:1px solid var(--line);
-  padding-top:32px;
-}
+    .nav-links {
+      display: flex;
+      gap: 48px;
+      list-style: none;
+    }
 
-.hero-desc {
-  font-size:1.05rem;
-  color:var(--ink-mid);
-  max-width:420px;
-  line-height:1.65;
-  font-weight:300;
-}
+    .nav-links a {
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 400;
+      color: var(--ink-light);
+      transition: var(--transition);
+      position: relative;
+    }
 
-.hero-metrics {
-  display:flex;
-  gap:48px;
-  flex-wrap:wrap;
-}
-.metric {
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-}
-.metric-val {
-  font-family:var(--mono);
-  font-size:2.4rem;
-  font-weight:500;
-  color:var(--ink);
-  line-height:1;
-}
-.metric-val .unit {
-  font-size:1rem;
-  color:var(--cyan);
-  margin-left:2px;
-}
-.metric-label {
-  font-family:var(--mono);
-  font-size:0.68rem;
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  color:var(--ink-low);
-}
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent);
+      transition: width 0.2s ease;
+    }
 
-.hero-cta {
-  display:flex;
-  gap:16px;
-  flex-wrap:wrap;
-  align-items:center;
-  margin-top:48px;
-}
+    .nav-links a:hover {
+      color: var(--ink);
+    }
 
-/* ── BUTTONS ── */
-.btn {
-  font-family:var(--mono);
-  font-size:0.72rem;
-  letter-spacing:0.12em;
-  text-transform:uppercase;
-  padding:14px 32px;
-  border:none;
-  cursor:pointer;
-  text-decoration:none;
-  display:inline-flex;
-  align-items:center;
-  gap:10px;
-  transition:all 0.25s ease;
-  position:relative;
-}
-.btn-primary {
-  background:var(--ink);
-  color:var(--paper);
-}
-.btn-primary:hover {
-  background:var(--cyan);
-  color:var(--ink);
-}
-.btn-ghost {
-  background:transparent;
-  color:var(--ink);
-  border:1px solid var(--line);
-}
-.btn-ghost:hover {
-  border-color:var(--ink);
-}
-.btn svg { width:14px; height:14px; flex-shrink:0; }
+    .nav-links a:hover::after {
+      width: 100%;
+    }
 
-/* ── SECTION WRAPPER ── */
-section {
-  position:relative;
-  z-index:1;
-  padding:120px 60px;
-}
-section.alt { background:var(--trace); }
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+    }
 
-.section-label {
-  font-family:var(--mono);
-  font-size:0.68rem;
-  letter-spacing:0.2em;
-  text-transform:uppercase;
-  color:var(--ink-low);
-  margin-bottom:20px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-.section-label::before {
-  content:attr(data-num);
-  color:var(--cyan);
-  font-size:0.9rem;
-}
+    .hamburger span {
+      width: 24px;
+      height: 2px;
+      background: var(--ink);
+      transition: var(--transition);
+    }
 
-.section-title {
-  font-family:var(--serif);
-  font-size:clamp(36px,4.5vw,64px);
-  line-height:1.05;
-  letter-spacing:-0.02em;
-  color:var(--ink);
-  margin-bottom:64px;
-  max-width:700px;
-}
-.section-title em { font-style:italic; color:var(--cyan-dim); }
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-end;
+      padding: 120px 0 80px;
+      position: relative;
+      background: linear-gradient(to bottom, transparent, var(--paper) 90%);
+    }
 
-/* ── SOBRE ── */
-.sobre-grid {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:80px;
-  align-items:start;
-}
-.sobre-text p {
-  font-size:1.1rem;
-  line-height:1.75;
-  color:var(--ink-mid);
-  margin-bottom:20px;
-}
-.sobre-text p strong { color:var(--ink); font-weight:500; }
+    .hero-content {
+      max-width: 900px;
+    }
 
-.sobre-sidebar {
-  border-left:1px solid var(--line);
-  padding-left:48px;
-}
-.side-block {
-  margin-bottom:40px;
-}
-.side-label {
-  font-family:var(--mono);
-  font-size:0.65rem;
-  letter-spacing:0.16em;
-  text-transform:uppercase;
-  color:var(--ink-low);
-  margin-bottom:12px;
-}
-.side-value {
-  font-family:var(--sans);
-  font-size:1rem;
-  color:var(--ink);
-  font-weight:400;
-  line-height:1.5;
-}
-.side-value a {
-  color:var(--cyan-dim);
-  text-decoration:none;
-  transition:color 0.2s;
-}
-.side-value a:hover { color:var(--cyan); }
+    .hero-tag {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+    }
 
-/* ── DESTAQUES / ENTREGAS ── */
-.entregas-list {
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:2px;
-}
-.entrega-item {
-  background:var(--paper);
-  padding:40px 32px;
-  border:1px solid var(--line);
-  position:relative;
-  overflow:hidden;
-  transition:background 0.3s;
-}
-.entrega-item::before {
-  content:attr(data-idx);
-  position:absolute;
-  top:24px; right:28px;
-  font-family:var(--mono);
-  font-size:0.65rem;
-  color:var(--grid);
-  letter-spacing:0.1em;
-}
-.entrega-item:hover { background:var(--ink); }
-.entrega-item:hover .entrega-num,
-.entrega-item:hover .entrega-desc { color:var(--paper); }
-.entrega-item:hover .entrega-unit { color:var(--cyan); }
-.entrega-item:hover .entrega-label { color:var(--grid); }
+    .hero h1 {
+      font-size: clamp(3rem, 8vw, 5rem);
+      line-height: 0.95;
+      margin-bottom: 2rem;
+    }
 
-.entrega-num {
-  font-family:var(--serif);
-  font-size:clamp(40px,4vw,64px);
-  line-height:1;
-  color:var(--ink);
-  margin-bottom:8px;
-  transition:color 0.3s;
-}
-.entrega-unit {
-  color:var(--cyan);
-  font-size:0.6em;
-  font-family:var(--mono);
-  transition:color 0.3s;
-}
-.entrega-label {
-  font-family:var(--mono);
-  font-size:0.65rem;
-  letter-spacing:0.12em;
-  text-transform:uppercase;
-  color:var(--ink-low);
-  margin-bottom:16px;
-  transition:color 0.3s;
-}
-.entrega-desc {
-  font-size:0.9rem;
-  color:var(--ink-mid);
-  line-height:1.55;
-  transition:color 0.3s;
-}
+    .hero h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
 
-/* ── COMPETÊNCIAS ── */
-.competencias-layout {
-  display:grid;
-  grid-template-columns:280px 1fr;
-  gap:80px;
-  align-items:start;
-}
-.comp-nav {
-  position:sticky;
-  top:100px;
-}
-.comp-nav-item {
-  font-family:var(--mono);
-  font-size:0.7rem;
-  letter-spacing:0.12em;
-  text-transform:uppercase;
-  color:var(--ink-low);
-  padding:16px 0;
-  border-top:1px solid var(--line);
-  cursor:pointer;
-  transition:color 0.2s;
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-.comp-nav-item:hover,
-.comp-nav-item.active {
-  color:var(--ink);
-}
-.comp-nav-item .dot {
-  width:6px; height:6px;
-  border-radius:50%;
-  border:1px solid currentColor;
-  flex-shrink:0;
-  transition:background 0.2s;
-}
-.comp-nav-item.active .dot {
-  background:var(--cyan);
-  border-color:var(--cyan);
-}
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 48px;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
 
-.comp-panels {}
-.comp-panel {
-  display:none;
-  animation:fadeIn 0.3s ease;
-}
-.comp-panel.active { display:block; }
+    .hero-desc {
+      max-width: 480px;
+      color: var(--ink-light);
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
 
-@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+    .hero-metrics {
+      display: flex;
+      gap: 40px;
+    }
 
-.tags-cloud {
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-bottom:40px;
-}
-.tag {
-  font-family:var(--mono);
-  font-size:0.72rem;
-  letter-spacing:0.08em;
-  padding:8px 18px;
-  border:1px solid var(--line);
-  color:var(--ink-mid);
-  background:transparent;
-  transition:all 0.2s;
-  cursor:default;
-}
-.tag:hover {
-  border-color:var(--ink);
-  color:var(--ink);
-  background:var(--ink);
-  color:var(--paper);
-}
-.tag.highlight {
-  border-color:var(--cyan);
-  color:var(--cyan-dim);
-}
+    .metric {
+      display: flex;
+      flex-direction: column;
+    }
 
-.soft-grid {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:20px;
-}
-.soft-card {
-  border:1px solid var(--line);
-  padding:24px;
-  transition:border-color 0.2s;
-}
-.soft-card:hover { border-color:var(--ink); }
-.soft-card-title {
-  font-family:var(--mono);
-  font-size:0.7rem;
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  color:var(--ink);
-  margin-bottom:10px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-.soft-card-title .ic {
-  color:var(--cyan);
-  font-size:0.85rem;
-}
-.soft-card p {
-  font-size:0.88rem;
-  color:var(--ink-mid);
-  line-height:1.55;
-}
+    .metric-value {
+      font-size: 2.5rem;
+      font-weight: 500;
+      line-height: 1;
+      color: var(--ink);
+    }
 
-/* ── EXPERIÊNCIA ── */
-.exp-timeline {
-  display:flex;
-  flex-direction:column;
-  gap:0;
-}
-.exp-entry {
-  display:grid;
-  grid-template-columns:200px 1fr;
-  gap:0;
-  border-top:1px solid var(--line);
-  padding:48px 0;
-  position:relative;
-}
-.exp-entry:last-child { border-bottom:1px solid var(--line); }
+    .metric-value small {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--accent);
+      margin-left: 4px;
+    }
 
-.exp-left {
-  padding-right:40px;
-}
-.exp-period {
-  font-family:var(--mono);
-  font-size:0.68rem;
-  letter-spacing:0.1em;
-  color:var(--ink-low);
-  text-transform:uppercase;
-  margin-bottom:8px;
-}
-.exp-current {
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  font-family:var(--mono);
-  font-size:0.62rem;
-  letter-spacing:0.1em;
-  color:var(--cyan);
-  text-transform:uppercase;
-}
-.exp-current::before {
-  content:'';
-  width:6px; height:6px;
-  border-radius:50%;
-  background:var(--cyan);
-  animation:pulse 2s infinite;
-}
-@keyframes pulse {
-  0%,100%{opacity:1;transform:scale(1)}
-  50%{opacity:0.5;transform:scale(1.3)}
-}
+    .metric-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink-lighter);
+      margin-top: 4px;
+    }
 
-.exp-right {}
-.exp-company {
-  font-family:var(--serif);
-  font-size:1.6rem;
-  letter-spacing:-0.02em;
-  color:var(--ink);
-  margin-bottom:4px;
-}
-.exp-role {
-  font-family:var(--mono);
-  font-size:0.75rem;
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  color:var(--cyan-dim);
-  margin-bottom:24px;
-}
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      margin-top: 3rem;
+    }
 
-.exp-badges {
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-bottom:24px;
-}
-.badge {
-  font-family:var(--mono);
-  font-size:0.65rem;
-  letter-spacing:0.08em;
-  padding:5px 14px;
-  background:var(--ink);
-  color:var(--paper);
-}
-.badge.outline {
-  background:transparent;
-  border:1px solid var(--line);
-  color:var(--ink-mid);
-}
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: var(--transition);
+      border: 1px solid transparent;
+    }
 
-.exp-list {
-  list-style:none;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-.exp-list li {
-  font-size:0.95rem;
-  color:var(--ink-mid);
-  line-height:1.6;
-  padding-left:20px;
-  position:relative;
-}
-.exp-list li::before {
-  content:'↳';
-  position:absolute;
-  left:0;
-  color:var(--cyan);
-  font-size:0.85rem;
-}
-.exp-list li strong { color:var(--ink); font-weight:500; }
+    .btn-primary {
+      background: var(--ink);
+      color: white;
+    }
 
-.exp-stack {
-  margin-top:24px;
-  padding-top:24px;
-  border-top:1px solid var(--line);
-  font-family:var(--mono);
-  font-size:0.68rem;
-  letter-spacing:0.08em;
-  color:var(--ink-low);
-  line-height:1.7;
-}
+    .btn-primary:hover {
+      background: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
 
-/* ── FORMAÇÃO ── */
-.formacao-list {
-  display:flex;
-  flex-direction:column;
-  gap:0;
-}
-.formacao-entry {
-  display:grid;
-  grid-template-columns:200px 1fr;
-  border-top:1px solid var(--line);
-  padding:32px 0;
-  gap:40px;
-  align-items:center;
-}
-.formacao-entry:last-child { border-bottom:1px solid var(--line); }
-.formacao-year {
-  font-family:var(--mono);
-  font-size:0.68rem;
-  letter-spacing:0.1em;
-  color:var(--ink-low);
-  text-transform:uppercase;
-}
-.formacao-degree {
-  font-family:var(--serif);
-  font-size:1.3rem;
-  color:var(--ink);
-  margin-bottom:4px;
-}
-.formacao-school {
-  font-family:var(--mono);
-  font-size:0.72rem;
-  letter-spacing:0.08em;
-  color:var(--cyan-dim);
-  text-transform:uppercase;
-}
+    .btn-outline {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--ink);
+    }
 
-/* ── PROJETOS ── */
-.projects-grid {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:2px;
-}
-.project-card {
-  background:var(--paper);
-  border:1px solid var(--line);
-  padding:36px 32px;
-  display:flex;
-  flex-direction:column;
-  gap:16px;
-  transition:all 0.3s;
-  text-decoration:none;
-  cursor:pointer;
-  position:relative;
-  overflow:hidden;
-}
-.project-card::after {
-  content:'';
-  position:absolute;
-  bottom:0; left:0; right:100%;
-  height:2px;
-  background:var(--cyan);
-  transition:right 0.4s ease;
-}
-.project-card:hover::after { right:0; }
-.project-card:hover { background:var(--trace); }
+    .btn-outline:hover {
+      border-color: var(--ink);
+      background: var(--paper);
+    }
 
-.project-num {
-  font-family:var(--mono);
-  font-size:0.65rem;
-  letter-spacing:0.1em;
-  color:var(--grid);
-}
-.project-title {
-  font-family:var(--serif);
-  font-size:1.25rem;
-  color:var(--ink);
-  line-height:1.2;
-}
-.project-desc {
-  font-size:0.88rem;
-  color:var(--ink-mid);
-  line-height:1.55;
-  flex:1;
-}
-.project-tags-row {
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-}
-.ptag {
-  font-family:var(--mono);
-  font-size:0.62rem;
-  letter-spacing:0.08em;
-  padding:3px 10px;
-  border:1px solid var(--line);
-  color:var(--ink-low);
-}
-.project-link {
-  font-family:var(--mono);
-  font-size:0.68rem;
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  color:var(--cyan-dim);
-  text-decoration:none;
-  display:flex;
-  align-items:center;
-  gap:6px;
-  margin-top:auto;
-}
+    /* ===== SEÇÕES ===== */
+    section {
+      padding: 100px 0;
+    }
 
-/* ── CERTIFICAÇÕES ── */
-.cert-cols {
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:40px;
-}
-.cert-col-title {
-  font-family:var(--mono);
-  font-size:0.68rem;
-  letter-spacing:0.14em;
-  text-transform:uppercase;
-  color:var(--cyan-dim);
-  margin-bottom:20px;
-  padding-bottom:12px;
-  border-bottom:1px solid var(--line);
-}
-.cert-list {
-  list-style:none;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-.cert-list li {
-  font-size:0.85rem;
-  color:var(--ink-mid);
-  line-height:1.4;
-  padding-left:14px;
-  position:relative;
-}
-.cert-list li::before {
-  content:'—';
-  position:absolute;
-  left:0;
-  color:var(--cyan);
-  font-family:var(--mono);
-  font-size:0.7rem;
-}
+    section.alt {
+      background: var(--paper);
+    }
 
-/* ── CONTATO ── */
-.contato-wrap {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:80px;
-  align-items:end;
-}
-.contato-left .big-cta {
-  font-family:var(--serif);
-  font-size:clamp(32px,3.5vw,52px);
-  line-height:1.1;
-  color:var(--ink);
-  margin-bottom:40px;
-}
-.contato-left .big-cta em {
-  font-style:italic;
-  color:var(--cyan-dim);
-}
+    /* ===== SOBRE ===== */
+    .sobre-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+    }
 
-.contact-links {
-  display:flex;
-  flex-direction:column;
-  gap:0;
-}
-.contact-link {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:20px 0;
-  border-top:1px solid var(--line);
-  text-decoration:none;
-  color:var(--ink-mid);
-  font-family:var(--mono);
-  font-size:0.78rem;
-  letter-spacing:0.08em;
-  transition:all 0.2s;
-}
-.contact-link:last-child { border-bottom:1px solid var(--line); }
-.contact-link:hover { color:var(--ink); padding-left:8px; }
-.contact-link .arr {
-  color:var(--cyan);
-  transition:transform 0.2s;
-}
-.contact-link:hover .arr { transform:translateX(4px); }
-.contact-link-label {
-  font-size:0.62rem;
-  letter-spacing:0.14em;
-  text-transform:uppercase;
-  color:var(--ink-low);
-}
+    .sobre-text p {
+      font-size: 1.1rem;
+      color: var(--ink-light);
+      margin-bottom: 1.5rem;
+    }
 
-.contato-right {}
-.contato-info-block {
-  background:var(--ink);
-  padding:48px;
-  color:var(--paper);
-}
-.ci-label {
-  font-family:var(--mono);
-  font-size:0.62rem;
-  letter-spacing:0.16em;
-  text-transform:uppercase;
-  color:var(--grid);
-  margin-bottom:6px;
-}
-.ci-val {
-  font-size:1rem;
-  color:var(--paper);
-  margin-bottom:28px;
-  font-weight:300;
-}
-.ci-val:last-child { margin-bottom:0; }
-.ci-val a { color:var(--cyan); text-decoration:none; }
+    .sobre-text strong {
+      color: var(--ink);
+      font-weight: 500;
+    }
 
-/* ── FOOTER ── */
-footer {
-  position:relative;
-  z-index:1;
-  padding:32px 60px;
-  border-top:1px solid var(--line);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-.foot-left {
-  font-family:var(--mono);
-  font-size:0.65rem;
-  letter-spacing:0.1em;
-  color:var(--ink-low);
-}
-.foot-right {
-  font-family:var(--mono);
-  font-size:0.65rem;
-  letter-spacing:0.1em;
-  color:var(--ink-low);
-}
+    .sobre-sidebar {
+      border-left: 1px solid var(--border);
+      padding-left: 48px;
+    }
 
-/* ── MOBILE HAMBURGER ── */
-.hamburger {
-  display:none;
-  flex-direction:column;
-  gap:5px;
-  cursor:pointer;
-  background:none;
-  border:none;
-  padding:4px;
-}
-.hamburger span {
-  display:block;
-  width:24px;
-  height:1px;
-  background:var(--ink);
-  transition:all 0.3s;
-}
+    .info-block {
+      margin-bottom: 32px;
+    }
 
-/* ── SCROLL REVEAL ── */
-.reveal {
-  opacity:0;
-  transform:translateY(24px);
-  transition:opacity 0.7s ease, transform 0.7s ease;
-}
-.reveal.visible {
-  opacity:1;
-  transform:translateY(0);
-}
-.reveal-delay-1 { transition-delay:0.1s; }
-.reveal-delay-2 { transition-delay:0.2s; }
-.reveal-delay-3 { transition-delay:0.3s; }
-.reveal-delay-4 { transition-delay:0.4s; }
+    .info-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink-lighter);
+      margin-bottom: 8px;
+    }
 
-/* ── COUNTER ANIMATION ── */
-.counter { display:inline; }
+    .info-value {
+      font-size: 1rem;
+      color: var(--ink);
+    }
 
-/* ── CURSOR LINE ── */
-.cursor-line {
-  position:fixed;
-  pointer-events:none;
-  z-index:9999;
-}
-.cursor-h {
-  top:0; bottom:0;
-  width:1px;
-  background:rgba(0,180,216,0.15);
-}
-.cursor-v {
-  left:0; right:0;
-  height:1px;
-  background:rgba(0,180,216,0.15);
-}
-.cursor-dot {
-  position:fixed;
-  width:6px; height:6px;
-  border-radius:50%;
-  background:var(--cyan);
-  pointer-events:none;
-  z-index:9999;
-  transform:translate(-50%,-50%);
-  transition:transform 0.1s;
-}
+    .info-value a {
+      color: var(--accent);
+      text-decoration: none;
+    }
 
-/* ── RESPONSIVE ── */
-@media(max-width:1024px){
-  .entregas-list { grid-template-columns:repeat(2,1fr); }
-  .cert-cols { grid-template-columns:repeat(2,1fr); }
-  .projects-grid { grid-template-columns:repeat(2,1fr); }
-}
-@media(max-width:768px){
-  nav { padding:0 24px; }
-  .nav-links { display:none; }
-  .hamburger { display:flex; }
-  .nav-links.open {
-    display:flex;
-    flex-direction:column;
-    position:fixed;
-    inset:0;
-    background:var(--paper);
-    justify-content:center;
-    align-items:center;
-    gap:32px;
-    z-index:99;
-  }
-  .hero { padding:100px 24px 60px; }
-  .hero h1 { font-size:clamp(36px,9vw,72px); }
-  .hero-metrics { gap:28px; }
-  section { padding:80px 24px; }
-  .sobre-grid { grid-template-columns:1fr; gap:40px; }
-  .sobre-sidebar { border-left:none; padding-left:0; border-top:1px solid var(--line); padding-top:40px; }
-  .entregas-list { grid-template-columns:1fr 1fr; }
-  .competencias-layout { grid-template-columns:1fr; }
-  .comp-nav { position:static; display:flex; gap:0; flex-wrap:wrap; border-top:1px solid var(--line); }
-  .comp-nav-item { border-top:none; border-right:1px solid var(--line); padding:12px 16px; }
-  .exp-entry { grid-template-columns:1fr; gap:16px; }
-  .formacao-entry { grid-template-columns:1fr; gap:8px; }
-  .projects-grid { grid-template-columns:1fr; }
-  .cert-cols { grid-template-columns:1fr 1fr; gap:28px; }
-  .contato-wrap { grid-template-columns:1fr; gap:48px; }
-  footer { flex-direction:column; gap:12px; text-align:center; padding:24px; }
-  .cursor-line, .cursor-dot { display:none; }
-}
-@media(max-width:480px){
-  .entregas-list { grid-template-columns:1fr; }
-  .cert-cols { grid-template-columns:1fr; }
-  .soft-grid { grid-template-columns:1fr; }
-  .hero-metrics { gap:20px; }
-  .metric-val { font-size:1.8rem; }
-}
-</style>
+    /* ===== ENTREGAS (cards de impacto) ===== */
+    .entregas-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+    }
+
+    .entrega-card {
+      background: white;
+      padding: 40px 32px;
+      border: 1px solid var(--border);
+      transition: var(--transition);
+    }
+
+    .entrega-card:hover {
+      background: var(--ink);
+      color: white;
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .entrega-card:hover .entrega-value,
+    .entrega-card:hover .entrega-label,
+    .entrega-card:hover .entrega-desc {
+      color: white;
+    }
+
+    .entrega-value {
+      font-size: 2.8rem;
+      font-weight: 500;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+      color: var(--ink);
+    }
+
+    .entrega-value small {
+      font-size: 1rem;
+      color: var(--accent);
+    }
+
+    .entrega-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink-lighter);
+      margin-bottom: 1rem;
+    }
+
+    .entrega-desc {
+      font-size: 0.9rem;
+      color: var(--ink-light);
+      line-height: 1.5;
+    }
+
+    /* ===== COMPETÊNCIAS (tabs refinadas) ===== */
+    .competencias-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 60px;
+    }
+
+    .comp-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .comp-nav-item {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: var(--ink-light);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .comp-nav-item .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: var(--transition);
+    }
+
+    .comp-nav-item.active,
+    .comp-nav-item:hover {
+      color: var(--ink);
+    }
+
+    .comp-nav-item.active .dot {
+      background: var(--accent);
+    }
+
+    .comp-panel {
+      display: none;
+      animation: fade 0.3s ease;
+    }
+
+    .comp-panel.active {
+      display: block;
+    }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .tags-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .tag {
+      padding: 6px 16px;
+      border: 1px solid var(--border);
+      border-radius: 40px;
+      font-size: 0.8rem;
+      color: var(--ink-light);
+      transition: var(--transition);
+    }
+
+    .tag:hover {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .tag.highlight {
+      border-color: var(--accent);
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    /* ===== TIMELINE EXPERIÊNCIA ===== */
+    .exp-entry {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 40px;
+      padding: 48px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .exp-entry:last-child {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .exp-period {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink-lighter);
+      margin-bottom: 8px;
+    }
+
+    .exp-current {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .exp-current::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+
+    .exp-company {
+      font-family: var(--font-serif);
+      font-size: 1.6rem;
+      margin-bottom: 4px;
+    }
+
+    .exp-role {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .exp-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .badge {
+      padding: 4px 12px;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 400;
+      background: var(--paper);
+      border: 1px solid var(--border);
+    }
+
+    .exp-list {
+      list-style: none;
+      margin-bottom: 24px;
+    }
+
+    .exp-list li {
+      padding-left: 20px;
+      position: relative;
+      margin-bottom: 12px;
+      color: var(--ink-light);
+    }
+
+    .exp-list li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    .exp-stack {
+      font-size: 0.8rem;
+      color: var(--ink-lighter);
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+    }
+
+    /* ===== PROJETOS (cards) ===== */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .project-card {
+      background: white;
+      border: 1px solid var(--border);
+      padding: 32px;
+      text-decoration: none;
+      color: inherit;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      border-radius: 16px;
+    }
+
+    .project-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--accent);
+    }
+
+    .project-num {
+      font-size: 0.7rem;
+      color: var(--ink-lighter);
+      margin-bottom: 16px;
+    }
+
+    .project-title {
+      font-family: var(--font-serif);
+      font-size: 1.3rem;
+      margin-bottom: 12px;
+    }
+
+    .project-desc {
+      font-size: 0.9rem;
+      color: var(--ink-light);
+      margin-bottom: 20px;
+      flex: 1;
+    }
+
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .project-tag {
+      font-size: 0.65rem;
+      padding: 4px 10px;
+      border-radius: 40px;
+      background: var(--paper);
+      border: 1px solid var(--border);
+    }
+
+    .project-link {
+      font-size: 0.8rem;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ===== CERTIFICAÇÕES ===== */
+    .cert-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 40px;
+    }
+
+    .cert-category h3 {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+
+    .cert-list {
+      list-style: none;
+    }
+
+    .cert-list li {
+      font-size: 0.85rem;
+      color: var(--ink-light);
+      margin-bottom: 12px;
+      padding-left: 16px;
+      position: relative;
+    }
+
+    .cert-list li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    /* ===== CONTATO ===== */
+    .contato-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+    }
+
+    .big-cta {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      line-height: 1.2;
+      margin-bottom: 40px;
+    }
+
+    .big-cta em {
+      color: var(--accent);
+      font-style: italic;
+    }
+
+    .contact-links {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .contact-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 0;
+      border-top: 1px solid var(--border);
+      text-decoration: none;
+      color: var(--ink-light);
+      transition: var(--transition);
+    }
+
+    .contact-link:last-child {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .contact-link:hover {
+      color: var(--ink);
+      padding-left: 8px;
+    }
+
+    .contact-link:hover .arr {
+      transform: translateX(4px);
+    }
+
+    .contact-link-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink-lighter);
+      margin-bottom: 4px;
+    }
+
+    .arr {
+      transition: transform 0.2s;
+      color: var(--accent);
+    }
+
+    .contato-card {
+      background: var(--ink);
+      color: white;
+      padding: 48px;
+      border-radius: 24px;
+    }
+
+    .contato-card .info-label {
+      color: rgba(255,255,255,0.5);
+    }
+
+    .contato-card .info-value {
+      color: white;
+      margin-bottom: 24px;
+    }
+
+    .contato-card a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      padding: 32px 48px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--ink-lighter);
+    }
+
+    /* ===== SCROLL REVEAL ===== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.3s; }
+    .delay-4 { transition-delay: 0.4s; }
+
+    /* ===== RESPONSIVO ===== */
+    @media (max-width: 1024px) {
+      .entregas-grid { grid-template-columns: repeat(2, 1fr); }
+      .projects-grid { grid-template-columns: repeat(2, 1fr); }
+      .cert-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 24px; }
+      .nav-links {
+        display: none;
+        position: fixed;
+        top: 72px;
+        left: 0;
+        right: 0;
+        background: white;
+        flex-direction: column;
+        align-items: center;
+        padding: 48px 24px;
+        gap: 24px;
+        border-bottom: 1px solid var(--border);
+        box-shadow: var(--shadow-md);
+      }
+      .nav-links.open { display: flex; }
+      .hamburger { display: flex; }
+
+      .hero { padding: 100px 0 60px; }
+      .hero-meta { flex-direction: column; align-items: flex-start; gap: 24px; }
+
+      .sobre-grid { grid-template-columns: 1fr; gap: 40px; }
+      .sobre-sidebar { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 40px; }
+
+      .competencias-layout { grid-template-columns: 1fr; }
+      .comp-nav { flex-direction: row; flex-wrap: wrap; gap: 16px; }
+      .comp-nav-item { border-bottom: none; padding: 8px 0; }
+
+      .exp-entry { grid-template-columns: 1fr; gap: 16px; }
+
+      .projects-grid { grid-template-columns: 1fr; }
+
+      .cert-grid { grid-template-columns: 1fr; }
+
+      .contato-wrap { grid-template-columns: 1fr; gap: 48px; }
+
+      footer { flex-direction: column; gap: 12px; text-align: center; padding: 24px; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- Cursor crosshair effect -->
-<div class="cursor-line cursor-h" id="curH" style="left:0;width:1px;top:0;bottom:0;position:fixed;"></div>
-<div class="cursor-line cursor-v" id="curV" style="top:0;left:0;right:0;height:1px;position:fixed;"></div>
-<div class="cursor-dot" id="curDot"></div>
-
-<!-- ══ NAV ══ -->
+<!-- NAVEGAÇÃO -->
 <nav>
-  <div class="nav-mark">WR <span>·</span> PMO · BI · Projetos</div>
+  <div class="nav-mark">Wagner <span>Ramos</span></div>
   <button class="hamburger" id="hamburger" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
@@ -1007,204 +858,174 @@ footer {
     <li><a href="#entregas">Entregas</a></li>
     <li><a href="#competencias">Competências</a></li>
     <li><a href="#experiencia">Experiência</a></li>
+    <li><a href="#projetos">Projetos</a></li>
     <li><a href="#contato">Contato</a></li>
   </ul>
 </nav>
 
-<!-- ══ HERO ══ -->
-<section class="hero" id="home" style="padding-top:64px;">
-  <div class="hero-bg-num" aria-hidden="true">WR</div>
-
-  <div class="hero-tag">Portfólio Profissional · 2026</div>
-
-  <h1>
-    Wagner<br>
-    <em>Douglas</em><br>
-    Ramos
-  </h1>
-
-  <div class="hero-meta">
-    <p class="hero-desc">
-      PMO e Gestão de Projetos com formação em Engenharia Civil. Governança de portfólios estratégicos, automação de dados e decisões em ambientes regulados de alta complexidade.
-    </p>
-    <div class="hero-metrics">
-      <div class="metric">
-        <div class="metric-val"><span class="counter" data-target="500">0</span><span class="unit">k</span></div>
-        <div class="metric-label">Recursos viabilizados (R$)</div>
-      </div>
-      <div class="metric">
-        <div class="metric-val"><span class="counter" data-target="75">0</span><span class="unit">%</span></div>
-        <div class="metric-label">Redução tempo análise</div>
-      </div>
-      <div class="metric">
-        <div class="metric-val"><span class="counter" data-target="15">0</span><span class="unit">+</span></div>
-        <div class="metric-label">Projetos simultâneos</div>
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="container hero-content">
+    <div class="hero-tag reveal">Portfólio 2026</div>
+    <h1 class="reveal delay-1">
+      Estratégia,<br>
+      <em>dados</em> e<br>
+      execução.
+    </h1>
+    <div class="hero-meta reveal delay-2">
+      <p class="hero-desc">
+        Engenheiro e especialista em PMO com visão analítica. Transformo problemas complexos em portfólios estruturados, governança e decisões baseadas em dados.
+      </p>
+      <div class="hero-metrics">
+        <div class="metric">
+          <div class="metric-value"><span class="counter" data-target="500">0</span><small>k R$</small></div>
+          <div class="metric-label">Recursos viabilizados</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value"><span class="counter" data-target="75">0</span><small>%</small></div>
+          <div class="metric-label">Redução tempo análise</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value"><span class="counter" data-target="15">0</span><small>+</small></div>
+          <div class="metric-label">Projetos simultâneos</div>
+        </div>
       </div>
     </div>
-  </div>
-
-  <div class="hero-cta">
-    <a href="#experiencia" class="btn btn-primary">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-      Ver Experiência
-    </a>
-    <a href="assets/curriculo-wagner-ramos.pdf" class="btn btn-ghost" download>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-      Baixar Currículo
-    </a>
+    <div class="hero-cta reveal delay-3">
+      <a href="#experiencia" class="btn btn-primary">Ver trajetória</a>
+      <a href="assets/curriculo-wagner-ramos.pdf" class="btn btn-outline" download>Baixar currículo</a>
+    </div>
   </div>
 </section>
 
-<!-- ══ SOBRE ══ -->
+<!-- SOBRE -->
 <section id="sobre" class="alt">
-  <div class="section-label" data-num="01">Sobre</div>
-  <h2 class="section-title reveal">Engenharia que<br><em>pensa em sistemas.</em></h2>
-
-  <div class="sobre-grid">
-    <div class="sobre-text reveal reveal-delay-1">
-      <p>
-        Profissional de <strong>PMO e Gestão de Projetos</strong> com base em Engenharia Civil e especialização em dados. Atuo na <strong>governança de portfólios estratégicos</strong>, integrando áreas de negócio, tecnologia e finanças para viabilizar entregas complexas em ambientes regulados.
-      </p>
-      <p>
-        Combino <strong>visão executiva com capacidade técnica</strong> em automação — Python, Power BI — para transformar dados em decisões, garantindo conformidade, rastreabilidade e eficiência operacional.
-      </p>
-      <p>
-        Experiência destacada em gestão de verbas públicas, reporting para C-level e estruturação de PMO hospitalar com 4 eixos estratégicos monitorados em tempo real.
-      </p>
-    </div>
-    <div class="sobre-sidebar reveal reveal-delay-2">
-      <div class="side-block">
-        <div class="side-label">Localização</div>
-        <div class="side-value">Belo Horizonte, MG — Brasil</div>
+  <div class="container">
+    <div class="section-label reveal">Apresentação</div>
+    <h2 class="section-title reveal">Engenharia que<br><em>pensa em sistemas.</em></h2>
+    <div class="sobre-grid">
+      <div class="sobre-text reveal delay-1">
+        <p>
+          Profissional de <strong>PMO e Gestão de Projetos</strong> com base em Engenharia Civil e especialização em dados. Atuo na <strong>governança de portfólios estratégicos</strong>, integrando áreas de negócio, tecnologia e finanças para viabilizar entregas complexas em ambientes regulados.
+        </p>
+        <p>
+          Combino <strong>visão executiva com capacidade técnica</strong> em automação — Python, Power BI — para transformar dados em decisões, garantindo conformidade, rastreabilidade e eficiência operacional.
+        </p>
+        <p>
+          Experiência destacada em gestão de verbas públicas, reporting para C-level e estruturação de PMO hospitalar com 4 eixos estratégicos monitorados em tempo real.
+        </p>
       </div>
-      <div class="side-block">
-        <div class="side-label">Formação Base</div>
-        <div class="side-value">Engenharia Civil<br>UniBH · 2017</div>
-      </div>
-      <div class="side-block">
-        <div class="side-label">Pós & MBA</div>
-        <div class="side-value">Gestão de Projetos · Descomplica 2023<br>MBA Gestão de Projetos · Fundace FEARP USP <em style="font-size:0.85em;color:var(--cyan-dim)">(em curso)</em></div>
-      </div>
-      <div class="side-block">
-        <div class="side-label">Contato</div>
-        <div class="side-value">
-          <a href="mailto:wagnerramoseng@gmail.com">wagnerramoseng@gmail.com</a><br>
-          <a href="https://linkedin.com/in/engwagnerramos" target="_blank">linkedin.com/in/engwagnerramos</a>
+      <div class="sobre-sidebar reveal delay-2">
+        <div class="info-block">
+          <div class="info-label">Localização</div>
+          <div class="info-value">Belo Horizonte, MG</div>
+        </div>
+        <div class="info-block">
+          <div class="info-label">Formação</div>
+          <div class="info-value">Engenharia Civil · UniBH 2017<br>MBA Gestão de Projetos · USP (em curso)</div>
+        </div>
+        <div class="info-block">
+          <div class="info-label">Contato</div>
+          <div class="info-value">
+            <a href="mailto:wagnerramoseng@gmail.com">wagnerramoseng@gmail.com</a><br>
+            <a href="https://linkedin.com/in/engwagnerramos" target="_blank">linkedin.com/in/engwagnerramos</a>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══ ENTREGAS ══ -->
+<!-- ENTREGAS -->
 <section id="entregas">
-  <div class="section-label" data-num="02">Entregas Estratégicas</div>
-  <h2 class="section-title reveal">Resultados que<br><em>ficam no registro.</em></h2>
-
-  <div class="entregas-list">
-    <div class="entrega-item reveal" data-idx="A">
-      <div class="entrega-num">R$<span class="entrega-unit">500k</span></div>
-      <div class="entrega-label">Recursos viabilizados</div>
-      <div class="entrega-desc">Automação em Python e Excel para gestão de verbas públicas — emendas e convênios — garantindo conformidade e agilidade na liberação.</div>
-    </div>
-    <div class="entrega-item reveal reveal-delay-1" data-idx="B">
-      <div class="entrega-num">−75<span class="entrega-unit">%</span></div>
-      <div class="entrega-label">Tempo de análise</div>
-      <div class="entrega-desc">Processos ETL em Python integrados a dashboards Power BI para tomada de decisão executiva em tempo real.</div>
-    </div>
-    <div class="entrega-item reveal reveal-delay-2" data-idx="C">
-      <div class="entrega-num">4<span class="entrega-unit">eixos</span></div>
-      <div class="entrega-label">Portfólio Estratégico</div>
-      <div class="entrega-desc">Governança do programa "Navega Baleia" com monitoramento em tempo real via Power BI — Eficiência, Pessoas, Qualidade e Crescimento.</div>
-    </div>
-    <div class="entrega-item reveal reveal-delay-3" data-idx="D">
-      <div class="entrega-num">15<span class="entrega-unit">+</span></div>
-      <div class="entrega-label">Projetos simultâneos</div>
-      <div class="entrega-desc">Gestão simultânea de projetos de alta complexidade em ambiente hospitalar regulado, do licenciamento à usina fotovoltaica.</div>
+  <div class="container">
+    <div class="section-label reveal">Resultados</div>
+    <h2 class="section-title reveal">Entregas que<br><em>geram impacto.</em></h2>
+    <div class="entregas-grid">
+      <div class="entrega-card reveal">
+        <div class="entrega-value">R$500<small>k</small></div>
+        <div class="entrega-label">Recursos viabilizados</div>
+        <div class="entrega-desc">Automação em Python e Excel para gestão de verbas públicas — emendas e convênios.</div>
+      </div>
+      <div class="entrega-card reveal delay-1">
+        <div class="entrega-value">−75<small>%</small></div>
+        <div class="entrega-label">Tempo de análise</div>
+        <div class="entrega-desc">Processos ETL em Python integrados a dashboards Power BI para tomada de decisão executiva.</div>
+      </div>
+      <div class="entrega-card reveal delay-2">
+        <div class="entrega-value">4<small>eixos</small></div>
+        <div class="entrega-label">Portfólio Estratégico</div>
+        <div class="entrega-desc">Governança do programa "Navega Baleia" com monitoramento em tempo real via Power BI.</div>
+      </div>
+      <div class="entrega-card reveal delay-3">
+        <div class="entrega-value">15<small>+</small></div>
+        <div class="entrega-label">Projetos simultâneos</div>
+        <div class="entrega-desc">Gestão simultânea de projetos de alta complexidade em ambiente hospitalar regulado.</div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ══ COMPETÊNCIAS ══ -->
+<!-- COMPETÊNCIAS -->
 <section id="competencias" class="alt">
-  <div class="section-label" data-num="03">Competências</div>
-  <h2 class="section-title reveal">O que eu sei<br><em>fazer de verdade.</em></h2>
-
-  <div class="competencias-layout">
-    <nav class="comp-nav" aria-label="Categorias de competência">
-      <div class="comp-nav-item active" data-panel="gov">
-        <span class="dot"></span>Governança & PMO
-      </div>
-      <div class="comp-nav-item" data-panel="dados">
-        <span class="dot"></span>Dados & Automação
-      </div>
-      <div class="comp-nav-item" data-panel="tools">
-        <span class="dot"></span>Ferramentas
-      </div>
-      <div class="comp-nav-item" data-panel="soft">
-        <span class="dot"></span>Soft Skills
-      </div>
-    </nav>
-
-    <div class="comp-panels">
-      <div class="comp-panel active" id="panel-gov">
-        <div class="tags-cloud">
-          <span class="tag highlight">Gestão de Portfólio</span>
-          <span class="tag highlight">PMBOK</span>
-          <span class="tag">Governança de PMO</span>
-          <span class="tag highlight">Controle Físico-Financeiro</span>
-          <span class="tag">Compliance</span>
-          <span class="tag">Gestão de Riscos</span>
-          <span class="tag highlight">Reporting Executivo</span>
-          <span class="tag">BPMN</span>
-          <span class="tag">Gestão de Verbas Públicas</span>
-          <span class="tag">Convênios & Emendas</span>
-          <span class="tag">Prestação de Contas</span>
-          <span class="tag">Ambiente Regulado</span>
-        </div>
-      </div>
-      <div class="comp-panel" id="panel-dados">
-        <div class="tags-cloud">
-          <span class="tag highlight">Power BI (DAX · ETL)</span>
-          <span class="tag highlight">Python (Pandas)</span>
-          <span class="tag">Excel Avançado</span>
-          <span class="tag">VBA</span>
-          <span class="tag">Power Query</span>
-          <span class="tag highlight">ETL / Pipelines</span>
-          <span class="tag">Dashboards Executivos</span>
-          <span class="tag">R</span>
-          <span class="tag">Ciência de Dados</span>
-        </div>
-      </div>
-      <div class="comp-panel" id="panel-tools">
-        <div class="tags-cloud">
-          <span class="tag highlight">Microsoft Project</span>
-          <span class="tag">Visio</span>
-          <span class="tag">Jira</span>
-          <span class="tag">Teams</span>
-          <span class="tag">SharePoint</span>
-          <span class="tag">Microsoft Access</span>
-          <span class="tag">KivyMD (Python)</span>
-          <span class="tag">GitHub</span>
-        </div>
-      </div>
-      <div class="comp-panel" id="panel-soft">
-        <div class="soft-grid">
-          <div class="soft-card">
-            <div class="soft-card-title"><span class="ic">↗</span> Negociação & Influência</div>
-            <p>Articulação entre áreas técnicas, administrativas e liderança executiva sem autoridade hierárquica direta.</p>
+  <div class="container">
+    <div class="section-label reveal">Expertise</div>
+    <h2 class="section-title reveal">O que eu sei<br><em>fazer de verdade.</em></h2>
+    <div class="competencias-layout">
+      <nav class="comp-nav reveal">
+        <div class="comp-nav-item active" data-panel="gov"><span class="dot"></span>Governança & PMO</div>
+        <div class="comp-nav-item" data-panel="dados"><span class="dot"></span>Dados & Automação</div>
+        <div class="comp-nav-item" data-panel="tools"><span class="dot"></span>Ferramentas</div>
+        <div class="comp-nav-item" data-panel="soft"><span class="dot"></span>Soft Skills</div>
+      </nav>
+      <div class="comp-panels">
+        <div class="comp-panel active" id="panel-gov">
+          <div class="tags-cloud">
+            <span class="tag highlight">Gestão de Portfólio</span>
+            <span class="tag highlight">PMBOK</span>
+            <span class="tag">Governança de PMO</span>
+            <span class="tag highlight">Controle Físico-Financeiro</span>
+            <span class="tag">Compliance</span>
+            <span class="tag">Gestão de Riscos</span>
+            <span class="tag highlight">Reporting Executivo</span>
+            <span class="tag">BPMN</span>
+            <span class="tag">Gestão de Verbas Públicas</span>
+            <span class="tag">Convênios & Emendas</span>
+            <span class="tag">Prestação de Contas</span>
+            <span class="tag">Ambiente Regulado</span>
           </div>
-          <div class="soft-card">
-            <div class="soft-card-title"><span class="ic">⊕</span> Visão Estratégica</div>
-            <p>Alinhamento do portfólio de projetos aos objetivos institucionais com reporting para C-level.</p>
+        </div>
+        <div class="comp-panel" id="panel-dados">
+          <div class="tags-cloud">
+            <span class="tag highlight">Power BI (DAX · ETL)</span>
+            <span class="tag highlight">Python (Pandas)</span>
+            <span class="tag">Excel Avançado</span>
+            <span class="tag">VBA</span>
+            <span class="tag">Power Query</span>
+            <span class="tag highlight">ETL / Pipelines</span>
+            <span class="tag">Dashboards Executivos</span>
+            <span class="tag">R</span>
+            <span class="tag">Ciência de Dados</span>
           </div>
-          <div class="soft-card">
-            <div class="soft-card-title"><span class="ic">◈</span> Pensamento Analítico</div>
-            <p>Estruturação de problemas complexos em dados, processos e decisões — resultando em 75% de redução no tempo de análise.</p>
+        </div>
+        <div class="comp-panel" id="panel-tools">
+          <div class="tags-cloud">
+            <span class="tag highlight">Microsoft Project</span>
+            <span class="tag">Visio</span>
+            <span class="tag">Jira</span>
+            <span class="tag">Teams</span>
+            <span class="tag">SharePoint</span>
+            <span class="tag">Microsoft Access</span>
+            <span class="tag">KivyMD (Python)</span>
+            <span class="tag">GitHub</span>
           </div>
-          <div class="soft-card">
-            <div class="soft-card-title"><span class="ic">⟳</span> Adaptabilidade</div>
-            <p>Atuação consistente em ambiente hospitalar de alta complexidade e pressão regulatória constante.</p>
+        </div>
+        <div class="comp-panel" id="panel-soft">
+          <div class="tags-cloud" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div><span class="tag">Negociação & Influência</span><br><small style="color:var(--ink-light);">Articulação entre áreas técnicas e liderança executiva</small></div>
+            <div><span class="tag">Visão Estratégica</span><br><small style="color:var(--ink-light);">Alinhamento do portfólio aos objetivos institucionais</small></div>
+            <div><span class="tag">Pensamento Analítico</span><br><small style="color:var(--ink-light);">Estruturação de problemas complexos em dados e processos</small></div>
+            <div><span class="tag">Adaptabilidade</span><br><small style="color:var(--ink-light);">Atuação consistente em ambiente hospitalar de alta pressão</small></div>
           </div>
         </div>
       </div>
@@ -1212,362 +1033,325 @@ footer {
   </div>
 </section>
 
-<!-- ══ EXPERIÊNCIA ══ -->
+<!-- EXPERIÊNCIA -->
 <section id="experiencia">
-  <div class="section-label" data-num="04">Experiência</div>
-  <h2 class="section-title reveal">Onde isso<br><em>foi aplicado.</em></h2>
-
-  <div class="exp-timeline">
-
-    <!-- Hospital da Baleia -->
-    <div class="exp-entry reveal">
-      <div class="exp-left">
-        <div class="exp-period">out/2024 — atual</div>
-        <div class="exp-current">Em andamento</div>
-      </div>
-      <div class="exp-right">
-        <div class="exp-company">Hospital da Baleia</div>
-        <div class="exp-role">Analista de Projetos · PMO · Belo Horizonte, MG</div>
-        <div class="exp-badges">
-          <span class="badge">R$ 500k viabilizados</span>
-          <span class="badge">−75% tempo análise</span>
-          <span class="badge">8+ projetos</span>
-          <span class="badge outline">PMO Hospitalar</span>
-          <span class="badge outline">Power BI</span>
-          <span class="badge outline">Verbas Públicas</span>
+  <div class="container">
+    <div class="section-label reveal">Trajetória</div>
+    <h2 class="section-title reveal">Onde isso<br><em>foi aplicado.</em></h2>
+    <div class="exp-timeline">
+      <!-- Hospital da Baleia -->
+      <div class="exp-entry reveal">
+        <div class="exp-left">
+          <div class="exp-period">out/2024 — atual</div>
+          <div class="exp-current">Em andamento</div>
         </div>
-        <ul class="exp-list">
-          <li><strong>Governança do portfólio "Navega Baleia"</strong> — programa institucional com 4 eixos estratégicos e monitoramento em tempo real via Power BI.</li>
-          <li><strong>Projetos de alta complexidade</strong> em ambiente hospitalar regulado: licenciamento ambiental, usina fotovoltaica, iniciativas Lean, gestão de riscos, incêndios e reformas assistenciais.</li>
-          <li><strong>Gestão de verbas públicas</strong> — reestruturação completa do fluxo de acompanhamento financeiro com dashboards automatizados em Excel e Power BI.</li>
-          <li><strong>Estruturação do processo de obras e demandas hospitalares</strong> com sistema integrado Power BI para controle em tempo real.</li>
-          <li><strong>Articulação com liderança executiva</strong> via kick-off, follow-up de projetos e reporting C-level.</li>
-        </ul>
-        <div class="exp-stack">
-          Governança de Portfólio · PMBOK · KPIs · BPMN · Gestão da Mudança · Controle Físico-Financeiro · Power BI · Python · Excel
+        <div class="exp-right">
+          <div class="exp-company">Hospital da Baleia</div>
+          <div class="exp-role">Analista de Projetos · PMO</div>
+          <div class="exp-badges">
+            <span class="badge">R$ 500k viabilizados</span>
+            <span class="badge">−75% tempo análise</span>
+            <span class="badge">8+ projetos</span>
+            <span class="badge">PMO Hospitalar</span>
+          </div>
+          <ul class="exp-list">
+            <li><strong>Governança do portfólio "Navega Baleia"</strong> — programa institucional com 4 eixos estratégicos e monitoramento em tempo real via Power BI.</li>
+            <li><strong>Projetos de alta complexidade</strong> em ambiente hospitalar regulado: licenciamento ambiental, usina fotovoltaica, iniciativas Lean, gestão de riscos, incêndios e reformas assistenciais.</li>
+            <li><strong>Gestão de verbas públicas</strong> — reestruturação completa do fluxo de acompanhamento financeiro com dashboards automatizados em Excel e Power BI.</li>
+            <li><strong>Articulação com liderança executiva</strong> via kick-off, follow-up de projetos e reporting C-level.</li>
+          </ul>
+          <div class="exp-stack">
+            Governança de Portfólio · PMBOK · KPIs · BPMN · Gestão da Mudança · Controle Físico-Financeiro · Power BI · Python · Excel
+          </div>
         </div>
       </div>
-    </div>
-
-    <!-- Autônomo -->
-    <div class="exp-entry reveal">
-      <div class="exp-left">
-        <div class="exp-period">mar/2018 — dez/2024</div>
+      <!-- Autônomo -->
+      <div class="exp-entry reveal">
+        <div class="exp-left">
+          <div class="exp-period">mar/2018 — dez/2024</div>
+        </div>
+        <div class="exp-right">
+          <div class="exp-company">Eng. Wagner Ramos</div>
+          <div class="exp-role">Consultor de Projetos</div>
+          <ul class="exp-list">
+            <li><strong>Consultor e gerente de projetos</strong> — do levantamento de requisitos à entrega final em projetos técnicos e de engenharia.</li>
+            <li><strong>Automações em Python e Excel</strong> para gestão de projetos, organização de informações e controle de prazos.</li>
+            <li><strong>Boas práticas PMBOK</strong> com uso de Microsoft Project para planejamento e controle de cronograma.</li>
+          </ul>
+          <div class="exp-stack">
+            Planejamento · Controle de Projetos · Gestão de Cronograma · Python · Excel · MS Project · PMBOK
+          </div>
+        </div>
       </div>
-      <div class="exp-right">
-        <div class="exp-company">Eng. Wagner Ramos</div>
-        <div class="exp-role">Engenheiro · Consultor de Projetos · Belo Horizonte, MG</div>
-        <ul class="exp-list">
-          <li><strong>Consultor e gerente de projetos</strong> — do levantamento de requisitos à entrega final em projetos técnicos e de engenharia.</li>
-          <li><strong>Automações em Python e Excel</strong> para gestão de projetos, organização de informações e controle de prazos.</li>
-          <li><strong>Boas práticas PMBOK</strong> com uso de Microsoft Project para planejamento e controle de cronograma.</li>
-        </ul>
-        <div class="exp-stack">
-          Planejamento · Controle de Projetos · Gestão de Cronograma · Python · Excel · MS Project · PMBOK
+      <!-- Estágio -->
+      <div class="exp-entry reveal">
+        <div class="exp-left">
+          <div class="exp-period">ago/2016 — jul/2017</div>
+        </div>
+        <div class="exp-right">
+          <div class="exp-company">Araujo Projeto</div>
+          <div class="exp-role">Estagiário de Engenharia</div>
+          <ul class="exp-list">
+            <li>Desenvolvimento de projetos técnicos com foco em conformidade normativa e qualidade.</li>
+            <li>Organização de dados em Microsoft Access e Excel para suporte à tomada de decisão.</li>
+          </ul>
         </div>
       </div>
     </div>
+  </div>
+</section>
 
-    <!-- Estágio -->
-    <div class="exp-entry reveal">
-      <div class="exp-left">
-        <div class="exp-period">ago/2016 — jul/2017</div>
+<!-- PROJETOS -->
+<section id="projetos" class="alt">
+  <div class="container">
+    <div class="section-label reveal">Aplicações</div>
+    <h2 class="section-title reveal">Código que<br><em>resolve problemas.</em></h2>
+    <div class="projects-grid">
+      <a class="project-card reveal" href="#" target="_blank">
+        <div class="project-num">001</div>
+        <div class="project-title">Dashboard Financeiro</div>
+        <div class="project-desc">Painel com KPIs financeiros para diretoria — fluxo de caixa, despesas e projeções em tempo real.</div>
+        <div class="project-tags">
+          <span class="project-tag">Power BI</span>
+          <span class="project-tag">DAX</span>
+          <span class="project-tag">Financeiro</span>
+        </div>
+        <span class="project-link">Ver projeto →</span>
+      </a>
+      <a class="project-card reveal delay-1" href="#" target="_blank">
+        <div class="project-num">002</div>
+        <div class="project-title">Dashboard de Portfólio</div>
+        <div class="project-desc">Monitoramento em tempo real do portfólio com 20+ projetos, status, prazos e riscos.</div>
+        <div class="project-tags">
+          <span class="project-tag">Power BI</span>
+          <span class="project-tag">PMO</span>
+          <span class="project-tag">ETL</span>
+        </div>
+        <span class="project-link">Ver projeto →</span>
+      </a>
+      <a class="project-card reveal delay-2" href="https://www.linkedin.com/posts/engwagnerramos_python-poo-kivymd-activity-7166114326922182657-kq71" target="_blank">
+        <div class="project-num">003</div>
+        <div class="project-title">App Android — Minha Lista</div>
+        <div class="project-desc">Aplicativo mobile de lista de compras desenvolvido com Python e KivyMD.</div>
+        <div class="project-tags">
+          <span class="project-tag">Python</span>
+          <span class="project-tag">KivyMD</span>
+          <span class="project-tag">JSON</span>
+        </div>
+        <span class="project-link">Ver no LinkedIn →</span>
+      </a>
+      <a class="project-card reveal" href="https://ramoswagner.github.io/flashcards/" target="_blank">
+        <div class="project-num">004</div>
+        <div class="project-title">Flashcards de Português</div>
+        <div class="project-desc">Ferramenta de estudo com flashcards interativos de língua portuguesa.</div>
+        <div class="project-tags">
+          <span class="project-tag">HTML</span>
+          <span class="project-tag">JavaScript</span>
+          <span class="project-tag">JSON</span>
+        </div>
+        <span class="project-link">Acessar →</span>
+      </a>
+      <a class="project-card reveal delay-1" href="https://ramoswagner.github.io/dice/" target="_blank">
+        <div class="project-num">005</div>
+        <div class="project-title">DICE Model Analyzer</div>
+        <div class="project-desc">Ferramenta de análise de risco e probabilidade de sucesso em projetos baseada no modelo BCG/EESC-USP.</div>
+        <div class="project-tags">
+          <span class="project-tag">PMBOK</span>
+          <span class="project-tag">Risco</span>
+          <span class="project-tag">HTML/JS</span>
+        </div>
+        <span class="project-link">Acessar →</span>
+      </a>
+      <a class="project-card reveal delay-2" href="https://www.linkedin.com/in/engwagnerramos/" target="_blank">
+        <div class="project-num">006</div>
+        <div class="project-title">Case: PMO Hospitalar</div>
+        <div class="project-desc">Artigo e apresentação sobre estruturação do PMO no Hospital da Baleia com programa "Navega Baleia".</div>
+        <div class="project-tags">
+          <span class="project-tag">PMO</span>
+          <span class="project-tag">Case</span>
+          <span class="project-tag">Hospital</span>
+        </div>
+        <span class="project-link">Ver no LinkedIn →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- CERTIFICAÇÕES -->
+<section id="certificacoes">
+  <div class="container">
+    <div class="section-label reveal">Formação contínua</div>
+    <h2 class="section-title reveal">Certificações<br><em>e especializações.</em></h2>
+    <div class="cert-grid">
+      <div class="cert-category reveal">
+        <h3>Dados & Analytics</h3>
+        <ul class="cert-list">
+          <li>Formação Plena em Ciência de Dados (Python e R) · Udemy 2023</li>
+          <li>Microsoft Power BI Profissional · Udemy 2023</li>
+          <li>Técnicas Avançadas de Power BI · LinkedIn Learning 2023</li>
+          <li>Excel · FAPEMG 2017</li>
+        </ul>
       </div>
-      <div class="exp-right">
-        <div class="exp-company">Araujo Projeto</div>
-        <div class="exp-role">Estagiário de Engenharia · Belo Horizonte, MG</div>
-        <ul class="exp-list">
-          <li>Desenvolvimento de projetos técnicos com foco em conformidade normativa e qualidade.</li>
-          <li>Organização de dados em Microsoft Access e Excel para suporte à tomada de decisão.</li>
+      <div class="cert-category reveal delay-1">
+        <h3>Gestão de Projetos</h3>
+        <ul class="cert-list">
+          <li>Microsoft Project — Básico ao Avançado · Udemy 2023</li>
+          <li>Execução e Controle com MS Project · LinkedIn Learning 2023</li>
+          <li>Gerenciamento de Cronogramas · LinkedIn Learning 2023</li>
+          <li>Lean Six Sigma · Escola DNC 2023</li>
+        </ul>
+      </div>
+      <div class="cert-category reveal delay-2">
+        <h3>Agilidade & Métodos</h3>
+        <ul class="cert-list">
+          <li>OKR na Prática · Udemy 2023</li>
+          <li>Gestão Ágil com Scrum · Udemy 2023</li>
+          <li>Kanban de A a Z · Udemy 2023</li>
+        </ul>
+      </div>
+      <div class="cert-category reveal delay-3">
+        <h3>Estratégia & Liderança</h3>
+        <ul class="cert-list">
+          <li>Comunicação e Oratória · Escola Conquer 2023</li>
+          <li>Liderança com Inteligência Emocional · LinkedIn Learning 2023</li>
+          <li>Pensamento Crítico · LinkedIn Learning 2023</li>
         </ul>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══ FORMAÇÃO ══ -->
-<section id="formacao" class="alt">
-  <div class="section-label" data-num="05">Formação</div>
-  <h2 class="section-title reveal">Base<br><em>acadêmica.</em></h2>
-
-  <div class="formacao-list">
-    <div class="formacao-entry reveal">
-      <div class="formacao-year">Em curso</div>
-      <div>
-        <div class="formacao-degree">MBA em Gestão de Projetos</div>
-        <div class="formacao-school">Fundace FEARP · USP</div>
+<!-- CONTATO -->
+<section id="contato" class="alt">
+  <div class="container">
+    <div class="section-label reveal">Contato</div>
+    <div class="contato-wrap">
+      <div class="contato-left">
+        <p class="big-cta reveal">
+          Vamos estruturar<br>
+          <em>algo relevante</em><br>
+          juntos?
+        </p>
+        <div class="contact-links reveal">
+          <a class="contact-link" href="mailto:wagnerramoseng@gmail.com">
+            <div>
+              <div class="contact-link-label">E-mail</div>
+              wagnerramoseng@gmail.com
+            </div>
+            <span class="arr">→</span>
+          </a>
+          <a class="contact-link" href="https://www.linkedin.com/in/engwagnerramos/" target="_blank">
+            <div>
+              <div class="contact-link-label">LinkedIn</div>
+              linkedin.com/in/engwagnerramos
+            </div>
+            <span class="arr">→</span>
+          </a>
+          <a class="contact-link" href="https://github.com/Ramoswagner" target="_blank">
+            <div>
+              <div class="contact-link-label">GitHub</div>
+              github.com/Ramoswagner
+            </div>
+            <span class="arr">→</span>
+          </a>
+        </div>
       </div>
-    </div>
-    <div class="formacao-entry reveal">
-      <div class="formacao-year">2023</div>
-      <div>
-        <div class="formacao-degree">Pós-graduação em Gestão de Projetos</div>
-        <div class="formacao-school">Descomplica Faculdade Digital</div>
-      </div>
-    </div>
-    <div class="formacao-entry reveal">
-      <div class="formacao-year">2017</div>
-      <div>
-        <div class="formacao-degree">Bacharelado em Engenharia Civil</div>
-        <div class="formacao-school">Centro Universitário de Belo Horizonte · UniBH</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ PROJETOS ══ -->
-<section id="projetos">
-  <div class="section-label" data-num="06">Aplicações Práticas</div>
-  <h2 class="section-title reveal">Código que<br><em>resolve problemas.</em></h2>
-
-  <div class="projects-grid">
-    <a class="project-card reveal" href="assets/projetos/dash-financeiro.jpg" target="_blank">
-      <div class="project-num">001</div>
-      <div class="project-title">Dashboard Financeiro</div>
-      <div class="project-desc">Painel com KPIs financeiros para diretoria — fluxo de caixa, despesas e projeções em tempo real.</div>
-      <div class="project-tags-row">
-        <span class="ptag">Power BI</span><span class="ptag">DAX</span><span class="ptag">Financeiro</span>
-      </div>
-      <span class="project-link">Ver projeto →</span>
-    </a>
-    <a class="project-card reveal reveal-delay-1" href="assets/projetos/dash-portfolio.jpg" target="_blank">
-      <div class="project-num">002</div>
-      <div class="project-title">Dashboard de Portfólio</div>
-      <div class="project-desc">Monitoramento em tempo real do portfólio com 20+ projetos, status, prazos e riscos.</div>
-      <div class="project-tags-row">
-        <span class="ptag">Power BI</span><span class="ptag">PMO</span><span class="ptag">ETL</span>
-      </div>
-      <span class="project-link">Ver projeto →</span>
-    </a>
-    <a class="project-card reveal reveal-delay-2" href="https://www.linkedin.com/posts/engwagnerramos_python-poo-kivymd-activity-7166114326922182657-kq71" target="_blank">
-      <div class="project-num">003</div>
-      <div class="project-title">App Android — Minha Lista</div>
-      <div class="project-desc">Aplicativo mobile de lista de compras desenvolvido com Python e KivyMD.</div>
-      <div class="project-tags-row">
-        <span class="ptag">Python</span><span class="ptag">KivyMD</span><span class="ptag">JSON</span>
-      </div>
-      <span class="project-link">Ver no LinkedIn →</span>
-    </a>
-    <a class="project-card reveal reveal-delay-3" href="https://ramoswagner.github.io/flashcards/" target="_blank">
-      <div class="project-num">004</div>
-      <div class="project-title">Flashcards de Português</div>
-      <div class="project-desc">Ferramenta de estudo com flashcards interativos de língua portuguesa.</div>
-      <div class="project-tags-row">
-        <span class="ptag">HTML</span><span class="ptag">JavaScript</span><span class="ptag">JSON</span>
-      </div>
-      <span class="project-link">Acessar →</span>
-    </a>
-    <a class="project-card reveal" href="https://ramoswagner.github.io/dice/" target="_blank">
-      <div class="project-num">005</div>
-      <div class="project-title">DICE Model Analyzer</div>
-      <div class="project-desc">Ferramenta de análise de risco e probabilidade de sucesso em projetos baseada no modelo BCG/EESC-USP.</div>
-      <div class="project-tags-row">
-        <span class="ptag">PMBOK</span><span class="ptag">Risco</span><span class="ptag">HTML/JS</span>
-      </div>
-      <span class="project-link">Acessar →</span>
-    </a>
-    <a class="project-card reveal reveal-delay-1" href="https://www.linkedin.com/in/engwagnerramos/" target="_blank">
-      <div class="project-num">006</div>
-      <div class="project-title">Case: PMO Hospitalar</div>
-      <div class="project-desc">Artigo e apresentação sobre estruturação do PMO no Hospital da Baleia com programa "Navega Baleia".</div>
-      <div class="project-tags-row">
-        <span class="ptag">PMO</span><span class="ptag">Case</span><span class="ptag">Hospital</span>
-      </div>
-      <span class="project-link">Ver no LinkedIn →</span>
-    </a>
-  </div>
-</section>
-
-<!-- ══ CERTIFICAÇÕES ══ -->
-<section id="certificacoes" class="alt">
-  <div class="section-label" data-num="07">Certificações</div>
-  <h2 class="section-title reveal">Formação<br><em>contínua.</em></h2>
-
-  <div class="cert-cols">
-    <div class="reveal">
-      <div class="cert-col-title">Dados & Analytics</div>
-      <ul class="cert-list">
-        <li>Formação Plena em Ciência de Dados (Python e R) · Udemy 2023</li>
-        <li>Microsoft Power BI Profissional · Udemy 2023</li>
-        <li>Técnicas Avançadas de Power BI · LinkedIn Learning 2023</li>
-        <li>Excel · FAPEMG 2017</li>
-      </ul>
-    </div>
-    <div class="reveal reveal-delay-1">
-      <div class="cert-col-title">Gestão de Projetos</div>
-      <ul class="cert-list">
-        <li>Microsoft Project — Básico ao Avançado · Udemy 2023</li>
-        <li>Execução e Controle com MS Project · LinkedIn Learning 2023</li>
-        <li>Gerenciamento de Cronogramas · LinkedIn Learning 2023</li>
-        <li>Gestão Ágil com Microsoft Project · LinkedIn Learning 2023</li>
-        <li>Lean Six Sigma · Escola DNC 2023</li>
-      </ul>
-    </div>
-    <div class="reveal reveal-delay-2">
-      <div class="cert-col-title">Agilidade & Métodos</div>
-      <ul class="cert-list">
-        <li>OKR na Prática · Udemy 2023</li>
-        <li>Gestão Ágil com Scrum · Udemy 2023</li>
-        <li>Kanban de A a Z · Udemy 2023</li>
-      </ul>
-    </div>
-    <div class="reveal reveal-delay-3">
-      <div class="cert-col-title">Estratégia & Liderança</div>
-      <ul class="cert-list">
-        <li>Comunicação e Oratória · Escola Conquer 2023</li>
-        <li>Liderança com Inteligência Emocional · LinkedIn Learning 2023</li>
-        <li>Pensamento Crítico · LinkedIn Learning 2023</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<!-- ══ CONTATO ══ -->
-<section id="contato">
-  <div class="section-label" data-num="08">Contato</div>
-
-  <div class="contato-wrap">
-    <div class="contato-left">
-      <p class="big-cta reveal">
-        Vamos estruturar<br>
-        <em>algo relevante</em><br>
-        juntos?
-      </p>
-      <div class="contact-links reveal">
-        <a class="contact-link" href="mailto:wagnerramoseng@gmail.com">
-          <div>
-            <div class="contact-link-label">E-mail</div>
-            wagnerramoseng@gmail.com
-          </div>
-          <span class="arr">→</span>
-        </a>
-        <a class="contact-link" href="https://www.linkedin.com/in/engwagnerramos/" target="_blank">
-          <div>
-            <div class="contact-link-label">LinkedIn</div>
-            linkedin.com/in/engwagnerramos
-          </div>
-          <span class="arr">→</span>
-        </a>
-        <a class="contact-link" href="https://github.com/Ramoswagner" target="_blank">
-          <div>
-            <div class="contact-link-label">GitHub</div>
-            github.com/Ramoswagner
-          </div>
-          <span class="arr">→</span>
-        </a>
-        <a class="contact-link" href="https://www.instagram.com/engwagnerramos" target="_blank">
-          <div>
-            <div class="contact-link-label">Instagram</div>
-            @engwagnerramos
-          </div>
-          <span class="arr">→</span>
-        </a>
-      </div>
-    </div>
-
-    <div class="contato-right reveal reveal-delay-1">
-      <div class="contato-info-block">
-        <div class="ci-label">Disponibilidade</div>
-        <div class="ci-val">Aberto a oportunidades</div>
-        <div class="ci-label">Localização</div>
-        <div class="ci-val">Belo Horizonte, MG<br>Disponível para remoto/híbrido</div>
-        <div class="ci-label">Baixar Currículo</div>
-        <div class="ci-val"><a href="assets/curriculo-wagner-ramos.pdf" download>curriculo-wagner-ramos.pdf →</a></div>
+      <div class="contato-right reveal delay-1">
+        <div class="contato-card">
+          <div class="info-label">Disponibilidade</div>
+          <div class="info-value">Aberto a oportunidades</div>
+          <div class="info-label">Localização</div>
+          <div class="info-value">Belo Horizonte, MG · Remoto/Híbrido</div>
+          <div class="info-label">Baixar Currículo</div>
+          <div class="info-value"><a href="assets/curriculo-wagner-ramos.pdf" download>curriculo-wagner-ramos.pdf →</a></div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══ FOOTER ══ -->
 <footer>
-  <div class="foot-left">© 2026 Wagner Douglas Ramos da Silva</div>
-  <div class="foot-right">PMO · Gestão de Projetos · Business Intelligence</div>
+  <div>© 2026 Wagner Douglas Ramos da Silva</div>
+  <div>Estratégia · PMO · Dados</div>
 </footer>
 
 <script>
-/* ── Cursor crosshair ── */
-const curH = document.getElementById('curH');
-const curV = document.getElementById('curV');
-const curDot = document.getElementById('curDot');
-document.addEventListener('mousemove', e => {
-  curH.style.left = e.clientX + 'px';
-  curV.style.top = e.clientY + 'px';
-  curDot.style.left = e.clientX + 'px';
-  curDot.style.top = e.clientY + 'px';
-});
-
-/* ── Scroll Reveal ── */
-const revealEls = document.querySelectorAll('.reveal');
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('visible');
-      observer.unobserve(e.target);
-    }
+  // Menu mobile
+  const hamburger = document.getElementById('hamburger');
+  const navLinks = document.getElementById('navLinks');
+  hamburger.addEventListener('click', () => {
+    navLinks.classList.toggle('open');
   });
-}, { threshold: 0.1 });
-revealEls.forEach(el => observer.observe(el));
 
-/* ── Counter Animation ── */
-function animateCounter(el) {
-  const target = parseInt(el.dataset.target);
-  const duration = 1800;
-  const start = performance.now();
-  const update = (now) => {
-    const progress = Math.min((now - start) / duration, 1);
-    const ease = 1 - Math.pow(1 - progress, 3);
-    el.textContent = Math.round(ease * target);
-    if (progress < 1) requestAnimationFrame(update);
-  };
-  requestAnimationFrame(update);
-}
-
-const counters = document.querySelectorAll('.counter');
-const counterObs = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      animateCounter(e.target);
-      counterObs.unobserve(e.target);
-    }
+  // Fechar menu ao clicar em link
+  navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      navLinks.classList.remove('open');
+    });
   });
-}, { threshold: 0.5 });
-counters.forEach(c => counterObs.observe(c));
 
-/* ── Competências Tabs ── */
-const navItems = document.querySelectorAll('.comp-nav-item');
-navItems.forEach(item => {
-  item.addEventListener('click', () => {
-    const panel = item.dataset.panel;
-    navItems.forEach(n => n.classList.remove('active'));
-    document.querySelectorAll('.comp-panel').forEach(p => p.classList.remove('active'));
-    item.classList.add('active');
-    document.getElementById('panel-' + panel).classList.add('active');
-  });
-});
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
 
-/* ── Mobile Menu ── */
-const hamburger = document.getElementById('hamburger');
-const navLinks = document.getElementById('navLinks');
-hamburger.addEventListener('click', () => {
-  navLinks.classList.toggle('open');
-});
-navLinks.querySelectorAll('a').forEach(a => {
-  a.addEventListener('click', () => navLinks.classList.remove('open'));
-});
+  // Contadores animados
+  const counters = document.querySelectorAll('.counter');
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const target = parseInt(el.dataset.target);
+        let count = 0;
+        const update = () => {
+          if (count < target) {
+            count += Math.ceil(target / 80);
+            if (count > target) count = target;
+            el.textContent = count;
+            requestAnimationFrame(update);
+          }
+        };
+        update();
+        counterObserver.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+  counters.forEach(c => counterObserver.observe(c));
 
-/* ── Active nav on scroll ── */
-const sections = document.querySelectorAll('section[id]');
-const navAs = document.querySelectorAll('.nav-links a');
-window.addEventListener('scroll', () => {
-  let current = '';
-  sections.forEach(s => {
-    if (window.scrollY >= s.offsetTop - 100) current = s.id;
+  // Tabs de competências
+  const navItems = document.querySelectorAll('.comp-nav-item');
+  const panels = document.querySelectorAll('.comp-panel');
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      navItems.forEach(n => n.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      item.classList.add('active');
+      const panelId = 'panel-' + item.dataset.panel;
+      document.getElementById(panelId).classList.add('active');
+    });
   });
-  navAs.forEach(a => {
-    a.style.color = a.getAttribute('href') === '#' + current
-      ? 'var(--ink)' : '';
-  });
-}, { passive: true });
+
+  // Destaque do menu ativo no scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navAs = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      const top = s.offsetTop - 100;
+      if (window.scrollY >= top) current = s.id;
+    });
+    navAs.forEach(a => {
+      a.style.color = a.getAttribute('href') === '#' + current ? 'var(--ink)' : '';
+    });
+  }, { passive: true });
 </script>
+
 </body>
 </html>
