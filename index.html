@@ -1,1596 +1,1527 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>Wagner Ramos — Strategic X-Ray</title>
-  <!-- Fontes premium: Satoshi (sans) + Garamond (serif) + Mono -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    /* ===== RESET E VARIÁVEIS ===== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    :root {
-      --bg-deep: #0A0C0F;
-      --bg-panel: #14181E;
-      --text-bright: #F0F2F5;
-      --text-dim: #9AA9B9;
-      --accent: #FF5A36;           /* laranja mais vibrante */
-      --accent-dim: #CC4A2C;
-      --grid-color: rgba(255, 90, 54, 0.15);
-      --border-light: rgba(255, 255, 255, 0.03);
-      --border-accent: rgba(255, 90, 54, 0.3);
-      --shadow-heavy: 0 30px 50px -30px black;
-      --shadow-glow: 0 0 0 1px rgba(255, 90, 54, 0.2);
-      --transition: all 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
-      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-      --font-serif: 'Instrument Serif', Georgia, serif;
-      --font-mono: 'JetBrains Mono', monospace;
-    }
-
-    body {
-      background-color: var(--bg-deep);
-      color: var(--text-bright);
-      font-family: var(--font-sans);
-      font-weight: 300;
-      line-height: 1.5;
-      overflow-x: hidden;
-      cursor: none;
-    }
-
-    /* ===== CURSOR PERSONALIZADO ===== */
-    #cursor-dot {
-      position: fixed;
-      width: 6px;
-      height: 6px;
-      background: var(--accent);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 10000;
-      transform: translate(-50%, -50%);
-      box-shadow: 0 0 20px var(--accent);
-      transition: width 0.2s, height 0.2s, background 0.2s;
-    }
-
-    #cursor-outline {
-      position: fixed;
-      width: 40px;
-      height: 40px;
-      border: 1px solid var(--accent);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
-      transform: translate(-50%, -50%);
-      transition: width 0.2s, height 0.2s, border-color 0.2s;
-      opacity: 0.5;
-    }
-
-    /* ===== FUNDO CINÉTICO ===== */
-    .xray-grid {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: 
-        linear-gradient(var(--grid-color) 1px, transparent 1px),
-        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-      background-size: 50px 50px;
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.4;
-      animation: gridShift 12s infinite alternate;
-    }
-
-    @keyframes gridShift {
-      0% { background-position: 0 0; opacity: 0.3; }
-      100% { background-position: 20px 20px; opacity: 0.5; }
-    }
-
-    .noise {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJmIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc0IiBudW1PY3RhdmVzPSIzIiAvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNmKSIgb3BhY2l0eT0iMC4wMjUiIC8+PC9zdmc+');
-      pointer-events: none;
-      z-index: 1;
-      opacity: 0.15;
-      mix-blend-mode: overlay;
-    }
-
-    /* ===== CONTAINER PRINCIPAL ===== */
-    main {
-      position: relative;
-      z-index: 10;
-    }
-
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 4rem;
-    }
-
-    @media (max-width: 768px) {
-      .container { padding: 0 1.5rem; }
-    }
-
-    /* ===== NAVEGAÇÃO ===== */
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      padding: 1.5rem 4rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(10, 12, 15, 0.7);
-      backdrop-filter: blur(16px) saturate(180%);
-      border-bottom: 1px solid var(--border-accent);
-    }
-
-    .nav-mark {
-      font-family: var(--font-serif);
-      font-size: 2rem;
-      letter-spacing: -0.02em;
-      color: var(--text-bright);
-      line-height: 1;
-    }
-
-    .nav-mark span {
-      color: var(--accent);
-      margin-left: 4px;
-      font-size: 1.2rem;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 3rem;
-      list-style: none;
-    }
-
-    .nav-links a {
-      text-decoration: none;
-      color: var(--text-dim);
-      font-size: 0.8rem;
-      font-weight: 400;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      transition: var(--transition);
-      position: relative;
-      padding: 0.5rem 0;
-    }
-
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 0;
-      height: 1px;
-      background: var(--accent);
-      transition: width 0.3s ease;
-    }
-
-    .nav-links a:hover {
-      color: var(--text-bright);
-    }
-
-    .nav-links a:hover::after {
-      width: 100%;
-    }
-
-    .menu-toggle {
-      display: none;
-      flex-direction: column;
-      gap: 6px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      z-index: 200;
-    }
-
-    .menu-toggle span {
-      width: 28px;
-      height: 2px;
-      background: var(--text-bright);
-      transition: var(--transition);
-    }
-
-    /* ===== SEÇÕES ===== */
-    section {
-      position: relative;
-      min-height: 100vh;
-      padding: 8rem 0;
-      display: flex;
-      align-items: center;
-    }
-
-    .section-badge {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.4em;
-      color: var(--accent);
-      margin-bottom: 2rem;
-    }
-
-    .section-badge span {
-      width: 60px;
-      height: 1px;
-      background: currentColor;
-      opacity: 0.5;
-    }
-
-    .section-title {
-      font-family: var(--font-serif);
-      font-size: clamp(3.5rem, 8vw, 6rem);
-      font-weight: 400;
-      line-height: 0.95;
-      letter-spacing: -0.03em;
-      max-width: 1000px;
-      margin-bottom: 3rem;
-      color: var(--text-bright);
-    }
-
-    .section-title em {
-      font-style: italic;
-      color: var(--accent);
-      display: inline-block;
-    }
-
-    /* ===== HERO ===== */
-    .hero {
-      align-items: flex-end;
-      padding-bottom: 6rem;
-    }
-
-    .hero-bg-number {
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      font-family: var(--font-serif);
-      font-size: 30vw;
-      line-height: 0.7;
-      color: transparent;
-      -webkit-text-stroke: 2px rgba(255, 90, 54, 0.2);
-      pointer-events: none;
-      z-index: 1;
-      user-select: none;
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 5;
-    }
-
-    .hero-name {
-      font-family: var(--font-serif);
-      font-size: clamp(4rem, 12vw, 9rem);
-      line-height: 0.85;
-      margin-bottom: 2rem;
-    }
-
-    .hero-name-line {
-      display: block;
-    }
-
-    .hero-name-line:last-child {
-      color: var(--accent);
-      padding-left: 2rem;
-    }
-
-    .hero-desc {
-      font-size: 1.3rem;
-      max-width: 600px;
-      color: var(--text-dim);
-      margin-bottom: 3rem;
-      border-left: 4px solid var(--accent);
-      padding-left: 2rem;
-      line-height: 1.5;
-    }
-
-    .hero-metrics {
-      display: flex;
-      gap: 4rem;
-      flex-wrap: wrap;
-    }
-
-    .metric {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .metric-value {
-      font-size: 3rem;
-      font-weight: 500;
-      font-family: var(--font-serif);
-      display: flex;
-      align-items: baseline;
-      gap: 4px;
-      color: var(--text-bright);
-    }
-
-    .metric-unit {
-      font-size: 1.2rem;
-      color: var(--accent);
-    }
-
-    .metric-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: var(--text-dim);
-    }
-
-    .btn-group {
-      display: flex;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-      margin-top: 3rem;
-    }
-
-    .btn {
-      padding: 1.2rem 2.8rem;
-      border-radius: 0;
-      font-size: 0.8rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      text-decoration: none;
-      transition: var(--transition);
-      border: 1px solid transparent;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.8rem;
-      cursor: pointer;
-      background: transparent;
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: var(--bg-deep);
-      border-color: var(--accent);
-    }
-
-    .btn-primary:hover {
-      background: transparent;
-      color: var(--accent);
-      box-shadow: 0 0 30px rgba(255, 90, 54, 0.5);
-    }
-
-    .btn-outline {
-      border-color: rgba(255, 90, 54, 0.3);
-      color: var(--text-bright);
-    }
-
-    .btn-outline:hover {
-      border-color: var(--accent);
-      background: rgba(255, 90, 54, 0.1);
-    }
-
-    /* ===== SOBRE ===== */
-    .about-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6rem;
-      align-items: start;
-    }
-
-    .about-text {
-      font-size: 1.1rem;
-      line-height: 1.8;
-      color: var(--text-dim);
-    }
-
-    .about-text p {
-      margin-bottom: 1.8rem;
-    }
-
-    .about-text strong {
-      color: var(--text-bright);
-      font-weight: 500;
-    }
-
-    .info-panel {
-      background: var(--bg-panel);
-      padding: 3rem;
-      border: 1px solid var(--border-accent);
-      backdrop-filter: blur(8px);
-      box-shadow: var(--shadow-heavy);
-    }
-
-    .info-row {
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-      margin-bottom: 2rem;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      padding-bottom: 1.5rem;
-    }
-
-    .info-label {
-      font-size: 0.7rem;
-      letter-spacing: 0.2em;
-      color: var(--accent);
-      text-transform: uppercase;
-    }
-
-    .info-value {
-      font-size: 1.1rem;
-      font-weight: 300;
-    }
-
-    .info-value a {
-      color: var(--text-bright);
-      text-decoration: none;
-      border-bottom: 1px dashed var(--accent);
-    }
-
-    /* ===== ENTREGAS (CARDS DE IMPACTO) ===== */
-    .deliveries-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1px;
-      background: var(--border-accent);
-      border: 1px solid var(--border-accent);
-    }
-
-    .delivery-card {
-      background: var(--bg-panel);
-      padding: 3rem 2rem;
-      transition: var(--transition);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .delivery-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255,90,54,0.15) 0%, transparent 60%);
-      opacity: 0;
-      transition: opacity 0.4s;
-      pointer-events: none;
-    }
-
-    .delivery-card:hover::before {
-      opacity: 1;
-    }
-
-    .delivery-card:hover {
-      transform: translateY(-5px) scale(1.02);
-      border-color: var(--accent);
-      box-shadow: var(--shadow-heavy);
-      z-index: 10;
-    }
-
-    .delivery-value {
-      font-size: 3.2rem;
-      font-family: var(--font-serif);
-      line-height: 1;
-      margin-bottom: 0.5rem;
-      color: var(--accent);
-    }
-
-    .delivery-label {
-      font-size: 0.7rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      margin-bottom: 1rem;
-    }
-
-    .delivery-desc {
-      font-size: 0.85rem;
-      color: var(--text-dim);
-      line-height: 1.6;
-    }
-
-    /* ===== COMPETÊNCIAS (REFINADO, NÃO AMONTOADO) ===== */
-    .skills-layout {
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      gap: 4rem;
-    }
-
-    .skills-nav {
-      position: sticky;
-      top: 120px;
-      height: fit-content;
-    }
-
-    .skill-nav-item {
-      padding: 1.5rem 0;
-      border-bottom: 1px solid rgba(255,90,54,0.2);
-      font-size: 1.2rem;
-      font-weight: 400;
-      color: var(--text-dim);
-      cursor: pointer;
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      position: relative;
-    }
-
-    .skill-nav-item .index {
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      opacity: 0.5;
-      width: 2rem;
-    }
-
-    .skill-nav-item.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-    }
-
-    .skill-nav-item.active::after {
-      content: '';
-      position: absolute;
-      left: -1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 4px;
-      height: 70%;
-      background: var(--accent);
-    }
-
-    .skill-panels {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-accent);
-      padding: 2.5rem;
-    }
-
-    .skill-panel {
-      display: none;
-    }
-
-    .skill-panel.active {
-      display: block;
-      animation: fadeIn 0.4s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateX(10px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    .skill-category-title {
-      font-family: var(--font-serif);
-      font-size: 1.8rem;
-      margin-bottom: 2rem;
-      color: var(--accent);
-      border-bottom: 1px solid var(--border-accent);
-      padding-bottom: 0.5rem;
-    }
-
-    .skill-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.5rem;
-    }
-
-    .skill-item {
-      background: rgba(255,90,54,0.05);
-      border: 1px solid rgba(255,90,54,0.15);
-      padding: 1.5rem;
-      transition: var(--transition);
-    }
-
-    .skill-item:hover {
-      border-color: var(--accent);
-      transform: translateY(-2px);
-      background: rgba(255,90,54,0.1);
-    }
-
-    .skill-name {
-      font-size: 1rem;
-      font-weight: 500;
-      color: var(--text-bright);
-      margin-bottom: 0.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .skill-name .icon {
-      color: var(--accent);
-      font-size: 1.2rem;
-    }
-
-    .skill-desc {
-      font-size: 0.8rem;
-      color: var(--text-dim);
-      line-height: 1.5;
-    }
-
-    .skill-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 1rem;
-    }
-
-    .skill-tag {
-      font-size: 0.6rem;
-      padding: 0.2rem 0.6rem;
-      background: rgba(255,90,54,0.1);
-      border: 1px solid rgba(255,90,54,0.2);
-      border-radius: 20px;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-    }
-
-    /* ===== EXPERIÊNCIA ===== */
-    .timeline {
-      position: relative;
-    }
-
-    .timeline::before {
-      content: '';
-      position: absolute;
-      left: 220px;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: linear-gradient(to bottom, transparent, var(--accent), transparent);
-      opacity: 0.3;
-    }
-
-    .timeline-entry {
-      display: grid;
-      grid-template-columns: 220px 1fr;
-      gap: 3rem;
-      padding: 3rem 0;
-      border-bottom: 1px solid rgba(255,255,255,0.02);
-    }
-
-    .timeline-date {
-      font-size: 1rem;
-      color: var(--accent);
-      letter-spacing: 0.1em;
-      font-family: var(--font-mono);
-    }
-
-    .timeline-current {
-      display: inline-block;
-      background: var(--accent);
-      color: var(--bg-deep);
-      padding: 0.2rem 1rem;
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      margin-top: 0.5rem;
-    }
-
-    .timeline-company {
-      font-family: var(--font-serif);
-      font-size: 2rem;
-      margin-bottom: 0.2rem;
-    }
-
-    .timeline-role {
-      color: var(--accent);
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      margin-bottom: 1.5rem;
-    }
-
-    .timeline-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .timeline-badge {
-      background: rgba(255,90,54,0.1);
-      border: 1px solid rgba(255,90,54,0.3);
-      padding: 0.3rem 1rem;
-      font-size: 0.65rem;
-      letter-spacing: 0.1em;
-    }
-
-    .timeline-list {
-      list-style: none;
-    }
-
-    .timeline-list li {
-      margin-bottom: 0.8rem;
-      padding-left: 1.5rem;
-      position: relative;
-      color: var(--text-dim);
-      font-size: 0.95rem;
-    }
-
-    .timeline-list li::before {
-      content: '▹';
-      position: absolute;
-      left: 0;
-      color: var(--accent);
-    }
-
-    /* ===== PROJETOS ===== */
-    .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1px;
-      background: var(--border-accent);
-      border: 1px solid var(--border-accent);
-    }
-
-    .project-card {
-      background: var(--bg-panel);
-      padding: 2.5rem;
-      text-decoration: none;
-      color: inherit;
-      transition: var(--transition);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .project-card:hover {
-      transform: translateY(-5px);
-      border-color: var(--accent);
-      box-shadow: var(--shadow-heavy);
-      z-index: 10;
-      background: #1A1F27;
-    }
-
-    .project-num {
-      font-size: 0.7rem;
-      color: var(--accent);
-      margin-bottom: 1rem;
-      font-family: var(--font-mono);
-    }
-
-    .project-title {
-      font-family: var(--font-serif);
-      font-size: 1.6rem;
-      line-height: 1.2;
-      margin-bottom: 1rem;
-    }
-
-    .project-desc {
-      color: var(--text-dim);
-      margin-bottom: 2rem;
-      flex: 1;
-      font-size: 0.9rem;
-    }
-
-    .project-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .project-tag {
-      font-size: 0.6rem;
-      padding: 0.2rem 0.8rem;
-      border: 1px solid rgba(255,90,54,0.3);
-      border-radius: 20px;
-      color: var(--text-dim);
-    }
-
-    .project-link {
-      color: var(--accent);
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    /* ===== CERTIFICAÇÕES ===== */
-    .certs-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1px;
-      background: var(--border-accent);
-      border: 1px solid var(--border-accent);
-    }
-
-    .cert-category {
-      background: var(--bg-panel);
-      padding: 2.5rem;
-    }
-
-    .cert-category h3 {
-      font-size: 1rem;
-      letter-spacing: 0.2em;
-      color: var(--accent);
-      margin-bottom: 2rem;
-      border-bottom: 1px solid rgba(255,90,54,0.2);
-      padding-bottom: 1rem;
-    }
-
-    .cert-list {
-      list-style: none;
-    }
-
-    .cert-list li {
-      margin-bottom: 1rem;
-      font-size: 0.8rem;
-      color: var(--text-dim);
-      padding-left: 1rem;
-      border-left: 1px solid rgba(255,90,54,0.3);
-      transition: var(--transition);
-    }
-
-    .cert-list li:hover {
-      border-left-color: var(--accent);
-      color: var(--text-bright);
-      padding-left: 1.5rem;
-    }
-
-    /* ===== CONTATO ===== */
-    .contact-layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-    }
-
-    .contact-big {
-      font-family: var(--font-serif);
-      font-size: clamp(2.5rem, 4vw, 4rem);
-      line-height: 1.2;
-      margin-bottom: 2rem;
-    }
-
-    .contact-big em {
-      color: var(--accent);
-      font-style: italic;
-    }
-
-    .contact-list {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .contact-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.5rem 0;
-      border-top: 1px solid rgba(255,90,54,0.2);
-      text-decoration: none;
-      color: var(--text-dim);
-      transition: var(--transition);
-    }
-
-    .contact-item:last-child {
-      border-bottom: 1px solid rgba(255,90,54,0.2);
-    }
-
-    .contact-item:hover {
-      color: var(--text-bright);
-      padding-left: 1rem;
-      border-top-color: var(--accent);
-    }
-
-    .contact-item .arrow {
-      color: var(--accent);
-      transition: transform 0.3s;
-    }
-
-    .contact-item:hover .arrow {
-      transform: translateX(5px);
-    }
-
-    .contact-card {
-      background: var(--bg-panel);
-      padding: 3rem;
-      border: 1px solid var(--border-accent);
-      box-shadow: var(--shadow-heavy);
-    }
-
-    /* ===== FOOTER ===== */
-    footer {
-      padding: 2rem 4rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid rgba(255,90,54,0.2);
-      font-size: 0.75rem;
-      color: var(--text-dim);
-    }
-
-    /* ===== REVEAL ===== */
-    .reveal {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 0.8s ease, transform 0.8s ease;
-    }
-
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .delay-1 { transition-delay: 0.1s; }
-    .delay-2 { transition-delay: 0.2s; }
-    .delay-3 { transition-delay: 0.3s; }
-
-    /* ===== RESPONSIVIDADE ===== */
-    @media (max-width: 1200px) {
-      .deliveries-grid { grid-template-columns: repeat(2, 1fr); }
-      .projects-grid { grid-template-columns: repeat(2, 1fr); }
-      .certs-grid { grid-template-columns: repeat(2, 1fr); }
-      .skills-layout { grid-template-columns: 1fr; }
-      .skills-nav { position: static; display: flex; flex-wrap: wrap; gap: 1rem; }
-      .skill-nav-item { border-bottom: none; padding: 0.8rem 1.5rem; background: rgba(255,90,54,0.05); }
-      .skill-nav-item.active::after { display: none; }
-      .skill-grid { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 900px) {
-      nav { padding: 1rem 1.5rem; }
-      .nav-links { display: none; }
-      .menu-toggle { display: flex; }
-      .nav-links.open {
-        display: flex;
-        flex-direction: column;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: var(--bg-deep);
-        padding: 6rem 2rem;
-        align-items: center;
-        justify-content: center;
-        gap: 2rem;
-        z-index: 150;
-        backdrop-filter: blur(20px);
-      }
-
-      .hero-name-line:last-child { padding-left: 0; }
-      .about-grid { grid-template-columns: 1fr; gap: 3rem; }
-      .timeline::before { left: 0; }
-      .timeline-entry { grid-template-columns: 1fr; gap: 1rem; }
-      .contact-layout { grid-template-columns: 1fr; }
-      footer { flex-direction: column; gap: 1rem; text-align: center; padding: 1.5rem; }
-    }
-
-    @media (max-width: 600px) {
-      section { padding: 5rem 0; }
-      .deliveries-grid { grid-template-columns: 1fr; }
-      .projects-grid { grid-template-columns: 1fr; }
-      .certs-grid { grid-template-columns: 1fr; }
-      .hero-metrics { flex-direction: column; gap: 2rem; }
-      .btn-group { flex-direction: column; }
-      .btn { width: 100%; justify-content: center; }
-      .skill-grid { grid-template-columns: 1fr; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wagner Ramos — PMO · Projetos · Business Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+
+/* ════════════════════════════════════════════
+   WAGNER RAMOS — v4 DEFINITIVO
+   Layout auditado. Cada detalhe intencional.
+   Mobile primeiro. Desktop extraordinário.
+════════════════════════════════════════════ */
+
+/* ─── TOKENS ─── */
+:root {
+  --smoke:   #F5F4F0;
+  --mist:    #EDECEA;
+  --white:   #FFFFFF;
+  --ink:     #0A0A0A;
+  --ink-mid: #3A3A38;
+  --dim:     #888580;
+  --dim2:    #B5B2AD;
+  --gold:    #8B6914;
+  --gold-lt: #C49A28;
+  --border:  rgba(10,10,10,.1);
+  --border2: rgba(10,10,10,.06);
+
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans:  'Inter', system-ui, sans-serif;
+
+  --nav-h:   72px;
+  --pad-x:   clamp(20px, 5vw, 80px);
+  --pad-sec: clamp(72px, 10vw, 128px);
+
+  --ease:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease2:   cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* ─── RESET ─── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--smoke);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 300;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  cursor: none;
+}
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; }
+::-webkit-scrollbar { width: 2px; }
+::-webkit-scrollbar-track { background: var(--smoke); }
+::-webkit-scrollbar-thumb { background: var(--gold); }
+
+/* ─── SCROLL MARGIN: evita nav fixa cobrir títulos ─── */
+section, [id] { scroll-margin-top: calc(var(--nav-h) + 24px); }
+
+/* ─── CURSOR (apenas pointer fino / desktop) ─── */
+@media (pointer: fine) {
+  .cur-dot, .cur-ring { display: block; }
+}
+.cur-dot {
+  display: none;
+  position: fixed; z-index: 9999;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--ink);
+  pointer-events: none;
+  will-change: transform;
+  mix-blend-mode: multiply;
+  transition: width .35s var(--ease), height .35s var(--ease), background .3s;
+}
+.cur-ring {
+  display: none;
+  position: fixed; z-index: 9998;
+  width: 34px; height: 34px;
+  border: 1px solid rgba(10,10,10,.22);
+  border-radius: 50%;
+  pointer-events: none;
+  will-change: transform;
+  transition: width .5s var(--ease), height .5s var(--ease), border-color .3s;
+}
+body.ch .cur-dot { width: 11px; height: 11px; background: var(--gold); }
+body.ch .cur-ring { width: 54px; height: 54px; border-color: rgba(139,105,20,.3); }
+
+/* ─── LOADER ─── */
+.loader {
+  position: fixed; inset: 0; z-index: 10000;
+  background: var(--ink);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 1s var(--ease2);
+}
+.loader.away { transform: translateY(-100%); pointer-events: none; }
+.ld-wrap { text-align: center; overflow: hidden; }
+.ld-name {
+  font-family: var(--serif);
+  font-size: clamp(44px, 9vw, 100px);
+  font-weight: 300; letter-spacing: .04em; line-height: 1;
+  color: var(--smoke);
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 1.1s var(--ease) .2s;
+}
+.loader.go .ld-name { clip-path: inset(0 0% 0 0); }
+.ld-sub {
+  margin-top: 14px;
+  font-size: .65rem; letter-spacing: .28em; text-transform: uppercase;
+  color: var(--dim); opacity: 0;
+  transition: opacity .6s .95s;
+}
+.loader.go .ld-sub { opacity: 1; }
+
+/* ─── NAV ─── */
+nav {
+  position: fixed; inset: 0 0 auto 0; z-index: 500;
+  height: var(--nav-h);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--pad-x);
+  border-bottom: 1px solid transparent;
+  transition: background .4s, border-color .4s, backdrop-filter .4s;
+}
+nav.over {
+  background: rgba(245,244,240,.93);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-color: var(--border);
+}
+.nav-logo {
+  font-family: var(--serif);
+  font-size: 1.1rem; font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--ink); text-decoration: none;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+/* Desktop links — centred absolutely so logo+cta don't fight for space */
+.nav-mid {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex; gap: 44px; list-style: none;
+}
+.nav-mid a {
+  font-size: .67rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--dim); text-decoration: none;
+  position: relative; transition: color .2s;
+}
+.nav-mid a::after {
+  content: '';
+  position: absolute; bottom: -4px; left: 0; right: 100%;
+  height: 1px; background: var(--gold);
+  transition: right .35s var(--ease);
+}
+.nav-mid a:hover { color: var(--ink); }
+.nav-mid a:hover::after { right: 0; }
+
+.nav-end { display: flex; align-items: center; gap: 24px; z-index: 1; flex-shrink: 0; }
+.nav-dl {
+  font-size: .67rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--gold); text-decoration: none;
+  border-bottom: 1px solid rgba(139,105,20,.4);
+  padding-bottom: 1px;
+  transition: opacity .2s;
+}
+.nav-dl:hover { opacity: .65; }
+
+/* Hamburger */
+.ham {
+  display: none;
+  flex-direction: column; justify-content: center; gap: 5px;
+  width: 32px; height: 32px;
+  background: none; border: none;
+  cursor: pointer; /* pointer for touch */
+  padding: 0;
+}
+.ham span {
+  display: block; width: 22px; height: 1px;
+  background: var(--ink);
+  transition: all .35s var(--ease);
+  transform-origin: center;
+}
+.ham.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.ham.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.ham.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+/* Mobile fullscreen menu */
+.mob {
+  position: fixed; inset: 0; z-index: 480;
+  background: var(--ink);
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: flex-start;
+  padding: 0 var(--pad-x);
+  gap: 0;
+  pointer-events: none; opacity: 0;
+  transition: opacity .4s var(--ease);
+}
+.mob.open { pointer-events: all; opacity: 1; }
+.mob a {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 8vw, 3.2rem);
+  font-weight: 300; letter-spacing: .02em;
+  color: rgba(245,244,240,.15);
+  text-decoration: none;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  width: 100%;
+  transform: translateX(-20px); opacity: 0;
+  transition: color .25s, transform .45s var(--ease), opacity .45s var(--ease);
+}
+.mob.open a { transform: none; opacity: 1; color: var(--smoke); }
+.mob.open a:nth-child(1) { transition-delay: .05s; }
+.mob.open a:nth-child(2) { transition-delay: .1s; }
+.mob.open a:nth-child(3) { transition-delay: .15s; }
+.mob.open a:nth-child(4) { transition-delay: .2s; }
+.mob.open a:nth-child(5) { transition-delay: .25s; }
+.mob a:hover { color: var(--gold-lt); }
+.mob-cv {
+  margin-top: 40px;
+  font-size: .7rem; letter-spacing: .18em; text-transform: uppercase;
+  color: rgba(196,154,40,.7) !important;
+  border-bottom: none !important;
+  font-family: var(--sans) !important;
+  font-size: .67rem !important;
+  width: auto !important;
+  transition-delay: .3s !important;
+}
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh;
+  padding-top: var(--nav-h);
+  padding-left: var(--pad-x);
+  padding-right: var(--pad-x);
+  padding-bottom: clamp(60px, 8vw, 100px);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  position: relative; overflow: hidden;
+}
+
+/* Ghost text — only shown on large screens, positioned safe from content */
+.hero-ghost {
+  display: none;
+  position: absolute;
+  right: -2%;
+  bottom: -8%;
+  font-family: var(--serif);
+  font-size: clamp(180px, 22vw, 360px);
+  font-weight: 700; line-height: 1;
+  letter-spacing: -.04em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(10,10,10,.045);
+  user-select: none; pointer-events: none;
+  white-space: nowrap;
+}
+@media (min-width: 900px) { .hero-ghost { display: block; } }
+
+/* Thin vertical accent line — only on large screens */
+.hero-vline {
+  display: none;
+  position: absolute;
+  left: var(--pad-x);
+  top: 20%; bottom: 20%;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--border), transparent);
+}
+@media (min-width: 900px) { .hero-vline { display: block; } }
+
+/* Content area */
+.hero-body { position: relative; z-index: 2; }
+
+.hero-eyebrow {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: clamp(28px, 4vw, 48px);
+}
+.ey-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
+  animation: blink 2.8s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.3;transform:scale(1.5)} }
+.ey-text {
+  font-size: .65rem; letter-spacing: .22em; text-transform: uppercase; color: var(--dim);
+}
+.ey-sep { width: 24px; height: 1px; background: var(--border); flex-shrink: 0; }
+.ey-year { font-size: .65rem; letter-spacing: .16em; color: var(--dim2); }
+
+.hero-name {
+  font-family: var(--serif);
+  font-size: clamp(64px, 12vw, 172px);
+  font-weight: 300; line-height: .9;
+  letter-spacing: -.035em;
+  color: var(--ink);
+  margin-bottom: clamp(40px, 5vw, 64px);
+}
+.hero-name .n2 {
+  display: block;
+  font-style: italic; font-weight: 300; color: var(--ink-mid);
+  padding-left: clamp(32px, 6vw, 112px);
+}
+.hero-name .n3 { display: block; font-weight: 700; }
+
+/* Divider */
+.hero-div {
+  width: 100%; height: 1px;
+  background: var(--border);
+  margin-bottom: clamp(28px, 4vw, 44px);
+}
+
+/* Bottom grid: desc left, stats right */
+.hero-bottom {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: clamp(24px, 4vw, 64px);
+  align-items: end;
+}
+.hero-desc {
+  font-size: clamp(.92rem, 1.5vw, 1.05rem);
+  line-height: 1.78; color: var(--dim); font-weight: 300;
+  max-width: 460px;
+}
+.hero-desc strong { color: var(--ink); font-weight: 400; }
+
+.hero-stats {
+  display: flex;
+  gap: clamp(24px, 3.5vw, 48px);
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+.stat { text-align: right; }
+.stat-n {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 3.5vw, 2.8rem);
+  font-weight: 600; line-height: 1;
+  color: var(--ink); margin-bottom: 5px;
+}
+.stat-n .u { font-size: .5em; color: var(--gold); font-weight: 300; }
+.stat-l {
+  font-size: .6rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--dim); line-height: 1.35;
+}
+
+.hero-actions {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  margin-top: clamp(28px, 4vw, 48px);
+}
+
+/* ─── BUTTONS ─── */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--sans);
+  font-size: .68rem; letter-spacing: .12em; text-transform: uppercase;
+  font-weight: 400; text-decoration: none;
+  padding: 14px 28px;
+  border: none; cursor: pointer;
+  transition: all .3s var(--ease);
+  white-space: nowrap;
+}
+.btn-solid { background: var(--ink); color: var(--smoke); }
+.btn-solid:hover { background: var(--gold); transform: translateY(-2px); }
+.btn-out {
+  background: transparent; color: var(--dim);
+  border: 1px solid var(--border);
+  padding: 13px 28px;
+}
+.btn-out:hover { border-color: var(--ink); color: var(--ink); transform: translateY(-2px); }
+
+/* Scroll hint */
+.scroll-hint {
+  position: absolute; bottom: 28px;
+  left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  z-index: 2; pointer-events: none;
+}
+.sh-line {
+  width: 1px; height: 48px;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+  animation: sh 2.4s var(--ease) infinite;
+  transform-origin: top;
+}
+@keyframes sh { 0%{transform:scaleY(0);opacity:0} 45%{opacity:1} 100%{transform:scaleY(1);opacity:0} }
+.sh-lbl {
+  font-size: .54rem; letter-spacing: .24em; text-transform: uppercase;
+  color: var(--dim2); writing-mode: vertical-rl;
+  margin-top: 4px;
+}
+
+/* ─── SECTION SHELL ─── */
+.sec {
+  padding: var(--pad-sec) var(--pad-x);
+}
+.sec.alt { background: var(--mist); }
+.sec.dark { background: var(--ink); }
+
+.stag {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 18px;
+}
+.stag-n { font-size: .6rem; letter-spacing: .2em; color: var(--gold); }
+.stag-bar { width: 32px; height: 1px; background: var(--gold); opacity: .5; }
+.stag-l { font-size: .6rem; letter-spacing: .2em; text-transform: uppercase; color: var(--dim); }
+
+.stitle {
+  font-family: var(--serif);
+  font-size: clamp(38px, 5.5vw, 72px);
+  font-weight: 300; line-height: 1.06; letter-spacing: -.025em;
+  color: var(--ink);
+  margin-bottom: clamp(44px, 7vw, 80px);
+}
+.stitle em { font-style: italic; color: var(--gold); }
+.sec.dark .stitle { color: var(--smoke); }
+
+/* ─── SOBRE ─── */
+.sobre-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: clamp(40px, 7vw, 96px);
+  align-items: start;
+}
+.sobre-text p {
+  font-size: clamp(.95rem, 1.4vw, 1.07rem);
+  line-height: 1.82; color: var(--dim);
+  margin-bottom: 20px; font-weight: 300;
+}
+.sobre-text p:first-child { font-size: clamp(1rem, 1.6vw, 1.15rem); }
+.sobre-text p strong { color: var(--ink); font-weight: 400; }
+
+/* Info card — sticky only on large screens */
+.info-card {
+  background: var(--ink); color: var(--smoke);
+  padding: clamp(28px, 4vw, 44px);
+}
+@media (min-width: 960px) { .info-card { position: sticky; top: calc(var(--nav-h) + 20px); } }
+.ic-name {
+  font-family: var(--serif); font-size: 1.4rem; font-weight: 400;
+  letter-spacing: .02em; margin-bottom: 2px;
+}
+.ic-role {
+  font-size: .6rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--dim2);
+  padding-bottom: 24px; margin-bottom: 24px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.ic-row { margin-bottom: 18px; }
+.ic-row:last-child { margin-bottom: 0; }
+.ic-lbl {
+  font-size: .56rem; letter-spacing: .16em; text-transform: uppercase;
+  color: rgba(255,255,255,.28); margin-bottom: 4px;
+}
+.ic-val { font-size: .86rem; color: rgba(255,255,255,.7); line-height: 1.5; }
+.ic-val a { color: var(--gold-lt); text-decoration: none; transition: opacity .2s; }
+.ic-val a:hover { opacity: .7; }
+
+/* ─── IMPACTO ─── */
+.impact-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+.imp {
+  padding: clamp(32px, 4vw, 52px) clamp(24px, 3.5vw, 44px);
+  border: 1px solid var(--border);
+  border-right: none; border-bottom: none;
+  position: relative; overflow: hidden;
+  transition: background .4s var(--ease);
+}
+/* Use outline-style grid: border on cell, collapse duplicates */
+.imp:nth-child(4n) { border-right: 1px solid var(--border); }
+.impact-grid { border-bottom: 1px solid var(--border); }
+
+/* Gold sweep on hover */
+.imp::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 100%;
+  height: 2px; background: var(--gold);
+  transition: right .6s var(--ease);
+}
+.imp:hover::before { right: 0; }
+.imp:hover { background: var(--white); }
+
+.imp-idx {
+  display: block; font-size: .56rem; letter-spacing: .16em;
+  color: var(--dim2); margin-bottom: clamp(16px, 2.5vw, 28px);
+}
+.imp-num {
+  font-family: var(--serif);
+  font-size: clamp(36px, 4.5vw, 60px);
+  font-weight: 600; line-height: 1;
+  color: var(--ink); margin-bottom: 8px;
+}
+.imp-num .u {
+  font-size: .48em; color: var(--gold); font-weight: 300;
+  vertical-align: super;
+}
+.imp-lbl {
+  display: block; font-size: .6rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 14px;
+}
+.imp-desc { font-size: .86rem; color: var(--dim); line-height: 1.62; }
+
+/* ─── COMPETÊNCIAS ─── */
+.comp-box {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+  border: 1px solid var(--border);
+}
+.comp-tabs {
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+}
+.ctab {
+  padding: 20px 24px;
+  border: none; border-bottom: 1px solid var(--border);
+  background: transparent; text-align: left;
+  cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center;
+  transition: background .22s;
+  -webkit-tap-highlight-color: transparent;
+}
+.ctab:last-child { border-bottom: none; }
+.ctab:hover { background: var(--mist); }
+.ctab.on { background: var(--ink); }
+.ctab-l {
+  font-size: .67rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--dim); transition: color .22s;
+  text-align: left;
+}
+.ctab.on .ctab-l { color: var(--smoke); }
+.ctab-arr { font-size: .78rem; color: var(--dim2); transition: all .22s; }
+.ctab.on .ctab-arr { color: var(--gold-lt); transform: rotate(90deg); }
+
+.comp-body { padding: clamp(24px, 4vw, 48px) clamp(20px, 4vw, 52px); }
+.cpanel { display: none; }
+.cpanel.on { display: block; animation: fadeup .3s var(--ease); }
+@keyframes fadeup { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  font-size: .71rem; letter-spacing: .06em;
+  padding: 7px 15px;
+  border: 1px solid var(--border); color: var(--dim);
+  transition: all .2s; cursor: default;
+}
+.chip:hover { border-color: var(--ink); color: var(--ink); background: var(--white); }
+.chip.hi { border-color: rgba(139,105,20,.38); color: var(--gold); }
+
+.soft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.sc {
+  border: 1px solid var(--border); padding: 24px 26px;
+  transition: border-color .22s, background .22s;
+}
+.sc:hover { border-color: var(--ink); background: var(--white); }
+.sc-t {
+  font-size: .63rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 9px;
+}
+.sc p { font-size: .86rem; color: var(--dim); line-height: 1.6; }
+
+/* ─── EXPERIÊNCIA ─── */
+.exp-item {
+  display: grid;
+  grid-template-columns: 196px 1fr;
+  border-top: 1px solid var(--border);
+  padding: clamp(36px, 5vw, 60px) 0;
+  gap: 0;
+}
+.exp-item:last-child { border-bottom: 1px solid var(--border); }
+
+.exp-meta { padding-right: clamp(20px, 3vw, 40px); padding-top: 4px; }
+.exp-per {
+  font-size: .63rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--dim); margin-bottom: 10px;
+}
+.exp-live {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .6rem; letter-spacing: .1em; text-transform: uppercase; color: var(--gold);
+}
+.exp-live-dot {
+  width: 5px; height: 5px; border-radius: 50%; background: var(--gold);
+  animation: blink 2s infinite;
+}
+
+.exp-body { }
+.exp-co {
+  font-family: var(--serif);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 400; letter-spacing: -.02em;
+  color: var(--ink); margin-bottom: 4px; line-height: 1.1;
+}
+.exp-role {
+  font-size: .64rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 24px; padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+.exp-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 22px; }
+.etag {
+  font-size: .6rem; letter-spacing: .07em; padding: 5px 12px;
+  border: 1px solid var(--border); color: var(--dim);
+}
+.etag.g { border-color: rgba(139,105,20,.4); color: var(--gold); background: rgba(139,105,20,.03); }
+.exp-ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.exp-ul li {
+  font-size: .9rem; color: var(--dim); line-height: 1.7;
+  padding-left: 20px; position: relative;
+}
+.exp-ul li::before {
+  content: '↳'; position: absolute; left: 0; top: 1px;
+  color: var(--gold); font-size: .75rem;
+}
+.exp-ul li strong { color: var(--ink); font-weight: 400; }
+.exp-stack {
+  margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border);
+  font-size: .63rem; letter-spacing: .07em; color: var(--dim2); line-height: 1.7;
+}
+
+/* ─── FORMAÇÃO ─── */
+.form-item {
+  display: grid;
+  grid-template-columns: 196px 1fr auto;
+  align-items: center; gap: 0;
+  border-top: 1px solid var(--border);
+  padding: clamp(22px, 3vw, 32px) 0;
+  /* NO layout shift on hover — use outline only */
+  transition: background .22s;
+}
+.form-item:last-child { border-bottom: 1px solid var(--border); }
+.form-item:hover { background: var(--white); }
+.form-yr {
+  font-size: .62rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--dim2); padding-right: clamp(16px, 2.5vw, 40px);
+}
+.form-deg {
+  font-family: var(--serif); font-size: clamp(1.1rem, 2vw, 1.3rem);
+  font-weight: 400; color: var(--ink); margin-bottom: 3px; line-height: 1.2;
+}
+.form-sch {
+  font-size: .63rem; letter-spacing: .1em; text-transform: uppercase; color: var(--gold);
+}
+.form-badge {
+  font-size: .56rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid rgba(139,105,20,.35);
+  padding: 4px 12px; white-space: nowrap;
+  margin-left: 16px;
+}
+
+/* ─── PROJETOS ─── */
+.proj-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+.pcard {
+  background: var(--smoke);
+  padding: clamp(28px, 3.5vw, 40px) clamp(24px, 3vw, 36px);
+  display: flex; flex-direction: column; gap: 11px;
+  text-decoration: none; position: relative; overflow: hidden;
+  transition: background .3s var(--ease);
+  /* cursor pointer set below */
+}
+.pcard::before {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 100%;
+  height: 2px; background: var(--gold);
+  transition: right .5s var(--ease);
+}
+.pcard::after {
+  content: '↗';
+  position: absolute; top: 24px; right: 24px;
+  color: var(--dim2); font-size: .85rem;
+  transition: color .3s, transform .3s var(--ease);
+}
+.pcard:hover { background: var(--white); }
+.pcard:hover::before { right: 0; }
+.pcard:hover::after { color: var(--gold); transform: translate(3px, -3px); }
+
+.p-n { font-size: .56rem; letter-spacing: .16em; color: var(--dim2); }
+.p-t { font-family: var(--serif); font-size: 1.18rem; font-weight: 400; color: var(--ink); line-height: 1.2; }
+.p-d { font-size: .84rem; color: var(--dim); line-height: 1.6; flex: 1; }
+.p-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: auto; }
+.pc { font-size: .56rem; letter-spacing: .07em; padding: 3px 9px; border: 1px solid var(--border); color: var(--dim2); }
+
+/* ─── CERTIFICAÇÕES ─── */
+.cert-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(28px, 4vw, 52px); }
+.cert-h {
+  font-size: .6rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 18px;
+  padding-bottom: 12px; border-bottom: 1px solid var(--border);
+}
+.cert-ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.cert-ul li {
+  font-size: .83rem; color: var(--dim); line-height: 1.45;
+  padding-left: 12px; position: relative;
+}
+.cert-ul li::before {
+  content: ''; position: absolute; left: 0; top: 8px;
+  width: 4px; height: 1px; background: var(--gold); opacity: .6;
+}
+
+/* ─── CONTATO ─── */
+.contato-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: clamp(40px, 7vw, 100px);
+  align-items: start;
+}
+.ct-head {
+  font-family: var(--serif);
+  font-size: clamp(36px, 5vw, 66px);
+  font-weight: 300; line-height: 1.1; letter-spacing: -.025em;
+  color: var(--smoke); margin-bottom: clamp(36px, 5vw, 52px);
+}
+.ct-head em { font-style: italic; color: var(--gold-lt); }
+
+.ct-links { display: flex; flex-direction: column; }
+.ct-link {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 18px 0;
+  border-top: 1px solid rgba(255,255,255,.07);
+  text-decoration: none;
+  transition: padding-left .25s var(--ease);
+  cursor: pointer;
+}
+.ct-link:last-child { border-bottom: 1px solid rgba(255,255,255,.07); }
+.ct-link:hover { padding-left: 8px; }
+.ct-type {
+  font-size: .56rem; letter-spacing: .16em; text-transform: uppercase;
+  color: rgba(255,255,255,.27); margin-bottom: 2px;
+}
+.ct-val { font-size: .88rem; color: rgba(255,255,255,.62); transition: color .2s; }
+.ct-link:hover .ct-val { color: var(--smoke); }
+.ct-arr { color: rgba(255,255,255,.22); transition: all .25s; flex-shrink: 0; font-size: .9rem; }
+.ct-link:hover .ct-arr { color: var(--gold-lt); transform: translateX(4px); }
+
+.ct-card {
+  background: var(--smoke); color: var(--ink);
+  padding: clamp(28px, 4vw, 48px);
+}
+.ct-card-title {
+  font-family: var(--serif); font-size: 1.1rem; font-weight: 400;
+  margin-bottom: 22px;
+}
+.ctcr { margin-bottom: 18px; }
+.ctcr-l {
+  font-size: .56rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--dim); margin-bottom: 3px;
+}
+.ctcr-v { font-size: .9rem; color: var(--ink); line-height: 1.5; }
+.ct-dl {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 24px;
+  font-size: .66rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--gold); text-decoration: none;
+  border-bottom: 1px solid rgba(139,105,20,.38);
+  padding-bottom: 2px; transition: opacity .2s;
+}
+.ct-dl:hover { opacity: .65; }
+
+/* ─── FOOTER ─── */
+footer {
+  padding: clamp(20px, 2.5vw, 28px) var(--pad-x);
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 10px;
+}
+.foot { font-size: .6rem; letter-spacing: .08em; color: var(--dim2); }
+.foot-g { color: var(--gold); }
+
+/* ─── SCROLL REVEAL ─── */
+.r {
+  opacity: 0; transform: translateY(20px);
+  transition: opacity .8s var(--ease), transform .8s var(--ease);
+}
+.r.in { opacity: 1; transform: none; }
+.r.d1 { transition-delay: .1s; }
+.r.d2 { transition-delay: .2s; }
+.r.d3 { transition-delay: .3s; }
+.r.d4 { transition-delay: .4s; }
+
+/* ─── RESPONSIVE BREAKPOINTS ─── */
+
+/* 1200px: cert & impact compress */
+@media (max-width: 1200px) {
+  .cert-grid { grid-template-columns: repeat(2, 1fr); }
+  .impact-grid { grid-template-columns: repeat(2, 1fr); }
+  /* Fix border for 2-col */
+  .imp:nth-child(4n) { border-right: none; }
+  .imp:nth-child(2n) { border-right: 1px solid var(--border); }
+  .impact-grid { border-bottom: 1px solid var(--border); }
+  .imp { border-bottom: none; border-top: 1px solid var(--border); }
+  .imp:nth-child(n) { border-bottom: none; }
+  .impact-grid { border: 1px solid var(--border); }
+  .imp { border: none; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .imp:nth-child(2n) { border-right: none; }
+}
+
+/* 1060px: sobre card drops below, contato stacks */
+@media (max-width: 1060px) {
+  .sobre-grid { grid-template-columns: 1fr; gap: clamp(36px, 5vw, 60px); }
+  .info-card { position: static; }
+  .contato-layout { grid-template-columns: 1fr; gap: clamp(36px, 5vw, 60px); }
+  .proj-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* 900px: nav collapses, exp/form lose left col */
+@media (max-width: 900px) {
+  .nav-mid { display: none; }
+  .nav-dl { display: none; }
+  .ham { display: flex; }
+
+  .exp-item { grid-template-columns: 1fr; gap: 16px; }
+  .exp-meta { padding-right: 0; padding-bottom: 0; }
+
+  .form-item { grid-template-columns: 1fr; align-items: flex-start; gap: 4px; }
+  .form-yr { padding-right: 0; }
+  .form-badge { margin-left: 0; margin-top: 6px; display: inline-block; }
+
+  .soft-grid { grid-template-columns: 1fr; }
+
+  /* comp tabs side-by-side on medium screens */
+  .comp-box { grid-template-columns: 1fr; }
+  .comp-tabs { border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; flex-wrap: wrap; }
+  .ctab { flex: 1 1 50%; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .ctab:nth-child(even) { border-right: none; }
+  .ctab:last-child { border-bottom: none; }
+  .ctab:nth-last-child(2) { border-bottom: none; }
+}
+
+/* 640px: mobile-first layout */
+@media (max-width: 640px) {
+  .hero-bottom { grid-template-columns: 1fr; gap: 28px; }
+  .hero-stats { justify-content: flex-start; }
+  .stat { text-align: left; }
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .btn { justify-content: center; }
+
+  .impact-grid { grid-template-columns: 1fr; border: 1px solid var(--border); }
+  .imp { border: none; border-bottom: 1px solid var(--border); }
+  .imp:last-child { border-bottom: none; }
+
+  .proj-grid { grid-template-columns: 1fr; }
+  .cert-grid { grid-template-columns: 1fr; }
+
+  .ctab { flex: 1 1 100%; border-right: none !important; }
+
+  .scroll-hint { display: none; }
+}
+
+/* 420px: tiny phones */
+@media (max-width: 420px) {
+  .hero-name { font-size: clamp(52px, 15vw, 80px); }
+  .hero-stats { gap: 20px; flex-wrap: wrap; }
+  .ctab { flex: 1 1 100%; }
+  .ey-sep, .ey-year { display: none; }
+}
+
+/* Touch devices: restore system cursor, no cursor elements */
+@media (pointer: coarse) {
+  body { cursor: auto; }
+  .cur-dot, .cur-ring { display: none !important; }
+  .btn, .ctab, .pcard, .ct-link, .ham,
+  .imp, .form-item { cursor: pointer; }
+}
+
+</style>
 </head>
 <body>
-  <!-- cursores -->
-  <div id="cursor-dot"></div>
-  <div id="cursor-outline"></div>
 
-  <!-- fundos -->
-  <div class="xray-grid"></div>
-  <div class="noise"></div>
+<!-- CURSOR (desktop only) -->
+<div class="cur-dot" id="cd" aria-hidden="true"></div>
+<div class="cur-ring" id="cr" aria-hidden="true"></div>
 
-  <!-- NAVEGAÇÃO -->
-  <nav>
-    <div class="nav-mark">WR<span>⚡</span></div>
-    <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+<!-- LOADER -->
+<div class="loader" id="loader" aria-hidden="true">
+  <div class="ld-wrap">
+    <div class="ld-name">Wagner Ramos</div>
+    <div class="ld-sub">PMO · Projetos · Business Intelligence</div>
+  </div>
+</div>
+
+<!-- MOBILE MENU -->
+<div class="mob" id="mob" role="dialog" aria-label="Menu de navegação">
+  <a href="#sobre"        onclick="closeMob()">Sobre</a>
+  <a href="#impacto"      onclick="closeMob()">Impacto</a>
+  <a href="#competencias" onclick="closeMob()">Competências</a>
+  <a href="#experiencia"  onclick="closeMob()">Experiência</a>
+  <a href="#contato"      onclick="closeMob()">Contato</a>
+  <a href="assets/curriculo-wagner-ramos.pdf" class="mob-cv" download onclick="closeMob()">Baixar Currículo</a>
+</div>
+
+<!-- NAV -->
+<nav id="nav" role="navigation">
+  <a class="nav-logo" href="#home">W. Ramos</a>
+
+  <ul class="nav-mid" aria-label="Links principais">
+    <li><a href="#sobre">Sobre</a></li>
+    <li><a href="#impacto">Impacto</a></li>
+    <li><a href="#competencias">Competências</a></li>
+    <li><a href="#experiencia">Experiência</a></li>
+    <li><a href="#contato">Contato</a></li>
+  </ul>
+
+  <div class="nav-end">
+    <a class="nav-dl" href="assets/curriculo-wagner-ramos.pdf" download>Currículo PDF</a>
+    <button class="ham" id="ham" aria-label="Abrir menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
-    <ul class="nav-links" id="navLinks">
-      <li><a href="#home">Início</a></li>
-      <li><a href="#sobre">Sobre</a></li>
-      <li><a href="#entregas">Entregas</a></li>
-      <li><a href="#competencias">Competências</a></li>
-      <li><a href="#experiencia">Experiência</a></li>
-      <li><a href="#projetos">Projetos</a></li>
-      <li><a href="#contato">Contato</a></li>
-    </ul>
-  </nav>
+  </div>
+</nav>
 
-  <main>
-    <!-- HERO -->
-    <section id="home" class="hero">
-      <div class="hero-bg-number">WR</div>
-      <div class="container hero-content">
-        <div class="section-badge reveal"><span></span> Strategic X‑Ray</div>
-        <h1 class="hero-name reveal">
-          <span class="hero-name-line">Wagner</span>
-          <span class="hero-name-line">Ramos</span>
-        </h1>
-        <p class="hero-desc reveal delay-1">Engenheiro · Arquiteto de Decisões · Revelando a estrutura oculta dos projetos.</p>
-        <div class="hero-metrics reveal delay-2">
-          <div class="metric">
-            <div class="metric-value"><span class="counter" data-target="500">0</span><span class="metric-unit">M R$</span></div>
-            <div class="metric-label">recursos viabilizados</div>
-          </div>
-          <div class="metric">
-            <div class="metric-value"><span class="counter" data-target="75">0</span><span class="metric-unit">%</span></div>
-            <div class="metric-label">redução em análise</div>
-          </div>
-          <div class="metric">
-            <div class="metric-value"><span class="counter" data-target="15">0</span><span class="metric-unit">+</span></div>
-            <div class="metric-label">projetos simultâneos</div>
-          </div>
-        </div>
-        <div class="btn-group reveal delay-3">
-          <a href="#experiencia" class="btn btn-primary">Explorar trajetória</a>
-          <a href="#" class="btn btn-outline">Baixar currículo</a>
+<!-- ══════════ HERO ══════════ -->
+<section class="hero" id="home" aria-label="Apresentação">
+  <div class="hero-ghost" aria-hidden="true">PMO</div>
+  <div class="hero-vline" aria-hidden="true"></div>
+
+  <div class="hero-body">
+    <div class="hero-eyebrow">
+      <span class="ey-dot" aria-hidden="true"></span>
+      <span class="ey-text">Portfólio Profissional</span>
+      <span class="ey-sep" aria-hidden="true"></span>
+      <span class="ey-year">2026</span>
+    </div>
+
+    <h1 class="hero-name">
+      Wagner<span class="n2">Douglas</span><span class="n3">Ramos</span>
+    </h1>
+
+    <div class="hero-div" aria-hidden="true"></div>
+
+    <div class="hero-bottom">
+      <div>
+        <p class="hero-desc">
+          <strong>PMO e Gestão de Projetos</strong> com formação em Engenharia Civil.
+          Governança de portfólios estratégicos, automação de dados e decisão em
+          ambientes regulados de alta complexidade. Belo Horizonte, MG.
+        </p>
+        <div class="hero-actions">
+          <a href="#experiencia" class="btn btn-solid">Ver Experiência</a>
+          <a href="assets/curriculo-wagner-ramos.pdf" class="btn btn-out" download>Baixar Currículo</a>
         </div>
       </div>
-    </section>
 
-    <!-- SOBRE -->
-    <section id="sobre">
-      <div class="container">
-        <div class="section-badge reveal"><span></span> Quem é</div>
-        <h2 class="section-title reveal">Engenharia que<br><em>pensa em sistemas</em></h2>
-        <div class="about-grid">
-          <div class="about-text reveal delay-1">
-            <p><strong>Wagner Ramos</strong> — profissional de PMO e gestão de projetos com base em engenharia civil e especialização em dados. Atua na <strong>governança de portfólios estratégicos</strong>, integrando áreas de negócio, tecnologia e finanças para viabilizar entregas complexas em ambientes regulados.</p>
-            <p>Combina <strong>visão executiva com capacidade técnica</strong> em automação (Python, Power BI) para transformar dados em decisões, garantindo conformidade, rastreabilidade e eficiência operacional.</p>
-            <p>Experiência destacada em gestão de verbas públicas, reporting para C-level e estruturação de PMO hospitalar com 4 eixos estratégicos monitorados em tempo real.</p>
-          </div>
-          <div class="info-panel reveal delay-2">
-            <div class="info-row">
-              <span class="info-label">Localização</span>
-              <span class="info-value">Belo Horizonte, MG</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Formação</span>
-              <span class="info-value">Engenharia Civil · UniBH 2017<br>MBA Gestão de Projetos · USP (cursando)</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Contato direto</span>
-              <span class="info-value"><a href="mailto:wagnerramoseng@gmail.com">wagnerramoseng@gmail.com</a><br><a href="#">linkedin.com/in/engwagnerramos</a></span>
-            </div>
-          </div>
+      <div class="hero-stats" aria-label="Métricas de impacto">
+        <div class="stat">
+          <div class="stat-n">R$<span class="cnt" data-to="500">0</span><span class="u">k</span></div>
+          <div class="stat-l">Recursos<br>viabilizados</div>
+        </div>
+        <div class="stat">
+          <div class="stat-n">−<span class="cnt" data-to="75">0</span><span class="u">%</span></div>
+          <div class="stat-l">Tempo de<br>análise</div>
+        </div>
+        <div class="stat">
+          <div class="stat-n"><span class="cnt" data-to="15">0</span><span class="u">+</span></div>
+          <div class="stat-l">Projetos<br>simultâneos</div>
         </div>
       </div>
-    </section>
+    </div>
+  </div>
 
-    <!-- ENTREGAS -->
-    <section id="entregas">
-      <div class="container">
-        <div class="section-badge reveal"><span></span> Impacto</div>
-        <h2 class="section-title reveal">Entregas que<br><em>ficam no registro</em></h2>
-        <div class="deliveries-grid">
-          <div class="delivery-card reveal" id="card1">
-            <div class="delivery-value">R$500k</div>
-            <div class="delivery-label">Recursos viabilizados</div>
-            <div class="delivery-desc">Automação em Python e Excel para gestão de verbas públicas — emendas e convênios.</div>
-          </div>
-          <div class="delivery-card reveal delay-1">
-            <div class="delivery-value">−75%</div>
-            <div class="delivery-label">Tempo de análise</div>
-            <div class="delivery-desc">Processos ETL em Python integrados a dashboards Power BI para decisões executivas.</div>
-          </div>
-          <div class="delivery-card reveal delay-2">
-            <div class="delivery-value">4 eixos</div>
-            <div class="delivery-label">Portfólio estratégico</div>
-            <div class="delivery-desc">Governança do programa "Navega Baleia" com monitoramento em tempo real via Power BI.</div>
-          </div>
-          <div class="delivery-card reveal delay-3">
-            <div class="delivery-value">15+</div>
-            <div class="delivery-label">Projetos simultâneos</div>
-            <div class="delivery-desc">Gestão de alta complexidade em ambiente hospitalar regulado.</div>
-          </div>
+  <div class="scroll-hint" aria-hidden="true">
+    <div class="sh-line"></div>
+    <span class="sh-lbl">Scroll</span>
+  </div>
+</section>
+
+<!-- ══════════ SOBRE ══════════ -->
+<section class="sec alt" id="sobre">
+  <div class="stag">
+    <span class="stag-n">01</span>
+    <span class="stag-bar" aria-hidden="true"></span>
+    <span class="stag-l">Sobre</span>
+  </div>
+  <h2 class="stitle r">Engenharia que<br><em>pensa em sistemas.</em></h2>
+
+  <div class="sobre-grid">
+    <div class="sobre-text">
+      <p class="r d1">
+        Profissional de <strong>PMO e Gestão de Projetos</strong> com formação em Engenharia Civil e
+        especialização em dados. Atuo na <strong>governança de portfólios estratégicos</strong>,
+        integrando áreas de negócio, tecnologia e finanças para viabilizar entregas complexas
+        em ambientes regulados.
+      </p>
+      <p class="r d2">
+        Combino <strong>visão executiva com capacidade técnica</strong> em automação — Python, Power BI —
+        para transformar dados em decisões, garantindo conformidade, rastreabilidade e
+        eficiência operacional. Experiência consolidada em gestão de verbas públicas,
+        reporting para C-level e estruturação de PMO em ambiente hospitalar de alta complexidade.
+      </p>
+      <p class="r d3">
+        Minha diferenciação está na <strong>confluência rara</strong> entre a precisão da Engenharia Civil,
+        a linguagem dos dados e a disciplina do PMO — combinação que permite atuar
+        da estratégia à execução com consistência.
+      </p>
+    </div>
+
+    <div class="info-card r d2">
+      <div class="ic-name">Wagner Ramos</div>
+      <div class="ic-role">PMO · Projetos · BI · Eng. Civil</div>
+      <div class="ic-row">
+        <div class="ic-lbl">Localização</div>
+        <div class="ic-val">Belo Horizonte, MG — Brasil</div>
+      </div>
+      <div class="ic-row">
+        <div class="ic-lbl">Formação base</div>
+        <div class="ic-val">Engenharia Civil · UniBH · 2017</div>
+      </div>
+      <div class="ic-row">
+        <div class="ic-lbl">MBA em curso</div>
+        <div class="ic-val">Gestão de Projetos<br>Fundace FEARP · USP</div>
+      </div>
+      <div class="ic-row">
+        <div class="ic-lbl">E-mail</div>
+        <div class="ic-val"><a href="mailto:wagnerramoseng@gmail.com">wagnerramoseng@gmail.com</a></div>
+      </div>
+      <div class="ic-row">
+        <div class="ic-lbl">LinkedIn</div>
+        <div class="ic-val"><a href="https://linkedin.com/in/engwagnerramos" target="_blank" rel="noopener">engwagnerramos</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ IMPACTO ══════════ -->
+<section class="sec" id="impacto">
+  <div class="stag">
+    <span class="stag-n">02</span>
+    <span class="stag-bar" aria-hidden="true"></span>
+    <span class="stag-l">Entregas Estratégicas</span>
+  </div>
+  <h2 class="stitle r">Resultados que<br><em>ficam no registro.</em></h2>
+
+  <div class="impact-grid">
+    <div class="imp r">
+      <span class="imp-idx">A — Impacto Financeiro</span>
+      <div class="imp-num">R$<span class="u">500k</span></div>
+      <span class="imp-lbl">Recursos viabilizados</span>
+      <p class="imp-desc">Automação em Python e Excel para gestão de verbas públicas — emendas e convênios — com conformidade e agilidade na liberação de recursos.</p>
+    </div>
+    <div class="imp r d1">
+      <span class="imp-idx">B — Eficiência Operacional</span>
+      <div class="imp-num">−75<span class="u">%</span></div>
+      <span class="imp-lbl">Redução no tempo de análise</span>
+      <p class="imp-desc">Processos ETL em Python integrados a dashboards Power BI para tomada de decisão executiva em tempo real.</p>
+    </div>
+    <div class="imp r d2">
+      <span class="imp-idx">C — Governança</span>
+      <div class="imp-num">4<span class="u">eixos</span></div>
+      <span class="imp-lbl">Portfólio Estratégico</span>
+      <p class="imp-desc">Programa "Navega Baleia" com monitoramento em tempo real — Eficiência, Pessoas, Qualidade Assistencial e Crescimento.</p>
+    </div>
+    <div class="imp r d3">
+      <span class="imp-idx">D — Escala</span>
+      <div class="imp-num">15<span class="u">+</span></div>
+      <span class="imp-lbl">Projetos simultâneos</span>
+      <p class="imp-desc">Gestão simultânea de projetos de alta complexidade em ambiente hospitalar regulado, do licenciamento à usina fotovoltaica.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ COMPETÊNCIAS ══════════ -->
+<section class="sec alt" id="competencias">
+  <div class="stag">
+    <span class="stag-n">03</span>
+    <span class="stag-bar" aria-hidden="true"></span>
+    <span class="stag-l">Competências</span>
+  </div>
+  <h2 class="stitle r">O que eu sei<br><em>fazer de verdade.</em></h2>
+
+  <div class="comp-box r">
+    <div class="comp-tabs" role="tablist">
+      <button class="ctab on" role="tab" aria-selected="true"  data-p="gov"   aria-controls="p-gov">
+        <span class="ctab-l">Governança &amp; PMO</span><span class="ctab-arr">›</span>
+      </button>
+      <button class="ctab" role="tab" aria-selected="false" data-p="dados" aria-controls="p-dados">
+        <span class="ctab-l">Dados &amp; Automação</span><span class="ctab-arr">›</span>
+      </button>
+      <button class="ctab" role="tab" aria-selected="false" data-p="tools" aria-controls="p-tools">
+        <span class="ctab-l">Ferramentas</span><span class="ctab-arr">›</span>
+      </button>
+      <button class="ctab" role="tab" aria-selected="false" data-p="soft"  aria-controls="p-soft">
+        <span class="ctab-l">Soft Skills</span><span class="ctab-arr">›</span>
+      </button>
+    </div>
+
+    <div class="comp-body">
+      <div class="cpanel on" id="p-gov" role="tabpanel">
+        <div class="chips">
+          <span class="chip hi">Gestão de Portfólio</span>
+          <span class="chip hi">PMBOK</span>
+          <span class="chip">Governança de PMO</span>
+          <span class="chip hi">Controle Físico-Financeiro</span>
+          <span class="chip">Compliance</span>
+          <span class="chip">Gestão de Riscos</span>
+          <span class="chip hi">Reporting Executivo</span>
+          <span class="chip">BPMN</span>
+          <span class="chip">Verbas Públicas</span>
+          <span class="chip">Convênios &amp; Emendas</span>
+          <span class="chip">Prestação de Contas</span>
+          <span class="chip">Ambiente Regulado</span>
+          <span class="chip">Gestão da Mudança</span>
         </div>
       </div>
-    </section>
-
-    <!-- COMPETÊNCIAS (REFINADO) -->
-    <section id="competencias">
-      <div class="container">
-        <div class="section-badge reveal"><span></span> Toolkit</div>
-        <h2 class="section-title reveal">O que sei<br><em>fazer de verdade</em></h2>
-        <div class="skills-layout">
-          <nav class="skills-nav reveal">
-            <div class="skill-nav-item active" data-panel="gov"><span class="index">01</span> Governança & PMO</div>
-            <div class="skill-nav-item" data-panel="dados"><span class="index">02</span> Dados & Automação</div>
-            <div class="skill-nav-item" data-panel="tools"><span class="index">03</span> Ferramentas</div>
-            <div class="skill-nav-item" data-panel="soft"><span class="index">04</span> Soft Skills</div>
-          </nav>
-          <div class="skill-panels">
-            <!-- painel gov -->
-            <div class="skill-panel active" id="panel-gov">
-              <div class="skill-category-title">Governança & PMO</div>
-              <div class="skill-grid">
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">⏣</span> Gestão de Portfólio</div>
-                  <div class="skill-desc">Alinhamento estratégico de projetos, priorização e governança de PMO.</div>
-                  <div class="skill-tags"><span class="skill-tag">PMBOK</span><span class="skill-tag">Governança</span></div>
-                </div>
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">◈</span> Controle Físico-Financeiro</div>
-                  <div class="skill-desc">Acompanhamento de verbas públicas, emendas e convênios.</div>
-                  <div class="skill-tags"><span class="skill-tag">Compliance</span><span class="skill-tag">Prestação de Contas</span></div>
-                </div>
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">⬖</span> Reporting Executivo</div>
-                  <div class="skill-desc">Dashboards e apresentações para C-level com insights acionáveis.</div>
-                  <div class="skill-tags"><span class="skill-tag">KPIs</span><span class="skill-tag">Power BI</span></div>
-                </div>
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">⌗</span> Gestão de Riscos</div>
-                  <div class="skill-desc">Identificação, análise e mitigação em ambientes regulados.</div>
-                  <div class="skill-tags"><span class="skill-tag">PMBOK</span><span class="skill-tag">Compliance</span></div>
-                </div>
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">⬔</span> BPMN</div>
-                  <div class="skill-desc">Modelagem de processos para otimização e padronização.</div>
-                  <div class="skill-tags"><span class="skill-tag">Processos</span></div>
-                </div>
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">⬕</span> Ambiente Regulado</div>
-                  <div class="skill-desc">Experiência em setor público e hospitalar com alta criticidade.</div>
-                  <div class="skill-tags"><span class="skill-tag">Licenciamento</span></div>
-                </div>
-              </div>
-            </div>
-            <!-- painel dados -->
-            <div class="skill-panel" id="panel-dados">
-              <div class="skill-category-title">Dados & Automação</div>
-              <div class="skill-grid">
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">📊</span> Power BI</div>
-                  <div class="skill-desc">DAX, ETL, modelagem e dashboards executivos.</div>
-                  <div class="skill-tags"><span class="skill-tag">DAX</span><span class="skill-tag">Power Query</span></div>
-                </div>
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">🐍</span> Python</div>
-                  <div class="skill-desc">Pandas, automação de processos, ETL e análise de dados.</div>
-                  <div class="skill-tags"><span class="skill-tag">Pandas</span><span class="skill-tag">ETL</span></div>
-                </div>
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">📈</span> Excel Avançado</div>
-                  <div class="skill-desc">VBA, power pivot, modelagem financeira.</div>
-                  <div class="skill-tags"><span class="skill-tag">VBA</span><span class="skill-tag">Power Pivot</span></div>
-                </div>
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">🔄</span> ETL / Pipelines</div>
-                  <div class="skill-desc">Construção de fluxos de dados para tomada de decisão.</div>
-                  <div class="skill-tags"><span class="skill-tag">Integração</span></div>
-                </div>
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">📉</span> R</div>
-                  <div class="skill-desc">Análise estatística e visualização de dados.</div>
-                  <div class="skill-tags"><span class="skill-tag">ggplot2</span></div>
-                </div>
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">🧪</span> Ciência de Dados</div>
-                  <div class="skill-desc">Modelos preditivos e análise exploratória.</div>
-                  <div class="skill-tags"><span class="skill-tag">Scikit-learn</span></div>
-                </div>
-              </div>
-            </div>
-            <!-- painel ferramentas -->
-            <div class="skill-panel" id="panel-tools">
-              <div class="skill-category-title">Ferramentas</div>
-              <div class="skill-grid">
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">📋</span> Microsoft Project</div>
-                  <div class="skill-desc">Planejamento, cronogramas e controle de projetos.</div>
-                </div>
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">🗺️</span> Visio</div>
-                  <div class="skill-desc">Modelagem de processos e fluxogramas.</div>
-                </div>
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">📌</span> Jira</div>
-                  <div class="skill-desc">Gestão ágil e acompanhamento de tarefas.</div>
-                </div>
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">📁</span> SharePoint</div>
-                  <div class="skill-desc">Gestão documental e portfólio.</div>
-                </div>
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">💾</span> Microsoft Access</div>
-                  <div class="skill-desc">Banco de dados para controle de informações.</div>
-                </div>
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">📱</span> KivyMD</div>
-                  <div class="skill-desc">Desenvolvimento mobile com Python.</div>
-                </div>
-              </div>
-            </div>
-            <!-- painel soft skills -->
-            <div class="skill-panel" id="panel-soft">
-              <div class="skill-category-title">Soft Skills</div>
-              <div class="skill-grid">
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">🤝</span> Negociação & Influência</div>
-                  <div class="skill-desc">Articulação entre áreas técnicas e liderança executiva sem autoridade hierárquica.</div>
-                </div>
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">🧠</span> Visão Estratégica</div>
-                  <div class="skill-desc">Alinhamento do portfólio aos objetivos institucionais.</div>
-                </div>
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">🔍</span> Pensamento Analítico</div>
-                  <div class="skill-desc">Estruturação de problemas complexos em dados e processos.</div>
-                </div>
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">⚡</span> Adaptabilidade</div>
-                  <div class="skill-desc">Atuação consistente em ambientes de alta pressão e regulação.</div>
-                </div>
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">🗣️</span> Comunicação</div>
-                  <div class="skill-desc">Reporting para C-level e facilitação de workshops.</div>
-                </div>
-                <div class="skill-item">
-                  <div class="skill-name"><span class="icon">👥</span> Liderança</div>
-                  <div class="skill-desc">Gestão de times multifuncionais e desenvolvimento de pessoas.</div>
-                </div>
-              </div>
-            </div>
+      <div class="cpanel" id="p-dados" role="tabpanel">
+        <div class="chips">
+          <span class="chip hi">Power BI — DAX · ETL</span>
+          <span class="chip hi">Python — Pandas</span>
+          <span class="chip">Excel Avançado</span>
+          <span class="chip">VBA</span>
+          <span class="chip">Power Query</span>
+          <span class="chip hi">Pipelines ETL</span>
+          <span class="chip">Dashboards Executivos</span>
+          <span class="chip">R</span>
+          <span class="chip">Ciência de Dados</span>
+        </div>
+      </div>
+      <div class="cpanel" id="p-tools" role="tabpanel">
+        <div class="chips">
+          <span class="chip hi">Microsoft Project</span>
+          <span class="chip">Visio</span>
+          <span class="chip">Jira</span>
+          <span class="chip">Teams</span>
+          <span class="chip">SharePoint</span>
+          <span class="chip">Microsoft Access</span>
+          <span class="chip">GitHub</span>
+          <span class="chip">KivyMD</span>
+        </div>
+      </div>
+      <div class="cpanel" id="p-soft" role="tabpanel">
+        <div class="soft-grid">
+          <div class="sc">
+            <div class="sc-t">Negociação &amp; Influência</div>
+            <p>Articulação entre áreas técnicas, administrativas e liderança executiva — resultados sem autoridade hierárquica direta.</p>
+          </div>
+          <div class="sc">
+            <div class="sc-t">Visão Estratégica</div>
+            <p>Alinhamento do portfólio de projetos aos objetivos institucionais com reporting para C-level e diretoria.</p>
+          </div>
+          <div class="sc">
+            <div class="sc-t">Pensamento Analítico</div>
+            <p>Estruturação de problemas complexos em dados e decisões — 75% de redução entregue no tempo de análise.</p>
+          </div>
+          <div class="sc">
+            <div class="sc-t">Comunicação Executiva</div>
+            <p>Tradução de análises técnicas em linguagem estratégica para lideranças. Relatórios e apresentações para C-level.</p>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </div>
+</section>
 
-    <!-- EXPERIÊNCIA -->
-    <section id="experiencia">
-      <div class="container">
-        <div class="section-badge reveal"><span></span> Linha do tempo</div>
-        <h2 class="section-title reveal">Onde isso<br><em>foi aplicado</em></h2>
-        <div class="timeline">
-          <div class="timeline-entry reveal">
-            <div class="timeline-date">
-              out/2024 — atual
-              <div class="timeline-current">EM ANDAMENTO</div>
-            </div>
-            <div>
-              <div class="timeline-company">Hospital da Baleia</div>
-              <div class="timeline-role">Analista de Projetos · PMO</div>
-              <div class="timeline-badges">
-                <span class="timeline-badge">R$ 500k viabilizados</span>
-                <span class="timeline-badge">−75% tempo análise</span>
-                <span class="timeline-badge">8+ projetos</span>
-                <span class="timeline-badge">PMO Hospitalar</span>
-              </div>
-              <ul class="timeline-list">
-                <li><strong>Governança do portfólio "Navega Baleia"</strong> — programa institucional com 4 eixos estratégicos e monitoramento em tempo real via Power BI.</li>
-                <li><strong>Projetos de alta complexidade</strong> em ambiente hospitalar regulado: licenciamento ambiental, usina fotovoltaica, iniciativas Lean, gestão de riscos.</li>
-                <li><strong>Gestão de verbas públicas</strong> — reestruturação do fluxo financeiro com dashboards automatizados.</li>
-                <li><strong>Articulação com liderança executiva</strong> — reporting C-level e follow-up de projetos.</li>
-              </ul>
-            </div>
-          </div>
-          <div class="timeline-entry reveal">
-            <div class="timeline-date">mar/2018 — dez/2024</div>
-            <div>
-              <div class="timeline-company">Eng. Wagner Ramos</div>
-              <div class="timeline-role">Consultor de Projetos</div>
-              <ul class="timeline-list">
-                <li><strong>Consultor e gerente de projetos</strong> — do levantamento de requisitos à entrega final.</li>
-                <li><strong>Automações em Python e Excel</strong> para gestão de projetos e controle de prazos.</li>
-                <li><strong>Boas práticas PMBOK</strong> com uso de Microsoft Project.</li>
-              </ul>
-            </div>
-          </div>
-          <div class="timeline-entry reveal">
-            <div class="timeline-date">ago/2016 — jul/2017</div>
-            <div>
-              <div class="timeline-company">Araujo Projeto</div>
-              <div class="timeline-role">Estagiário de Engenharia</div>
-              <ul class="timeline-list">
-                <li>Desenvolvimento de projetos técnicos com foco em conformidade normativa.</li>
-                <li>Organização de dados em Microsoft Access e Excel.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
+<!-- ══════════ EXPERIÊNCIA ══════════ -->
+<section class="sec" id="experiencia">
+  <div class="stag">
+    <span class="stag-n">04</span>
+    <span class="stag-bar" aria-hidden="true"></span>
+    <span class="stag-l">Experiência Profissional</span>
+  </div>
+  <h2 class="stitle r">Onde isso<br><em>foi aplicado.</em></h2>
+
+  <!-- Hospital da Baleia -->
+  <div class="exp-item r">
+    <div class="exp-meta">
+      <div class="exp-per">out/2024 — atual</div>
+      <div class="exp-live" aria-label="Cargo atual">
+        <span class="exp-live-dot" aria-hidden="true"></span>Em andamento
       </div>
-    </section>
-
-    <!-- PROJETOS -->
-    <section id="projetos">
-      <div class="container">
-        <div class="section-badge reveal"><span></span> Aplicações</div>
-        <h2 class="section-title reveal">Código que<br><em>resolve problemas</em></h2>
-        <div class="projects-grid">
-          <a href="#" class="project-card reveal">
-            <div class="project-num">001</div>
-            <div class="project-title">Dashboard Financeiro</div>
-            <div class="project-desc">Painel com KPIs financeiros para diretoria — fluxo de caixa, despesas e projeções em tempo real.</div>
-            <div class="project-tags">
-              <span class="project-tag">Power BI</span>
-              <span class="project-tag">DAX</span>
-              <span class="project-tag">Financeiro</span>
-            </div>
-            <span class="project-link">Ver projeto →</span>
-          </a>
-          <a href="#" class="project-card reveal delay-1">
-            <div class="project-num">002</div>
-            <div class="project-title">Dashboard de Portfólio</div>
-            <div class="project-desc">Monitoramento em tempo real do portfólio com 20+ projetos, status, prazos e riscos.</div>
-            <div class="project-tags">
-              <span class="project-tag">Power BI</span>
-              <span class="project-tag">PMO</span>
-              <span class="project-tag">ETL</span>
-            </div>
-            <span class="project-link">Ver projeto →</span>
-          </a>
-          <a href="#" class="project-card reveal delay-2">
-            <div class="project-num">003</div>
-            <div class="project-title">App Android — Minha Lista</div>
-            <div class="project-desc">Aplicativo mobile de lista de compras desenvolvido com Python e KivyMD.</div>
-            <div class="project-tags">
-              <span class="project-tag">Python</span>
-              <span class="project-tag">KivyMD</span>
-              <span class="project-tag">JSON</span>
-            </div>
-            <span class="project-link">Ver no LinkedIn →</span>
-          </a>
-          <a href="#" class="project-card reveal">
-            <div class="project-num">004</div>
-            <div class="project-title">Flashcards de Português</div>
-            <div class="project-desc">Ferramenta de estudo com flashcards interativos de língua portuguesa.</div>
-            <div class="project-tags">
-              <span class="project-tag">HTML</span>
-              <span class="project-tag">JavaScript</span>
-              <span class="project-tag">JSON</span>
-            </div>
-            <span class="project-link">Acessar →</span>
-          </a>
-          <a href="#" class="project-card reveal delay-1">
-            <div class="project-num">005</div>
-            <div class="project-title">DICE Model Analyzer</div>
-            <div class="project-desc">Ferramenta de análise de risco baseada no modelo BCG/EESC-USP.</div>
-            <div class="project-tags">
-              <span class="project-tag">PMBOK</span>
-              <span class="project-tag">Risco</span>
-              <span class="project-tag">HTML/JS</span>
-            </div>
-            <span class="project-link">Acessar →</span>
-          </a>
-          <a href="#" class="project-card reveal delay-2">
-            <div class="project-num">006</div>
-            <div class="project-title">Case: PMO Hospitalar</div>
-            <div class="project-desc">Artigo e apresentação sobre estruturação do PMO no Hospital da Baleia.</div>
-            <div class="project-tags">
-              <span class="project-tag">PMO</span>
-              <span class="project-tag">Case</span>
-              <span class="project-tag">Hospital</span>
-            </div>
-            <span class="project-link">Ver no LinkedIn →</span>
-          </a>
-        </div>
+    </div>
+    <div class="exp-body">
+      <div class="exp-co">Hospital da Baleia</div>
+      <div class="exp-role">Analista de Projetos · PMO · Belo Horizonte, MG</div>
+      <div class="exp-tags">
+        <span class="etag g">R$ 500k viabilizados</span>
+        <span class="etag g">−75% tempo análise</span>
+        <span class="etag g">8+ projetos</span>
+        <span class="etag">PMO Hospitalar</span>
+        <span class="etag">Power BI</span>
+        <span class="etag">Verbas Públicas</span>
+        <span class="etag">PMBOK</span>
       </div>
-    </section>
-
-    <!-- CERTIFICAÇÕES -->
-    <section id="certificacoes">
-      <div class="container">
-        <div class="section-badge reveal"><span></span> Formação</div>
-        <h2 class="section-title reveal">Certificações<br><em>e especializações</em></h2>
-        <div class="certs-grid">
-          <div class="cert-category reveal">
-            <h3>Dados & Analytics</h3>
-            <ul class="cert-list">
-              <li>Formação Plena em Ciência de Dados (Python e R) · Udemy 2023</li>
-              <li>Microsoft Power BI Profissional · Udemy 2023</li>
-              <li>Técnicas Avançadas de Power BI · LinkedIn Learning 2023</li>
-              <li>Excel · FAPEMG 2017</li>
-            </ul>
-          </div>
-          <div class="cert-category reveal delay-1">
-            <h3>Gestão de Projetos</h3>
-            <ul class="cert-list">
-              <li>Microsoft Project — Básico ao Avançado · Udemy 2023</li>
-              <li>Execução e Controle com MS Project · LinkedIn Learning 2023</li>
-              <li>Gerenciamento de Cronogramas · LinkedIn Learning 2023</li>
-              <li>Lean Six Sigma · Escola DNC 2023</li>
-            </ul>
-          </div>
-          <div class="cert-category reveal delay-2">
-            <h3>Agilidade & Métodos</h3>
-            <ul class="cert-list">
-              <li>OKR na Prática · Udemy 2023</li>
-              <li>Gestão Ágil com Scrum · Udemy 2023</li>
-              <li>Kanban de A a Z · Udemy 2023</li>
-            </ul>
-          </div>
-          <div class="cert-category reveal delay-3">
-            <h3>Estratégia & Liderança</h3>
-            <ul class="cert-list">
-              <li>Comunicação e Oratória · Escola Conquer 2023</li>
-              <li>Liderança com Inteligência Emocional · LinkedIn Learning 2023</li>
-              <li>Pensamento Crítico · LinkedIn Learning 2023</li>
-            </ul>
-          </div>
-        </div>
+      <ul class="exp-ul">
+        <li><strong>Governança do portfólio "Navega Baleia"</strong> — programa institucional com 4 eixos estratégicos monitorados em tempo real via Power BI, com reporting para C-level.</li>
+        <li><strong>Liderança de projetos de alta complexidade</strong> em ambiente hospitalar regulado: licenciamento ambiental, usina fotovoltaica, iniciativas Lean, gestão de riscos e reformas assistenciais.</li>
+        <li><strong>Reestruturação do fluxo de verbas públicas</strong> — automação em Python e Power BI, viabilizando R$ 500k com conformidade e rastreabilidade total.</li>
+        <li><strong>Implantação de sistema integrado</strong> de controle de obras e demandas hospitalares em Power BI, com visibilidade em tempo real para gestão e diretoria.</li>
+        <li><strong>Articulação com liderança executiva</strong> via kick-off, follow-up, reporting e gestão de mudança sem autoridade hierárquica direta.</li>
+      </ul>
+      <div class="exp-stack">
+        Governança de Portfólio · PMBOK · KPIs · BPMN · Gestão da Mudança · Controle Físico-Financeiro · Power BI · Python · Pandas · Excel Avançado
       </div>
-    </section>
+    </div>
+  </div>
 
-    <!-- CONTATO -->
-    <section id="contato">
-      <div class="container">
-        <div class="section-badge reveal"><span></span> Conexão</div>
-        <div class="contact-layout">
-          <div>
-            <p class="contact-big reveal">Vamos escanear<br><em>seu próximo</em><br>desafio?</p>
-            <div class="contact-list reveal">
-              <a class="contact-item" href="mailto:wagnerramoseng@gmail.com">
-                <div>
-                  <div class="info-label">E-mail</div>
-                  wagnerramoseng@gmail.com
-                </div>
-                <span class="arrow">→</span>
-              </a>
-              <a class="contact-item" href="#" target="_blank">
-                <div>
-                  <div class="info-label">LinkedIn</div>
-                  linkedin.com/in/engwagnerramos
-                </div>
-                <span class="arrow">→</span>
-              </a>
-              <a class="contact-item" href="#" target="_blank">
-                <div>
-                  <div class="info-label">GitHub</div>
-                  github.com/Ramoswagner
-                </div>
-                <span class="arrow">→</span>
-              </a>
-            </div>
-          </div>
-          <div class="contact-card reveal delay-1">
-            <div class="info-row">
-              <span class="info-label">Disponibilidade</span>
-              <span class="info-value">Aberto a oportunidades</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Localização</span>
-              <span class="info-value">Belo Horizonte, MG · Remoto/Híbrido</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Currículo</span>
-              <span class="info-value"><a href="#" style="color:var(--accent);">download PDF →</a></span>
-            </div>
-          </div>
-        </div>
+  <!-- Autônomo -->
+  <div class="exp-item r">
+    <div class="exp-meta">
+      <div class="exp-per">mar/2018 — dez/2024</div>
+    </div>
+    <div class="exp-body">
+      <div class="exp-co">Eng. Wagner Ramos</div>
+      <div class="exp-role">Engenheiro · Consultor de Projetos · Belo Horizonte, MG</div>
+      <ul class="exp-ul">
+        <li><strong>Consultoria e gestão de projetos</strong> de engenharia — do levantamento de requisitos à entrega final, com aplicação das boas práticas PMBOK.</li>
+        <li><strong>Desenvolvimento de automações em Python e Excel</strong> para controle de prazos, organização de dados e geração de relatórios.</li>
+        <li><strong>Planejamento e controle de cronograma</strong> com Microsoft Project em projetos de média e alta complexidade.</li>
+      </ul>
+      <div class="exp-stack">Planejamento · Controle de Projetos · Python · Excel · MS Project · PMBOK</div>
+    </div>
+  </div>
+
+  <!-- Estágio -->
+  <div class="exp-item r">
+    <div class="exp-meta">
+      <div class="exp-per">ago/2016 — jul/2017</div>
+    </div>
+    <div class="exp-body">
+      <div class="exp-co">Araujo Projeto</div>
+      <div class="exp-role">Estagiário de Engenharia · Belo Horizonte, MG</div>
+      <ul class="exp-ul">
+        <li>Desenvolvimento de projetos técnicos com foco em conformidade normativa e controle de qualidade.</li>
+        <li>Organização de dados em Microsoft Access e Excel para suporte à tomada de decisão gerencial.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FORMAÇÃO ══════════ -->
+<section class="sec alt" id="formacao">
+  <div class="stag">
+    <span class="stag-n">05</span>
+    <span class="stag-bar" aria-hidden="true"></span>
+    <span class="stag-l">Formação Acadêmica</span>
+  </div>
+  <h2 class="stitle r">Base<br><em>sólida.</em></h2>
+
+  <div>
+    <div class="form-item r">
+      <div class="form-yr">Em curso</div>
+      <div>
+        <div class="form-deg">MBA em Gestão de Projetos</div>
+        <div class="form-sch">Fundace FEARP · USP</div>
       </div>
-    </section>
+      <span class="form-badge">Em andamento</span>
+    </div>
+    <div class="form-item r">
+      <div class="form-yr">2023</div>
+      <div>
+        <div class="form-deg">Pós-graduação em Gestão de Projetos</div>
+        <div class="form-sch">Descomplica Faculdade Digital</div>
+      </div>
+      <span></span>
+    </div>
+    <div class="form-item r">
+      <div class="form-yr">2017</div>
+      <div>
+        <div class="form-deg">Bacharelado em Engenharia Civil</div>
+        <div class="form-sch">Centro Universitário de Belo Horizonte · UniBH</div>
+      </div>
+      <span></span>
+    </div>
+  </div>
+</section>
 
-    <footer>
-      <div>© 2026 Wagner Ramos — Strategic X‑Ray</div>
-      <div>Estratégia · PMO · Dados</div>
-    </footer>
-  </main>
+<!-- ══════════ PROJETOS ══════════ -->
+<section class="sec" id="projetos">
+  <div class="stag">
+    <span class="stag-n">06</span>
+    <span class="stag-bar" aria-hidden="true"></span>
+    <span class="stag-l">Aplicações Práticas</span>
+  </div>
+  <h2 class="stitle r">Código que<br><em>resolve.</em></h2>
 
-  <script>
-    // ===== CURSOR =====
-    const dot = document.getElementById('cursor-dot');
-    const outline = document.getElementById('cursor-outline');
-    document.addEventListener('mousemove', (e) => {
-      dot.style.left = e.clientX + 'px';
-      dot.style.top = e.clientY + 'px';
-      outline.style.left = e.clientX + 'px';
-      outline.style.top = e.clientY + 'px';
+  <div class="proj-grid">
+    <a class="pcard r" href="assets/projetos/dash-financeiro.jpg" target="_blank" rel="noopener">
+      <span class="p-n">001 — Power BI</span>
+      <div class="p-t">Dashboard Financeiro</div>
+      <p class="p-d">Painel com KPIs financeiros para diretoria — fluxo de caixa, despesas e projeções em tempo real.</p>
+      <div class="p-chips"><span class="pc">Power BI</span><span class="pc">DAX</span><span class="pc">ETL</span></div>
+    </a>
+    <a class="pcard r d1" href="assets/projetos/dash-portfolio.jpg" target="_blank" rel="noopener">
+      <span class="p-n">002 — Power BI</span>
+      <div class="p-t">Dashboard de Portfólio</div>
+      <p class="p-d">Monitoramento em tempo real de 20+ projetos — status, prazos e riscos consolidados.</p>
+      <div class="p-chips"><span class="pc">Power BI</span><span class="pc">PMO</span><span class="pc">ETL</span></div>
+    </a>
+    <a class="pcard r d2" href="https://www.linkedin.com/posts/engwagnerramos_python-poo-kivymd-activity-7166114326922182657-kq71" target="_blank" rel="noopener">
+      <span class="p-n">003 — Python</span>
+      <div class="p-t">App Android — Minha Lista</div>
+      <p class="p-d">Aplicativo mobile de lista de compras desenvolvido com Python e KivyMD.</p>
+      <div class="p-chips"><span class="pc">Python</span><span class="pc">KivyMD</span><span class="pc">JSON</span></div>
+    </a>
+    <a class="pcard r d3" href="https://ramoswagner.github.io/flashcards/" target="_blank" rel="noopener">
+      <span class="p-n">004 — Web</span>
+      <div class="p-t">Flashcards de Português</div>
+      <p class="p-d">Ferramenta de estudo com flashcards interativos em HTML e JavaScript.</p>
+      <div class="p-chips"><span class="pc">HTML</span><span class="pc">JS</span><span class="pc">JSON</span></div>
+    </a>
+    <a class="pcard r" href="https://ramoswagner.github.io/dice/" target="_blank" rel="noopener">
+      <span class="p-n">005 — Gestão</span>
+      <div class="p-t">DICE Model Analyzer</div>
+      <p class="p-d">Análise de risco e probabilidade de sucesso em projetos baseada no modelo BCG/EESC-USP.</p>
+      <div class="p-chips"><span class="pc">PMBOK</span><span class="pc">Risco</span><span class="pc">HTML/JS</span></div>
+    </a>
+    <a class="pcard r d1" href="https://github.com/Ramoswagner" target="_blank" rel="noopener">
+      <span class="p-n">006 — PMO</span>
+      <div class="p-t">Case: PMO Hospitalar</div>
+      <p class="p-d">Estruturação do PMO no Hospital da Baleia — programa estratégico "Navega Baleia".</p>
+      <div class="p-chips"><span class="pc">PMO</span><span class="pc">Case</span><span class="pc">Hospital</span></div>
+    </a>
+  </div>
+</section>
+
+<!-- ══════════ CERTIFICAÇÕES ══════════ -->
+<section class="sec alt" id="certificacoes">
+  <div class="stag">
+    <span class="stag-n">07</span>
+    <span class="stag-bar" aria-hidden="true"></span>
+    <span class="stag-l">Certificações</span>
+  </div>
+  <h2 class="stitle r">Aprendizado<br><em>contínuo.</em></h2>
+
+  <div class="cert-grid">
+    <div class="r">
+      <div class="cert-h">Dados &amp; Analytics</div>
+      <ul class="cert-ul">
+        <li>Ciência de Dados — Python e R · Udemy 2023</li>
+        <li>Microsoft Power BI Profissional · Udemy 2023</li>
+        <li>Técnicas Avançadas Power BI · LinkedIn Learning 2023</li>
+        <li>Excel · FAPEMG 2017</li>
+      </ul>
+    </div>
+    <div class="r d1">
+      <div class="cert-h">Gestão de Projetos</div>
+      <ul class="cert-ul">
+        <li>Microsoft Project — Básico ao Avançado · Udemy 2023</li>
+        <li>Execução e Controle com MS Project · LinkedIn 2023</li>
+        <li>Gerenciamento de Cronogramas · LinkedIn 2023</li>
+        <li>Lean Six Sigma · Escola DNC 2023</li>
+      </ul>
+    </div>
+    <div class="r d2">
+      <div class="cert-h">Agilidade &amp; Métodos</div>
+      <ul class="cert-ul">
+        <li>OKR na Prática · Udemy 2023</li>
+        <li>Gestão Ágil com Scrum · Udemy 2023</li>
+        <li>Kanban de A a Z · Udemy 2023</li>
+        <li>Gestão Ágil com MS Project · LinkedIn 2023</li>
+      </ul>
+    </div>
+    <div class="r d3">
+      <div class="cert-h">Estratégia &amp; Liderança</div>
+      <ul class="cert-ul">
+        <li>Comunicação e Oratória · Escola Conquer 2023</li>
+        <li>Liderança com Int. Emocional · LinkedIn 2023</li>
+        <li>Pensamento Crítico · LinkedIn Learning 2023</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CONTATO ══════════ -->
+<section class="sec dark" id="contato">
+  <div class="stag">
+    <span class="stag-n" style="color:rgba(196,154,40,.65)">08</span>
+    <span class="stag-bar" style="background:rgba(196,154,40,.3)" aria-hidden="true"></span>
+    <span class="stag-l" style="color:rgba(255,255,255,.3)">Contato</span>
+  </div>
+
+  <div class="contato-layout">
+    <div>
+      <h2 class="ct-head r">
+        Vamos construir<br>algo <em>relevante</em><br>juntos?
+      </h2>
+      <div class="ct-links r d1">
+        <a class="ct-link" href="mailto:wagnerramoseng@gmail.com">
+          <div><div class="ct-type">E-mail</div><div class="ct-val">wagnerramoseng@gmail.com</div></div>
+          <span class="ct-arr">→</span>
+        </a>
+        <a class="ct-link" href="https://www.linkedin.com/in/engwagnerramos/" target="_blank" rel="noopener">
+          <div><div class="ct-type">LinkedIn</div><div class="ct-val">linkedin.com/in/engwagnerramos</div></div>
+          <span class="ct-arr">→</span>
+        </a>
+        <a class="ct-link" href="https://github.com/Ramoswagner" target="_blank" rel="noopener">
+          <div><div class="ct-type">GitHub</div><div class="ct-val">github.com/Ramoswagner</div></div>
+          <span class="ct-arr">→</span>
+        </a>
+        <a class="ct-link" href="https://www.instagram.com/engwagnerramos" target="_blank" rel="noopener">
+          <div><div class="ct-type">Instagram</div><div class="ct-val">@engwagnerramos</div></div>
+          <span class="ct-arr">→</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="ct-card r d2">
+      <div class="ct-card-title">Disponibilidade</div>
+      <div class="ctcr">
+        <div class="ctcr-l">Status</div>
+        <div class="ctcr-v">Aberto a oportunidades</div>
+      </div>
+      <div class="ctcr">
+        <div class="ctcr-l">Localização</div>
+        <div class="ctcr-v">Belo Horizonte, MG<br>Disponível para remoto e híbrido</div>
+      </div>
+      <div class="ctcr">
+        <div class="ctcr-l">Áreas de interesse</div>
+        <div class="ctcr-v">PMO · Gestão de Projetos<br>Business Intelligence · Consultoria</div>
+      </div>
+      <a class="ct-dl" href="assets/curriculo-wagner-ramos.pdf" download>Baixar Currículo PDF ↓</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="foot">© 2026 <span class="foot-g">Wagner Douglas Ramos da Silva</span></span>
+  <span class="foot">PMO · Gestão de Projetos · Business Intelligence</span>
+</footer>
+
+<script>
+/* ── LOADER ── */
+const loader = document.getElementById('loader');
+window.addEventListener('load', () => {
+  loader.classList.add('go');
+  setTimeout(() => loader.classList.add('away'), 2300);
+  setTimeout(() => { if (loader.parentNode) loader.remove(); }, 3300);
+});
+
+/* ── CURSOR (pointer:fine only) ── */
+if (window.matchMedia('(pointer:fine)').matches) {
+  const cd = document.getElementById('cd');
+  const cr = document.getElementById('cr');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cd.style.transform = `translate(calc(${mx}px - 50%), calc(${my}px - 50%))`;
+  }, { passive: true });
+
+  (function lerp() {
+    rx += (mx - rx) * 0.1;
+    ry += (my - ry) * 0.1;
+    cr.style.transform = `translate(calc(${rx}px - 50%), calc(${ry}px - 50%))`;
+    requestAnimationFrame(lerp);
+  })();
+
+  document.querySelectorAll('a, button, .imp, .form-item, .pcard').forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('ch'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('ch'));
+  });
+}
+
+/* ── NAV SCROLL ── */
+const nav = document.getElementById('nav');
+const onScroll = () => nav.classList.toggle('over', window.scrollY > 20);
+window.addEventListener('scroll', onScroll, { passive: true });
+onScroll();
+
+/* ── HAMBURGER ── */
+const ham = document.getElementById('ham');
+const mob = document.getElementById('mob');
+
+function closeMob() {
+  ham.classList.remove('open');
+  ham.setAttribute('aria-expanded', 'false');
+  mob.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+ham.addEventListener('click', () => {
+  const open = ham.classList.toggle('open');
+  ham.setAttribute('aria-expanded', open);
+  mob.classList.toggle('open', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+});
+
+/* close on ESC */
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMob(); });
+
+/* ── SCROLL REVEAL ── */
+const revObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); revObs.unobserve(e.target); }
+  });
+}, { threshold: 0.07, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.r').forEach(el => revObs.observe(el));
+
+/* ── COUNTERS ── */
+function animCount(el) {
+  const to = parseInt(el.dataset.to, 10);
+  const dur = 1800;
+  const t0 = performance.now();
+  (function tick(now) {
+    const p = Math.min((now - t0) / dur, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(ease * to);
+    if (p < 1) requestAnimationFrame(tick);
+  })(t0);
+}
+const cntObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { animCount(e.target); cntObs.unobserve(e.target); }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.cnt').forEach(el => cntObs.observe(el));
+
+/* ── COMPETÊNCIAS TABS ── */
+document.querySelectorAll('.ctab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.ctab').forEach(b => {
+      b.classList.remove('on');
+      b.setAttribute('aria-selected', 'false');
     });
-
-    // hover effect
-    document.querySelectorAll('a, button, .skill-nav-item, .project-card, .delivery-card').forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        outline.style.width = '50px';
-        outline.style.height = '50px';
-        outline.style.borderColor = 'var(--accent)';
-        outline.style.opacity = '1';
-      });
-      el.addEventListener('mouseleave', () => {
-        outline.style.width = '40px';
-        outline.style.height = '40px';
-        outline.style.borderColor = 'var(--accent)';
-        outline.style.opacity = '0.5';
-      });
-    });
-
-    // ===== MENU MOBILE =====
-    const menuToggle = document.getElementById('menuToggle');
-    const navLinks = document.getElementById('navLinks');
-    menuToggle.addEventListener('click', () => {
-      navLinks.classList.toggle('open');
-    });
-    navLinks.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => navLinks.classList.remove('open'));
-    });
-
-    // ===== SCROLL REVEAL =====
-    const reveals = document.querySelectorAll('.reveal');
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
-    reveals.forEach(el => observer.observe(el));
-
-    // ===== COUNTERS =====
-    const counters = document.querySelectorAll('.counter');
-    const counterObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const el = entry.target;
-          const target = parseInt(el.dataset.target);
-          let count = 0;
-          const update = () => {
-            if (count < target) {
-              count += Math.ceil(target / 80);
-              if (count > target) count = target;
-              el.textContent = count;
-              requestAnimationFrame(update);
-            } else {
-              el.textContent = target;
-            }
-          };
-          update();
-          counterObserver.unobserve(el);
-        }
-      });
-    }, { threshold: 0.5 });
-    counters.forEach(c => counterObserver.observe(c));
-
-    // ===== TABS =====
-    const navItems = document.querySelectorAll('.skill-nav-item');
-    const panels = document.querySelectorAll('.skill-panel');
-    navItems.forEach(item => {
-      item.addEventListener('click', () => {
-        navItems.forEach(n => n.classList.remove('active'));
-        panels.forEach(p => p.classList.remove('active'));
-        item.classList.add('active');
-        const panelId = 'panel-' + item.dataset.panel;
-        document.getElementById(panelId).classList.add('active');
-      });
-    });
-
-    // ===== ACTIVE NAV =====
-    const sections = document.querySelectorAll('section[id]');
-    const navAs = document.querySelectorAll('.nav-links a');
-    window.addEventListener('scroll', () => {
-      let current = '';
-      sections.forEach(s => {
-        const top = s.offsetTop - 200;
-        if (window.scrollY >= top) current = s.id;
-      });
-      navAs.forEach(a => {
-        a.style.color = a.getAttribute('href') === '#' + current ? 'var(--accent)' : '';
-      });
-    }, { passive: true });
-
-    // ===== SCANNER EFFECT ON CARDS =====
-    document.querySelectorAll('.delivery-card').forEach(card => {
-      card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-        card.style.setProperty('--x', x + '%');
-        card.style.setProperty('--y', y + '%');
-      });
-    });
-  </script>
+    document.querySelectorAll('.cpanel').forEach(p => p.classList.remove('on'));
+    btn.classList.add('on');
+    btn.setAttribute('aria-selected', 'true');
+    const panel = document.getElementById('p-' + btn.dataset.p);
+    if (panel) panel.classList.add('on');
+  });
+});
+</script>
 </body>
 </html>
