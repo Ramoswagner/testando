@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Capa LinkedIn · Wagner Ramos (alta qualidade)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <title>Fundo para Capa LinkedIn · Wagner Ramos</title>
     <style>
         body {
             background: #0B1E33;
@@ -22,7 +21,7 @@
         }
         canvas {
             width: 100%;
-            max-width: 792px; /* metade para visualização, mas o original tem 1584px */
+            max-width: 792px; /* metade do tamanho real */
             height: auto;
             border: 2px solid #C4A35A;
             border-radius: 8px;
@@ -56,13 +55,15 @@
             margin-top: 15px;
         }
     </style>
+    <!-- Fonte apenas para a coordenada (pode ser removida se preferir) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <canvas id="linkedinBanner" width="1584" height="396"></canvas>
         <br>
-        <button class="btn" id="downloadBtn">⬇ Baixar Capa LinkedIn</button>
-        <p class="note">Dimensões: 1584 x 396 px — qualidade profissional para capa do LinkedIn.</p>
+        <button class="btn" id="downloadBtn">⬇ Baixar Fundo (PNG)</button>
+        <p class="note">Dimensões: 1584 x 396 px — alta qualidade. Use como base no Canva.</p>
     </div>
 
     <script>
@@ -70,43 +71,41 @@
             const canvas = document.getElementById('linkedinBanner');
             const ctx = canvas.getContext('2d');
 
-            // Cores do tema
+            // Cores do tema (apenas as necessárias para o fundo)
             const colors = {
                 bg: '#0B1E33',
-                text: '#F0F4FA',
-                mid: '#A0B3CC',
                 low: '#62748C',
                 gold: '#C4A35A',
-                glt: '#D8B87A',
-                line: 'rgba(255,255,255,0.08)',
                 lineg: 'rgba(196,163,90,0.25)'
             };
 
             const width = canvas.width;
             const height = canvas.height;
 
-            // Ativar suavização de imagem para melhor qualidade
+            // Ativar alta qualidade
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
 
-            // Fundo principal
+            // 1. Fundo principal
             ctx.fillStyle = colors.bg;
             ctx.fillRect(0, 0, width, height);
 
-            // Gradientes suaves (como no site)
+            // 2. Gradientes suaves (característicos do site)
+            // Gradiente inferior esquerdo (dourado suave)
             const grad1 = ctx.createRadialGradient(200, height - 100, 50, 250, height - 150, 600);
             grad1.addColorStop(0, 'rgba(196,163,90,0.1)');
             grad1.addColorStop(1, 'transparent');
             ctx.fillStyle = grad1;
             ctx.fillRect(0, 0, width, height);
 
+            // Gradiente superior direito (azul profundo)
             const grad2 = ctx.createRadialGradient(width - 200, 100, 50, width - 300, 150, 700);
             grad2.addColorStop(0, 'rgba(26,62,90,0.5)');
             grad2.addColorStop(1, 'transparent');
             ctx.fillStyle = grad2;
             ctx.fillRect(0, 0, width, height);
 
-            // Linha vertical esquerda
+            // 3. Linha vertical esquerda (característica)
             ctx.strokeStyle = colors.lineg;
             ctx.lineWidth = 1;
             ctx.beginPath();
@@ -114,7 +113,7 @@
             ctx.lineTo(80, height - 60);
             ctx.stroke();
 
-            // Coordenada geográfica no canto superior direito (vertical)
+            // 4. Coordenada geográfica no canto superior direito (vertical)
             ctx.save();
             ctx.translate(width - 50, 100);
             ctx.rotate(-Math.PI/2);
@@ -124,77 +123,10 @@
             ctx.fillText('19°55\'S · 43°56\'W', 0, 0);
             ctx.restore();
 
-            // ----- LADO ESQUERDO: título e área de atuação -----
-            const leftX = 120;
-
-            // Ponto dourado (eyebrow)
-            ctx.beginPath();
-            ctx.arc(leftX, 85, 4, 0, 2 * Math.PI);
-            ctx.fillStyle = colors.gold;
-            ctx.fill();
-
-            // Frase principal (PMO · Projetos · Business Intelligence) - maior destaque
-            ctx.font = '500 36px "Cormorant Garamond", serif';
-            ctx.fillStyle = colors.text;
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'top';
-            ctx.fillText('PMO · Projetos · Business Intelligence', leftX + 20, 70);
-
-            // Linha dourada abaixo
-            ctx.strokeStyle = colors.gold;
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(leftX, 130);
-            ctx.lineTo(leftX + 400, 130);
-            ctx.stroke();
-
-            // Subtítulo (Engenharia Civil · Gestão de Portfólio · Dados)
-            ctx.font = '300 18px "Inter", sans-serif';
-            ctx.fillStyle = colors.mid;
-            ctx.fillText('Engenharia Civil · Gestão de Portfólio · Dados', leftX, 160);
-
-            // ----- LADO DIREITO: contatos discretos com ícones alinhados -----
-            const rightColX = width - 400;  // coluna para os ícones
-            const textStartX = width - 360; // texto começa após o ícone
-            const lineHeight = 45;
-            const startY = 180;
-
-            // Ícones usando caracteres especiais (discretos)
-            const icons = [
-                { icon: '✉', text: 'wagnerramoseng@gmail.com' },
-                { icon: 'in', text: '/in/engwagnerramos' },
-                { icon: '🌐', text: 'ramoswagner.github.io/inforamoswagner' }
-            ];
-
-            ctx.font = '300 16px "Inter", sans-serif';
-            ctx.fillStyle = colors.low;
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'middle';
-
-            icons.forEach((item, index) => {
-                const y = startY + index * lineHeight;
-
-                // Desenha o ícone em dourado suave
-                ctx.fillStyle = colors.gold;
-                ctx.font = '500 18px "Inter", sans-serif'; // ícone um pouco maior
-                ctx.fillText(item.icon, rightColX, y);
-
-                // Desenha o texto em low
-                ctx.fillStyle = colors.low;
-                ctx.font = '300 16px "Inter", sans-serif';
-                ctx.fillText(item.text, textStartX, y);
-            });
-
-            // Pequenos detalhes: linha fina separando sutilmente a área de contatos
-            ctx.strokeStyle = colors.line;
-            ctx.lineWidth = 0.5;
-            ctx.beginPath();
-            ctx.moveTo(width - 420, 140);
-            ctx.lineTo(width - 420, startY + icons.length * lineHeight - 10);
-            ctx.stroke();
-
-            // Ghost "PMO" no canto inferior direito
-            ctx.font = '700 110px "Cormorant Garamond", serif';
+            // 5. Ghost "PMO" no canto inferior direito (extremamente sutil)
+            // Usando Cormorant Garamond, mas como é apenas um ghost, qualquer fonte serifada funciona
+            // Vamos usar uma fonte padrão, mas para manter a identidade, carregamos a Cormorant via sistema
+            ctx.font = '700 110px "Cormorant Garamond", "Times New Roman", serif';
             ctx.fillStyle = 'rgba(255,255,255,0.03)';
             ctx.textAlign = 'right';
             ctx.textBaseline = 'bottom';
@@ -203,12 +135,12 @@
             // Botão de download
             document.getElementById('downloadBtn').addEventListener('click', function() {
                 const link = document.createElement('a');
-                link.download = 'wagner-ramos-linkedin-capa.png';
+                link.download = 'fundo-linkedin-wagner-ramos.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             });
 
-            console.log('Capa de alta qualidade gerada com sucesso!');
+            console.log('Fundo de alta qualidade gerado com sucesso!');
         })();
     </script>
 </body>
