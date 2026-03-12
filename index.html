@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Capa LinkedIn · Wagner Ramos (estilo portfólio)</title>
+    <title>Capa LinkedIn · Wagner Ramos (versão discreta)</title>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         body {
@@ -22,7 +22,7 @@
         }
         canvas {
             width: 100%;
-            max-width: 792px; /* metade do tamanho real para visualização */
+            max-width: 792px;
             height: auto;
             border: 2px solid #C4A35A;
             border-radius: 8px;
@@ -70,7 +70,7 @@
             const canvas = document.getElementById('linkedinBanner');
             const ctx = canvas.getContext('2d');
 
-            // Cores do tema (mesmas do site)
+            // Cores do tema
             const colors = {
                 bg: '#0B1E33',
                 text: '#F0F4FA',
@@ -89,7 +89,7 @@
             ctx.fillStyle = colors.bg;
             ctx.fillRect(0, 0, width, height);
 
-            // Gradientes suaves (como no site)
+            // Gradientes suaves
             const grad1 = ctx.createRadialGradient(200, height - 100, 50, 250, height - 150, 600);
             grad1.addColorStop(0, 'rgba(196,163,90,0.1)');
             grad1.addColorStop(1, 'transparent');
@@ -102,7 +102,7 @@
             ctx.fillStyle = grad2;
             ctx.fillRect(0, 0, width, height);
 
-            // Linha vertical esquerda (como no site)
+            // Linha vertical esquerda
             ctx.strokeStyle = colors.lineg;
             ctx.lineWidth = 1;
             ctx.beginPath();
@@ -120,117 +120,70 @@
             ctx.fillText('19°55\'S · 43°56\'W', 0, 0);
             ctx.restore();
 
-            // ===== LADO ESQUERDO =====
-            // Eyebrow (igual ao site)
-            const eyebrowY = 70;
-            // Ponto dourado
+            // ----- LADO ESQUERDO: título e área de atuação -----
+            const leftX = 120;
+            // Ponto dourado (eyebrow)
             ctx.beginPath();
-            ctx.arc(120, eyebrowY + 3, 4, 0, 2 * Math.PI);
+            ctx.arc(leftX, 85, 4, 0, 2 * Math.PI);
             ctx.fillStyle = colors.gold;
             ctx.fill();
 
-            // Texto "Portfólio · 2026"
-            ctx.font = '400 14px "Inter", sans-serif';
-            ctx.fillStyle = colors.mid;
-            ctx.fillText('Portfólio', 140, eyebrowY);
-
-            // Linha separadora
-            ctx.strokeStyle = colors.line;
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(240, eyebrowY);
-            ctx.lineTo(270, eyebrowY);
-            ctx.stroke();
-
-            // Ano 2026
-            ctx.font = '400 14px "Inter", sans-serif';
-            ctx.fillStyle = colors.low;
-            ctx.fillText('2026', 280, eyebrowY);
-
-            // Nome (três linhas, como no site)
-            ctx.font = '300 58px "Cormorant Garamond", serif';
+            // Frase principal (PMO · Projetos · Business Intelligence)
+            ctx.font = '400 28px "Cormorant Garamond", serif';
             ctx.fillStyle = colors.text;
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
-            ctx.fillText('Wagner', 120, 110);
+            ctx.fillText('PMO · Projetos · Business Intelligence', leftX + 20, 70);
 
-            ctx.font = '300 58px "Cormorant Garamond", serif';
-            ctx.fillStyle = colors.mid;
-            ctx.fillText('Douglas', 120, 170);
-
-            ctx.font = '700 64px "Cormorant Garamond", serif';
-            ctx.fillStyle = colors.text;
-            ctx.fillText('Ramos', 120, 230);
-
-            // Linha dourada abaixo do nome
+            // Linha dourada abaixo
             ctx.strokeStyle = colors.gold;
             ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.moveTo(120, 300);
-            ctx.lineTo(500, 300);
+            ctx.moveTo(leftX, 120);
+            ctx.lineTo(leftX + 300, 120);
             ctx.stroke();
 
-            // Título / área de atuação
-            ctx.font = '400 18px "Inter", sans-serif';
+            // Subtítulo (opcional, reforça a área)
+            ctx.font = '300 16px "Inter", sans-serif';
+            ctx.fillStyle = colors.mid;
+            ctx.fillText('Engenharia Civil · Gestão de Portfólio · Dados', leftX, 150);
+
+            // ----- LADO DIREITO: ano 2026 e contatos discretos -----
+            const rightX = width - 300; // margem direita
+
+            // Ano 2026 em destaque (mas sem competir com o nome)
+            ctx.font = '700 70px "Cormorant Garamond", serif';
             ctx.fillStyle = colors.gold;
-            ctx.fillText('PMO · Projetos · Business Intelligence', 120, 320);
+            ctx.textAlign = 'right';
+            ctx.fillText('2026', width - 120, 130);
 
-            // Breve descrição (opcional, inspirado no site)
-            ctx.font = '300 14px "Inter", sans-serif';
-            ctx.fillStyle = colors.low;
-            ctx.fillText('Engenharia Civil · Gestão de Portfólio · Dados', 120, 355);
-
-            // ===== LADO DIREITO =====
-            // Cards de impacto (como no site)
-            const rightX = 900; // posição inicial
-            const cardWidth = 180;
-            const cardHeight = 120;
-            const cardSpacing = 20;
-
-            // Card 1: Recursos viabilizados
-            ctx.fillStyle = colors.bg3 || '#153450'; // fallback para bg3
-            ctx.fillRect(rightX, 120, cardWidth, cardHeight);
+            // Linha fina separadora abaixo do ano
             ctx.strokeStyle = colors.line;
-            ctx.lineWidth = 1;
-            ctx.strokeRect(rightX, 120, cardWidth, cardHeight);
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(width - 300, 180);
+            ctx.lineTo(width - 80, 180);
+            ctx.stroke();
 
+            // Contatos em tom discreto (cor low)
             ctx.font = '300 14px "Inter", sans-serif';
             ctx.fillStyle = colors.low;
-            ctx.fillText('Recursos viabilizados', rightX + 15, 140);
+            ctx.textAlign = 'right';
+            ctx.fillText('wagnerramoseng@gmail.com', width - 120, 210);
+            ctx.fillText('/in/engwagnerramos', width - 120, 240);
+            ctx.fillText('/Ramoswagner', width - 120, 270);
 
-            ctx.font = '600 36px "Cormorant Garamond", serif';
-            ctx.fillStyle = colors.text;
-            ctx.fillText('R$500k', rightX + 15, 190);
-
-            // Card 2: Redução de tempo
-            ctx.fillStyle = colors.bg3 || '#153450';
-            ctx.fillRect(rightX + cardWidth + cardSpacing, 120, cardWidth, cardHeight);
-            ctx.strokeStyle = colors.line;
-            ctx.strokeRect(rightX + cardWidth + cardSpacing, 120, cardWidth, cardHeight);
-
-            ctx.font = '300 14px "Inter", sans-serif';
-            ctx.fillStyle = colors.low;
-            ctx.fillText('Redução no tempo', rightX + cardWidth + cardSpacing + 15, 140);
-            ctx.fillText('de análise', rightX + cardWidth + cardSpacing + 15, 158);
-
-            ctx.font = '600 36px "Cormorant Garamond", serif';
-            ctx.fillStyle = colors.text;
-            ctx.fillText('-75%', rightX + cardWidth + cardSpacing + 15, 200);
-
-            // Card 3: Projetos simultâneos
-            ctx.fillStyle = colors.bg3 || '#153450';
-            ctx.fillRect(rightX + 2*(cardWidth + cardSpacing), 120, cardWidth, cardHeight);
-            ctx.strokeStyle = colors.line;
-            ctx.strokeRect(rightX + 2*(cardWidth + cardSpacing), 120, cardWidth, cardHeight);
-
-            ctx.font = '300 14px "Inter", sans-serif';
-            ctx.fillStyle = colors.low;
-            ctx.fillText('Projetos', rightX + 2*(cardWidth + cardSpacing) + 15, 140);
-            ctx.fillText('simultâneos', rightX + 2*(cardWidth + cardSpacing) + 15, 158);
-
-            ctx.font = '600 36px "Cormorant Garamond", serif';
-            ctx.fillStyle = colors.text;
-            ctx.fillText('17+', rightX + 2*(cardWidth + cardSpacing) + 15, 200);
+            // Ícones sutis (opcional) - pequenos círculos dourados
+            ctx.beginPath();
+            ctx.arc(width - 140, 215, 2, 0, 2 * Math.PI);
+            ctx.fillStyle = colors.gold;
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(width - 140, 245, 2, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(width - 140, 275, 2, 0, 2 * Math.PI);
+            ctx.fill();
 
             // Ghost "PMO" no canto inferior direito
             ctx.font = '700 110px "Cormorant Garamond", serif';
@@ -242,12 +195,12 @@
             // Botão de download
             document.getElementById('downloadBtn').addEventListener('click', function() {
                 const link = document.createElement('a');
-                link.download = 'wagner-ramos-linkedin-capa.png';
+                link.download = 'wagner-ramos-linkedin-capa-discreta.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             });
 
-            console.log('Capa estilo portfólio gerada com sucesso!');
+            console.log('Capa discreta gerada com sucesso!');
         })();
     </script>
 </body>
