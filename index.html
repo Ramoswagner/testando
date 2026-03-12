@@ -102,20 +102,12 @@
             ctx.fillStyle = grad2;
             ctx.fillRect(0, 0, width, height);
 
-            // Linha vertical esquerda
+            // Linha vertical esquerda (como no site)
             ctx.strokeStyle = colors.lineg;
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(80, 60);
             ctx.lineTo(80, height - 60);
-            ctx.stroke();
-
-            // Linha horizontal inferior
-            ctx.strokeStyle = colors.line;
-            ctx.lineWidth = 0.5;
-            ctx.beginPath();
-            ctx.moveTo(100, height - 70);
-            ctx.lineTo(width - 100, height - 70);
             ctx.stroke();
 
             // Coordenada geográfica no canto superior direito (vertical)
@@ -128,42 +120,117 @@
             ctx.fillText('19°55\'S · 43°56\'W', 0, 0);
             ctx.restore();
 
-            // EYEBROW (Portfólio · 2026) - igual ao site
+            // ===== LADO ESQUERDO =====
+            // Eyebrow (igual ao site)
             const eyebrowY = 70;
             // Ponto dourado
             ctx.beginPath();
             ctx.arc(120, eyebrowY + 3, 4, 0, 2 * Math.PI);
             ctx.fillStyle = colors.gold;
             ctx.fill();
+
+            // Texto "Portfólio · 2026"
+            ctx.font = '400 14px "Inter", sans-serif';
+            ctx.fillStyle = colors.mid;
+            ctx.fillText('Portfólio', 140, eyebrowY);
+
             // Linha separadora
             ctx.strokeStyle = colors.line;
             ctx.lineWidth = 1;
             ctx.beginPath();
-            ctx.moveTo(280, eyebrowY);
-            ctx.lineTo(310, eyebrowY);
+            ctx.moveTo(240, eyebrowY);
+            ctx.lineTo(270, eyebrowY);
             ctx.stroke();
+
             // Ano 2026
             ctx.font = '400 14px "Inter", sans-serif';
             ctx.fillStyle = colors.low;
-            ctx.fillText('2026', 320, eyebrowY);
+            ctx.fillText('2026', 280, eyebrowY);
 
-            // Subtítulo (PMO · Projetos · Business Intelligence)
-            ctx.font = '300 22px "Inter", sans-serif';
+            // Nome (três linhas, como no site)
+            ctx.font = '300 58px "Cormorant Garamond", serif';
+            ctx.fillStyle = colors.text;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillText('Wagner', 120, 110);
+
+            ctx.font = '300 58px "Cormorant Garamond", serif';
             ctx.fillStyle = colors.mid;
-            ctx.fillText('PMO · Projetos · Business Intelligence', 120, 210);
+            ctx.fillText('Douglas', 120, 170);
 
-            // Linha dourada abaixo do subtítulo
+            ctx.font = '700 64px "Cormorant Garamond", serif';
+            ctx.fillStyle = colors.text;
+            ctx.fillText('Ramos', 120, 230);
+
+            // Linha dourada abaixo do nome
             ctx.strokeStyle = colors.gold;
             ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.moveTo(120, 235);
-            ctx.lineTo(500, 235);
+            ctx.moveTo(120, 300);
+            ctx.lineTo(500, 300);
             ctx.stroke();
 
-            // Pequeno descritivo (opcional, como no site: "Engenharia Civil · Dados · Estratégia")
-            ctx.font = '300 16px "Inter", sans-serif';
+            // Título / área de atuação
+            ctx.font = '400 18px "Inter", sans-serif';
+            ctx.fillStyle = colors.gold;
+            ctx.fillText('PMO · Projetos · Business Intelligence', 120, 320);
+
+            // Breve descrição (opcional, inspirado no site)
+            ctx.font = '300 14px "Inter", sans-serif';
             ctx.fillStyle = colors.low;
-            ctx.fillText('Engenharia Civil · Dados · Estratégia', 120, 270);
+            ctx.fillText('Engenharia Civil · Gestão de Portfólio · Dados', 120, 355);
+
+            // ===== LADO DIREITO =====
+            // Cards de impacto (como no site)
+            const rightX = 900; // posição inicial
+            const cardWidth = 180;
+            const cardHeight = 120;
+            const cardSpacing = 20;
+
+            // Card 1: Recursos viabilizados
+            ctx.fillStyle = colors.bg3 || '#153450'; // fallback para bg3
+            ctx.fillRect(rightX, 120, cardWidth, cardHeight);
+            ctx.strokeStyle = colors.line;
+            ctx.lineWidth = 1;
+            ctx.strokeRect(rightX, 120, cardWidth, cardHeight);
+
+            ctx.font = '300 14px "Inter", sans-serif';
+            ctx.fillStyle = colors.low;
+            ctx.fillText('Recursos viabilizados', rightX + 15, 140);
+
+            ctx.font = '600 36px "Cormorant Garamond", serif';
+            ctx.fillStyle = colors.text;
+            ctx.fillText('R$500k', rightX + 15, 190);
+
+            // Card 2: Redução de tempo
+            ctx.fillStyle = colors.bg3 || '#153450';
+            ctx.fillRect(rightX + cardWidth + cardSpacing, 120, cardWidth, cardHeight);
+            ctx.strokeStyle = colors.line;
+            ctx.strokeRect(rightX + cardWidth + cardSpacing, 120, cardWidth, cardHeight);
+
+            ctx.font = '300 14px "Inter", sans-serif';
+            ctx.fillStyle = colors.low;
+            ctx.fillText('Redução no tempo', rightX + cardWidth + cardSpacing + 15, 140);
+            ctx.fillText('de análise', rightX + cardWidth + cardSpacing + 15, 158);
+
+            ctx.font = '600 36px "Cormorant Garamond", serif';
+            ctx.fillStyle = colors.text;
+            ctx.fillText('-75%', rightX + cardWidth + cardSpacing + 15, 200);
+
+            // Card 3: Projetos simultâneos
+            ctx.fillStyle = colors.bg3 || '#153450';
+            ctx.fillRect(rightX + 2*(cardWidth + cardSpacing), 120, cardWidth, cardHeight);
+            ctx.strokeStyle = colors.line;
+            ctx.strokeRect(rightX + 2*(cardWidth + cardSpacing), 120, cardWidth, cardHeight);
+
+            ctx.font = '300 14px "Inter", sans-serif';
+            ctx.fillStyle = colors.low;
+            ctx.fillText('Projetos', rightX + 2*(cardWidth + cardSpacing) + 15, 140);
+            ctx.fillText('simultâneos', rightX + 2*(cardWidth + cardSpacing) + 15, 158);
+
+            ctx.font = '600 36px "Cormorant Garamond", serif';
+            ctx.fillStyle = colors.text;
+            ctx.fillText('17+', rightX + 2*(cardWidth + cardSpacing) + 15, 200);
 
             // Ghost "PMO" no canto inferior direito
             ctx.font = '700 110px "Cormorant Garamond", serif';
@@ -180,9 +247,8 @@
                 link.click();
             });
 
-            console.log('Capa estilo portfólio gerada!');
+            console.log('Capa estilo portfólio gerada com sucesso!');
         })();
     </script>
 </body>
 </html>
-
