@@ -1,174 +1,1571 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fundo Premium · Wagner Ramos</title>
-    <style>
-        body {
-            background: #0B1E33;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            font-family: 'Inter', system-ui, sans-serif;
-        }
-        .container {
-            text-align: center;
-        }
-        canvas {
-            width: 100%;
-            max-width: 792px; /* visualização em metade do tamanho */
-            height: auto;
-            border: 2px solid #C4A35A;
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-        }
-        .btn {
-            margin-top: 30px;
-            background: linear-gradient(135deg, #C4A35A, #D8B87A);
-            color: #0B1E33;
-            font-size: 1rem;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            padding: 16px 36px;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(196,163,90,0.3);
-        }
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 28px rgba(196,163,90,0.5);
-        }
-        .note {
-            color: #A0B3CC;
-            font-size: 0.85rem;
-            margin-top: 16px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Navega Baleia — Gerador de Apresentação</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pptxgenjs/3.12.0/pptxgen.bundle.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root {
+  --bg:       #07090f;
+  --surface:  #0e1220;
+  --surface2: #141926;
+  --border:   rgba(255,255,255,0.07);
+  --border2:  rgba(255,255,255,0.12);
+  --ocean:    #0d2d6b;
+  --cobalt:   #1d4ed8;
+  --electric: #3b82f6;
+  --aqua:     #06b6d4;
+  --teal:     #0d9488;
+  --mint:     #10ffcb;
+  --white:    #ffffff;
+  --mist:     #94a3b8;
+  --danger:   #f87171;
+  --success:  #34d399;
+  --gold:     #fbbf24;
+  --r:        14px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;overflow-x:hidden}
+
+/* ── HEADER ── */
+.header{
+  position:sticky;top:0;z-index:200;
+  background:rgba(7,9,15,.92);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:.9rem 2rem;
+  display:flex;align-items:center;gap:1.5rem;
+}
+.header-brand{display:flex;align-items:center;gap:.75rem}
+.logo-preview{
+  width:36px;height:36px;border-radius:8px;
+  background:linear-gradient(135deg,var(--ocean),var(--cobalt));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-size:.65rem;font-weight:800;
+  color:var(--white);letter-spacing:-.02em;
+  overflow:hidden;
+}
+.logo-preview img{width:100%;height:100%;object-fit:contain}
+.header-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700}
+.header-sub{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--aqua);letter-spacing:.15em;text-transform:uppercase}
+.header-spacer{flex:1}
+.btn{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.55rem 1.25rem;border-radius:8px;
+  font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;
+  cursor:pointer;border:none;transition:all .2s;white-space:nowrap;
+}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--mist)}
+.btn-ghost:hover{border-color:var(--electric);color:var(--white)}
+.btn-primary{background:linear-gradient(135deg,var(--cobalt),var(--aqua));color:var(--white)}
+.btn-primary:hover{opacity:.88;transform:translateY(-1px)}
+.btn-success{background:linear-gradient(135deg,var(--teal),var(--mint));color:var(--bg)}
+.btn-success:hover{opacity:.88;transform:translateY(-1px)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.btn svg{width:16px;height:16px;flex-shrink:0}
+
+/* ── LAYOUT ── */
+.app{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 57px)}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  padding:1.5rem 0;
+  position:sticky;top:57px;height:calc(100vh - 57px);
+  overflow-y:auto;
+}
+.sidebar-section{padding:0 1.25rem;margin-bottom:1.5rem}
+.sidebar-label{
+  font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.25em;
+  text-transform:uppercase;color:var(--mist);opacity:.5;
+  padding:.5rem .75rem;display:block;
+}
+.tab-btn{
+  width:100%;display:flex;align-items:center;gap:.75rem;
+  padding:.7rem .75rem;border-radius:8px;
+  background:transparent;border:none;color:var(--mist);
+  cursor:pointer;transition:all .2s;text-align:left;
+  font-family:'DM Sans',sans-serif;font-size:.83rem;
+}
+.tab-btn:hover{background:rgba(255,255,255,.04);color:var(--white)}
+.tab-btn.active{background:rgba(59,130,246,.12);color:var(--electric);border-left:2px solid var(--electric)}
+.tab-icon{
+  width:28px;height:28px;border-radius:6px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;font-weight:700;font-family:'Syne',sans-serif;
+}
+.tab-num{font-size:.6rem;font-family:'DM Mono',monospace;color:var(--mist);margin-left:auto;opacity:.6}
+.tab-complete{width:6px;height:6px;border-radius:50%;background:var(--success);margin-left:auto;flex-shrink:0}
+
+.progress-wrap{padding:1.25rem;margin:0 1.25rem;background:var(--surface2);border-radius:10px}
+.progress-label{display:flex;justify-content:space-between;margin-bottom:.5rem}
+.progress-label span{font-size:.7rem;color:var(--mist)}
+.progress-label strong{font-size:.7rem;color:var(--mint);font-family:'DM Mono',monospace}
+.progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--cobalt),var(--mint));border-radius:2px;transition:width .4s}
+
+/* ── MAIN CONTENT ── */
+.main{padding:2.5rem;max-width:900px}
+
+.panel{display:none}
+.panel.active{display:block}
+
+.panel-header{margin-bottom:2rem}
+.panel-tag{
+  font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.25em;
+  text-transform:uppercase;color:var(--aqua);margin-bottom:.5rem;display:block;
+}
+.panel-title{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;line-height:1.1;margin-bottom:.5rem}
+.panel-desc{font-size:.85rem;color:var(--mist);line-height:1.6}
+
+/* ── FORM ── */
+.form-section{margin-bottom:2rem}
+.form-section-title{
+  font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;
+  color:var(--white);margin-bottom:1rem;
+  display:flex;align-items:center;gap:.5rem;padding-bottom:.5rem;
+  border-bottom:1px solid var(--border);
+}
+.form-section-title span{
+  width:22px;height:22px;border-radius:5px;
+  background:linear-gradient(135deg,var(--cobalt),var(--aqua));
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:.65rem;color:var(--white);flex-shrink:0;
+}
+
+.form-grid{display:grid;gap:1rem}
+.form-grid-2{grid-template-columns:1fr 1fr}
+.form-grid-3{grid-template-columns:1fr 1fr 1fr}
+
+.field{display:flex;flex-direction:column;gap:.4rem}
+.field label{
+  font-size:.72rem;font-weight:500;color:var(--mist);
+  letter-spacing:.04em;text-transform:uppercase;
+  font-family:'DM Mono',monospace;
+}
+.field label .req{color:var(--electric)}
+
+input[type=text],input[type=date],textarea,select{
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:.6rem .85rem;
+  font-family:'DM Sans',sans-serif;font-size:.85rem;
+  color:var(--white);width:100%;
+  transition:border-color .2s;outline:none;
+  resize:vertical;
+}
+input[type=text]:focus,input[type=date]:focus,textarea:focus,select:focus{
+  border-color:var(--electric);
+}
+input[type=text]::placeholder,textarea::placeholder{color:rgba(148,163,184,.4)}
+select option{background:var(--surface2)}
+
+/* ── REPEATER ── */
+.repeater{display:flex;flex-direction:column;gap:.75rem}
+.repeater-item{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:10px;padding:1rem;position:relative;
+}
+.repeater-item-header{
+  display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem;
+}
+.repeater-badge{
+  font-family:'DM Mono',monospace;font-size:.6rem;
+  background:rgba(59,130,246,.15);color:var(--electric);
+  padding:.2rem .5rem;border-radius:4px;
+}
+.repeater-remove{
+  margin-left:auto;background:transparent;border:none;
+  color:rgba(248,113,113,.5);cursor:pointer;font-size:.8rem;
+  padding:.25rem .5rem;border-radius:4px;transition:all .2s;
+}
+.repeater-remove:hover{background:rgba(248,113,113,.1);color:var(--danger)}
+.btn-add{
+  background:transparent;border:1px dashed rgba(59,130,246,.3);
+  color:var(--electric);border-radius:8px;
+  padding:.6rem;width:100%;cursor:pointer;
+  font-size:.8rem;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:.5rem;
+}
+.btn-add:hover{border-color:var(--electric);background:rgba(59,130,246,.05)}
+
+/* ── KPI ROW ── */
+.kpi-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:.5rem}
+
+/* ── UPLOAD ── */
+.upload-zone{
+  border:1.5px dashed var(--border2);border-radius:10px;
+  padding:2rem;text-align:center;cursor:pointer;
+  transition:all .2s;background:var(--surface2);
+  position:relative;overflow:hidden;
+}
+.upload-zone:hover{border-color:var(--electric);background:rgba(59,130,246,.04)}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-icon{font-size:1.5rem;margin-bottom:.5rem}
+.upload-label{font-size:.8rem;color:var(--mist);line-height:1.5}
+.upload-label strong{color:var(--electric)}
+.upload-preview{
+  max-height:120px;object-fit:contain;border-radius:6px;
+  margin-top:.75rem;max-width:100%;
+}
+.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+
+/* ── STATUS BADGE ── */
+.status-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.25rem}
+.status-opt{
+  padding:.4rem .9rem;border-radius:100px;font-size:.75rem;
+  border:1px solid var(--border);cursor:pointer;transition:all .2s;color:var(--mist);
+  font-family:'DM Sans',sans-serif;
+}
+.status-opt:hover{border-color:var(--electric);color:var(--white)}
+.status-opt.selected{border-color:transparent;color:var(--bg)}
+.status-opt[data-val="Concluído"].selected{background:var(--success)}
+.status-opt[data-val="Em andamento"].selected{background:var(--gold)}
+.status-opt[data-val="Pausado"].selected{background:var(--danger)}
+
+/* ── GLOBAL SECTION ── */
+.global-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+
+/* ── PREVIEW CARD ── */
+.preview-card{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:12px;padding:1.25rem;margin-top:1.5rem;
+}
+.preview-title{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;margin-bottom:1rem;color:var(--mist)}
+.preview-slide-list{display:flex;flex-direction:column;gap:.4rem}
+.preview-slide{
+  display:flex;align-items:center;gap:.75rem;padding:.5rem .75rem;
+  border-radius:6px;background:rgba(255,255,255,.02);
+  font-size:.78rem;color:var(--mist);
+}
+.preview-slide .slide-n{
+  font-family:'DM Mono',monospace;font-size:.6rem;
+  color:var(--electric);width:24px;flex-shrink:0;
+}
+.slide-sep{
+  background:rgba(59,130,246,.08);border-left:2px solid var(--cobalt);
+  color:var(--electric);font-weight:600;
+}
+
+/* ── GENERATE PANEL ── */
+.generate-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-top:1.5rem}
+.gen-card{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:14px;padding:1.75rem;
+  display:flex;flex-direction:column;gap:1rem;
+  transition:border-color .3s;
+}
+.gen-card:hover{border-color:var(--border2)}
+.gen-icon{font-size:2rem}
+.gen-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700}
+.gen-desc{font-size:.78rem;color:var(--mist);line-height:1.6}
+.gen-badge{
+  display:inline-flex;align-items:center;gap:.35rem;
+  font-family:'DM Mono',monospace;font-size:.6rem;
+  color:var(--mint);background:rgba(16,255,203,.08);
+  border:1px solid rgba(16,255,203,.2);border-radius:100px;
+  padding:.2rem .6rem;align-self:flex-start;
+}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:2rem;right:2rem;z-index:999;
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:10px;padding:.9rem 1.25rem;
+  display:flex;align-items:center;gap:.75rem;
+  font-size:.83rem;max-width:320px;
+  transform:translateY(100px);opacity:0;transition:all .3s;
+  pointer-events:none;
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast-icon{font-size:1rem}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+
+@media(max-width:768px){
+  .app{grid-template-columns:1fr}
+  .sidebar{position:relative;height:auto;top:0}
+  .form-grid-2,.form-grid-3,.global-grid,.generate-grid,.kpi-grid{grid-template-columns:1fr}
+  .header{padding:.75rem 1rem;flex-wrap:wrap}
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <canvas id="premiumCanvas" width="1584" height="396"></canvas>
-        <br>
-        <button class="btn" id="downloadBtn">⬇ Baixar Fundo Premium</button>
-        <p class="note">1584 x 396 px · qualidade superior · pronto para edição no Canva</p>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-brand">
+    <div class="logo-preview" id="headerLogo">NB</div>
+    <div>
+      <div class="header-title">Navega Baleia</div>
+      <div class="header-sub">Gerador de Apresentação</div>
+    </div>
+  </div>
+  <div class="header-spacer"></div>
+  <button class="btn btn-ghost" onclick="saveData()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+    Salvar rascunho
+  </button>
+  <button class="btn btn-ghost" onclick="loadData()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Carregar
+  </button>
+  <button class="btn btn-primary" onclick="showPanel('generate')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    Gerar Apresentação
+  </button>
+</header>
+
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <span class="sidebar-label">Global</span>
+  <div style="padding:0 1rem;margin-bottom:1rem">
+    <button class="tab-btn" onclick="showPanel('global')" id="tab-global">
+      <div class="tab-icon" style="background:linear-gradient(135deg,#1e40af,#0891b2)">🌐</div>
+      Configurações Gerais
+    </button>
+  </div>
+
+  <span class="sidebar-label">Projetos</span>
+  <div style="padding:0 1rem;display:flex;flex-direction:column;gap:.25rem" id="projectTabs"></div>
+
+  <div style="padding:1rem">
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>Preenchimento</span>
+        <strong id="progressPct">0%</strong>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <span class="sidebar-label">Ação</span>
+  <div style="padding:0 1rem">
+    <button class="tab-btn" onclick="showPanel('generate')" id="tab-generate">
+      <div class="tab-icon" style="background:linear-gradient(135deg,var(--teal),var(--mint))">⚡</div>
+      Gerar Apresentação
+    </button>
+    <button class="tab-btn" onclick="showPanel('preview')" id="tab-preview">
+      <div class="tab-icon" style="background:linear-gradient(135deg,#7c3aed,#2563eb)">👁</div>
+      Pré-visualizar Estrutura
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main" id="mainContent">
+
+  <!-- PANEL: GLOBAL -->
+  <div class="panel active" id="panel-global">
+    <div class="panel-header">
+      <span class="panel-tag">Configuração Global</span>
+      <h1 class="panel-title">Logos & Imagens Gerais</h1>
+      <p class="panel-desc">Estas informações aparecerão em todos os slides. Configure antes de preencher os projetos.</p>
     </div>
 
-    <script>
-        (function() {
-            const canvas = document.getElementById('premiumCanvas');
-            const ctx = canvas.getContext('2d');
+    <div class="form-section">
+      <div class="form-section-title"><span>📋</span>Informações do Evento</div>
+      <div class="form-grid form-grid-2">
+        <div class="field">
+          <label>Nome do Evento</label>
+          <input type="text" id="g_evento" value="Navega Baleia" placeholder="Ex: Navega Baleia">
+        </div>
+        <div class="field">
+          <label>Data da Apresentação</label>
+          <input type="date" id="g_data" value="2026-03-18">
+        </div>
+        <div class="field">
+          <label>Hospital / Organização</label>
+          <input type="text" id="g_org" value="Hospital da Baleia" placeholder="Ex: Hospital da Baleia">
+        </div>
+        <div class="field">
+          <label>Subtítulo da Apresentação</label>
+          <input type="text" id="g_subtitle" value="Portfólio de Projetos Estratégicos 2024–2026" placeholder="Subtítulo">
+        </div>
+      </div>
+    </div>
 
-            // Cores refinadas
-            const colors = {
-                bg: '#0B1E33',
-                gold: '#C4A35A',
-                goldSoft: 'rgba(196,163,90,0.08)',
-                goldLine: 'rgba(196,163,90,0.25)',
-                navyGlow: 'rgba(26,62,90,0.6)',
-                ghost: 'rgba(255,255,255,0.02)',
-            };
+    <div class="form-section">
+      <div class="form-section-title"><span>🖼</span>Logos</div>
+      <div class="upload-grid">
+        <div class="field">
+          <label>Logo Navega Baleia</label>
+          <div class="upload-zone" id="zone-logoNavega">
+            <input type="file" accept="image/*" onchange="handleUpload(this,'logoNavega','zone-logoNavega')">
+            <div class="upload-icon">🧭</div>
+            <div class="upload-label"><strong>Clique para enviar</strong><br>PNG ou SVG recomendado</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Logo Hospital da Baleia</label>
+          <div class="upload-zone" id="zone-logoHospital">
+            <input type="file" accept="image/*" onchange="handleUpload(this,'logoHospital','zone-logoHospital')">
+            <div class="upload-icon">🏥</div>
+            <div class="upload-label"><strong>Clique para enviar</strong><br>PNG ou SVG recomendado</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-            const w = canvas.width;
-            const h = canvas.height;
+    <div class="form-section">
+      <div class="form-section-title"><span>📊</span>Dashboard BI</div>
+      <div class="upload-grid">
+        <div class="field">
+          <label>Print BI Navega 2025</label>
+          <div class="upload-zone" id="zone-bi2025">
+            <input type="file" accept="image/*" onchange="handleUpload(this,'bi2025','zone-bi2025')">
+            <div class="upload-icon">📈</div>
+            <div class="upload-label"><strong>Clique para enviar</strong><br>Screenshot do dashboard 2025</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Print BI Navega 2026</label>
+          <div class="upload-zone" id="zone-bi2026">
+            <input type="file" accept="image/*" onchange="handleUpload(this,'bi2026','zone-bi2026')">
+            <div class="upload-icon">📊</div>
+            <div class="upload-label"><strong>Clique para enviar</strong><br>Screenshot do dashboard 2026</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-            // Habilitar alta qualidade
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
+  <!-- PANELS: PROJECTS (gerados por JS) -->
 
-            // ─────────────────────────────────────────────────
-            // 1. Fundo sólido
-            ctx.fillStyle = colors.bg;
-            ctx.fillRect(0, 0, w, h);
+  <!-- PANEL: PREVIEW -->
+  <div class="panel" id="panel-preview">
+    <div class="panel-header">
+      <span class="panel-tag">Estrutura</span>
+      <h1 class="panel-title">Pré-visualização dos Slides</h1>
+      <p class="panel-desc">Mapa completo de todos os slides que serão gerados.</p>
+    </div>
+    <div id="previewContent"></div>
+  </div>
 
-            // ─────────────────────────────────────────────────
-            // 2. Gradientes complexos (múltiplas camadas)
-            // Camada 1: Brilho dourado no canto inferior esquerdo
-            const grad1 = ctx.createRadialGradient(200, h-100, 30, 250, h-150, 700);
-            grad1.addColorStop(0, colors.goldSoft);
-            grad1.addColorStop(0.7, 'transparent');
-            ctx.fillStyle = grad1;
-            ctx.fillRect(0, 0, w, h);
+  <!-- PANEL: GENERATE -->
+  <div class="panel" id="panel-generate">
+    <div class="panel-header">
+      <span class="panel-tag">Exportar</span>
+      <h1 class="panel-title">Gerar Apresentação</h1>
+      <p class="panel-desc">Escolha o formato de exportação. Todos os dados preenchidos serão incluídos.</p>
+    </div>
 
-            // Camada 2: Brilho azul profundo no canto superior direito
-            const grad2 = ctx.createRadialGradient(w-200, 80, 20, w-300, 120, 800);
-            grad2.addColorStop(0, colors.navyGlow);
-            grad2.addColorStop(0.8, 'transparent');
-            ctx.fillStyle = grad2;
-            ctx.fillRect(0, 0, w, h);
+    <div id="validationMsg" style="display:none;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.3);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:.82rem;color:var(--gold);line-height:1.7"></div>
 
-            // Camada 3: Suave vinheta escura nas bordas
-            const grad3 = ctx.createRadialGradient(w/2, h/2, 400, w/2, h/2, 900);
-            grad3.addColorStop(0, 'transparent');
-            grad3.addColorStop(1, 'rgba(0,0,0,0.15)');
-            ctx.fillStyle = grad3;
-            ctx.fillRect(0, 0, w, h);
+    <div class="generate-grid">
+      <div class="gen-card">
+        <div class="gen-icon">📊</div>
+        <div class="gen-title">PowerPoint (PPTX)</div>
+        <div class="gen-desc">Arquivo editável no PowerPoint ou Google Slides. Ideal para ajustes finais e apresentação ao vivo.</div>
+        <div class="gen-badge">✦ Editável · Animações · 16:9</div>
+        <button class="btn btn-primary" onclick="generatePPTX()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Baixar PPTX
+        </button>
+      </div>
+      <div class="gen-card">
+        <div class="gen-icon">📄</div>
+        <div class="gen-title">PDF</div>
+        <div class="gen-desc">Documento fechado para envio por email ou impressão. Layout fiel ao design da apresentação.</div>
+        <div class="gen-badge">✦ Compartilhável · Imprimível · A4</div>
+        <button class="btn btn-success" onclick="generatePDF()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Baixar PDF
+        </button>
+      </div>
+    </div>
 
-            // ─────────────────────────────────────────────────
-            // 3. Linha vertical esquerda (mais refinada)
-            ctx.save();
-            ctx.shadowColor = 'rgba(196,163,90,0.3)';
-            ctx.shadowBlur = 6;
-            ctx.shadowOffsetX = 2;
-            ctx.strokeStyle = colors.goldLine;
-            ctx.lineWidth = 1.2;
-            ctx.beginPath();
-            ctx.moveTo(80, 50);
-            ctx.lineTo(80, h-50);
-            ctx.stroke();
-            ctx.restore();
+    <div class="preview-card" style="margin-top:2rem">
+      <div class="preview-title">⚡ O que será gerado</div>
+      <div id="genSlideList" class="preview-slide-list"></div>
+    </div>
+  </div>
 
-            // ─────────────────────────────────────────────────
-            // 4. Linha horizontal sutil na base (reforça a estrutura)
-            ctx.strokeStyle = 'rgba(255,255,255,0.03)';
-            ctx.lineWidth = 0.6;
-            ctx.beginPath();
-            ctx.moveTo(100, h-70);
-            ctx.lineTo(w-100, h-70);
-            ctx.stroke();
+</main>
+</div>
 
-            // ─────────────────────────────────────────────────
-            // 5. Ghost "PMO" extremamente suave, com leve desfoque
-            ctx.save();
-            ctx.shadowColor = 'rgba(196,163,90,0.1)';
-            ctx.shadowBlur = 20;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 0;
-            ctx.font = '700 130px "Cormorant Garamond", "Times New Roman", serif';
-            ctx.fillStyle = colors.ghost;
-            ctx.textAlign = 'right';
-            ctx.textBaseline = 'bottom';
-            ctx.fillText('PMO', w-40, h-20);
-            ctx.restore();
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toastIcon">✓</span>
+  <span id="toastMsg">Salvo com sucesso</span>
+</div>
 
-            // ─────────────────────────────────────────────────
-            // 6. Pequenos detalhes: pontos de luz (opcional)
-            ctx.beginPath();
-            ctx.arc(80, 60, 3, 0, 2*Math.PI);
-            ctx.fillStyle = colors.gold;
-            ctx.shadowColor = colors.gold;
-            ctx.shadowBlur = 10;
-            ctx.fill();
-            ctx.shadowBlur = 0; // reset
+<script>
+// ─────────────────────────────────────────────
+// DATA MODEL
+// ─────────────────────────────────────────────
+const PROJECTS = [
+  { id:'p1', name:'Gestão do Ciclo de Receita', leader:'Ricardo', color:'1d4ed8' },
+  { id:'p2', name:'Brand 2025',                leader:'Flávia',  color:'7c3aed' },
+  { id:'p3', name:'Lean no Bloco Cirúrgico',   leader:'Roberta', color:'0d9488' },
+  { id:'p4', name:'100% SUS / BG Saúde',       leader:'Josi',    color:'b45309' },
+  { id:'p5', name:'Nova UDC (Assistência)',     leader:'Thaís',   color:'0891b2' },
+  { id:'p6', name:'Governança Clínica',         leader:'Samar',   color:'9333ea' },
+];
 
-            // ─────────────────────────────────────────────────
-            // Download
-            document.getElementById('downloadBtn').addEventListener('click', () => {
-                const link = document.createElement('a');
-                link.download = 'wagner-ramos-fundo-premium.png';
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            });
+const uploads = {}; // key -> base64
 
-            console.log('Fundo premium gerado com excelência.');
-        })();
-    </script>
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+function init() {
+  buildProjectTabs();
+  buildProjectPanels();
+  buildPreview();
+  buildGenList();
+  updateProgress();
+}
+
+function buildProjectTabs() {
+  const container = document.getElementById('projectTabs');
+  PROJECTS.forEach((p, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn';
+    btn.id = `tab-${p.id}`;
+    btn.onclick = () => showPanel(p.id);
+    btn.innerHTML = `
+      <div class="tab-icon" style="background:linear-gradient(135deg,#${p.color},#06b6d4);font-size:.7rem">${i+1}</div>
+      <div style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name}</div>
+    `;
+    container.appendChild(btn);
+  });
+}
+
+function buildProjectPanels() {
+  const main = document.getElementById('mainContent');
+  PROJECTS.forEach((p, idx) => {
+    const div = document.createElement('div');
+    div.className = 'panel';
+    div.id = `panel-${p.id}`;
+    div.innerHTML = projectPanelHTML(p, idx);
+    main.appendChild(div);
+    // init repeaters
+    addRepeaterItem(`etapas_${p.id}`, etapaTemplate);
+    addRepeaterItem(`marcos_${p.id}`, marcoTemplate);
+    addRepeaterItem(`kpis_${p.id}`, kpiTemplate);
+    addRepeaterItem(`resultados_${p.id}`, resultadoTemplate);
+    addRepeaterItem(`riscos_${p.id}`, riscoTemplate);
+    addRepeaterItem(`licoes_${p.id}`, licaoTemplate);
+  });
+}
+
+function projectPanelHTML(p, idx) {
+  return `
+    <div class="panel-header">
+      <span class="panel-tag">Projeto ${idx+1} de ${PROJECTS.length} · ${p.leader}</span>
+      <h1 class="panel-title">${p.name}</h1>
+      <p class="panel-desc">Preencha todas as seções. Campos marcados com <span style="color:var(--electric)">*</span> são obrigatórios para geração.</p>
+    </div>
+
+    <!-- 1. Identificação -->
+    <div class="form-section">
+      <div class="form-section-title"><span>1</span>Identificação</div>
+      <div class="form-grid form-grid-2">
+        <div class="field">
+          <label>Nome do Projeto <span class="req">*</span></label>
+          <input type="text" id="${p.id}_nome" value="${p.name}" oninput="updateProgress()">
+        </div>
+        <div class="field">
+          <label>Líder do Projeto <span class="req">*</span></label>
+          <input type="text" id="${p.id}_lider" value="${p.leader}" oninput="updateProgress()">
+        </div>
+        <div class="field">
+          <label>Data de Início <span class="req">*</span></label>
+          <input type="date" id="${p.id}_inicio">
+        </div>
+        <div class="field">
+          <label>Data de Conclusão <span class="req">*</span></label>
+          <input type="date" id="${p.id}_fim">
+        </div>
+        <div class="field" style="grid-column:1/-1">
+          <label>Status</label>
+          <div class="status-row" id="${p.id}_status_row">
+            ${['Concluído','Em andamento','Pausado'].map(s=>`<div class="status-opt${s==='Concluído'?' selected':''}" data-val="${s}" onclick="selectStatus('${p.id}',this)">${s}</div>`).join('')}
+          </div>
+          <input type="hidden" id="${p.id}_status" value="Concluído">
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Objetivo -->
+    <div class="form-section">
+      <div class="form-section-title"><span>2</span>Objetivo do Projeto</div>
+      <div class="field">
+        <label>Descreva o problema ou oportunidade <span class="req">*</span></label>
+        <textarea id="${p.id}_objetivo" rows="4" placeholder="Ex: O projeto buscou reduzir o tempo de ciclo de faturamento, aumentar a taxa de aprovação de contas e diminuir as glosas, impactando diretamente a receita hospitalar..."></textarea>
+      </div>
+    </div>
+
+    <!-- 3. Etapas -->
+    <div class="form-section">
+      <div class="form-section-title"><span>3</span>Etapas do Projeto (4–5 fases)</div>
+      <div class="repeater" id="etapas_${p.id}"></div>
+      <button class="btn-add" onclick="addRepeaterItem('etapas_${p.id}',etapaTemplate)">+ Adicionar etapa</button>
+    </div>
+
+    <!-- 4. Marcos -->
+    <div class="form-section">
+      <div class="form-section-title"><span>4</span>Marcos do Projeto (4–5 entregas)</div>
+      <div class="repeater" id="marcos_${p.id}"></div>
+      <button class="btn-add" onclick="addRepeaterItem('marcos_${p.id}',marcoTemplate)">+ Adicionar marco</button>
+    </div>
+
+    <!-- 5. KPIs -->
+    <div class="form-section">
+      <div class="form-section-title"><span>5</span>Indicadores de Acompanhamento</div>
+      <div class="repeater" id="kpis_${p.id}"></div>
+      <button class="btn-add" onclick="addRepeaterItem('kpis_${p.id}',kpiTemplate)">+ Adicionar indicador</button>
+    </div>
+
+    <!-- 6. Resultados -->
+    <div class="form-section">
+      <div class="form-section-title"><span>6</span>Resultados do Projeto</div>
+      <div class="repeater" id="resultados_${p.id}"></div>
+      <button class="btn-add" onclick="addRepeaterItem('resultados_${p.id}',resultadoTemplate)">+ Adicionar resultado</button>
+    </div>
+
+    <!-- 7. Riscos -->
+    <div class="form-section">
+      <div class="form-section-title"><span>7</span>Riscos e Pontos de Atenção</div>
+      <div class="repeater" id="riscos_${p.id}"></div>
+      <button class="btn-add" onclick="addRepeaterItem('riscos_${p.id}',riscoTemplate)">+ Adicionar risco</button>
+    </div>
+
+    <!-- 8. Lições -->
+    <div class="form-section">
+      <div class="form-section-title"><span>8</span>Lições Aprendidas</div>
+      <div class="repeater" id="licoes_${p.id}"></div>
+      <button class="btn-add" onclick="addRepeaterItem('licoes_${p.id}',licaoTemplate)">+ Adicionar lição</button>
+    </div>
+
+    <!-- 9. Evidências -->
+    <div class="form-section">
+      <div class="form-section-title"><span>9</span>Fotos e Evidências (até 4 imagens)</div>
+      <div class="upload-grid">
+        ${[1,2,3,4].map(n=>`
+          <div class="field">
+            <label>Evidência ${n}</label>
+            <div class="upload-zone" id="zone-ev_${p.id}_${n}">
+              <input type="file" accept="image/*" onchange="handleUpload(this,'ev_${p.id}_${n}','zone-ev_${p.id}_${n}')">
+              <div class="upload-icon">📷</div>
+              <div class="upload-label"><strong>Upload</strong> foto ou print</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <!-- 10. Pós-projeto -->
+    <div class="form-section">
+      <div class="form-section-title"><span>10</span>Desafios Futuros (Pós-projeto)</div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Continuidade e desdobramentos</label>
+          <textarea id="${p.id}_futuros" rows="4" placeholder="Descreva os desafios para continuidade, necessidade de acompanhamento e possíveis novos projetos derivados..."></textarea>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ─────────────────────────────────────────────
+// REPEATER TEMPLATES
+// ─────────────────────────────────────────────
+function etapaTemplate(id, n) {
+  return `
+    <div class="repeater-item">
+      <div class="repeater-item-header">
+        <span class="repeater-badge">FASE ${n}</span>
+        <button class="repeater-remove" onclick="this.closest('.repeater-item').remove()">✕ remover</button>
+      </div>
+      <div class="form-grid form-grid-2">
+        <div class="field">
+          <label>Nome da Fase</label>
+          <input type="text" placeholder="Ex: Diagnóstico e Planejamento">
+        </div>
+        <div class="field">
+          <label>Período</label>
+          <input type="text" placeholder="Ex: Jan–Mar 2024">
+        </div>
+        <div class="field" style="grid-column:1/-1">
+          <label>Descrição resumida</label>
+          <input type="text" placeholder="O que aconteceu nesta fase...">
+        </div>
+      </div>
+    </div>`;
+}
+
+function marcoTemplate(id, n) {
+  return `
+    <div class="repeater-item">
+      <div class="repeater-item-header">
+        <span class="repeater-badge">MARCO ${n}</span>
+        <button class="repeater-remove" onclick="this.closest('.repeater-item').remove()">✕ remover</button>
+      </div>
+      <div class="form-grid form-grid-2">
+        <div class="field">
+          <label>Data / Período</label>
+          <input type="text" placeholder="Ex: Março 2024">
+        </div>
+        <div class="field">
+          <label>Entrega / Conclusão</label>
+          <input type="text" placeholder="Ex: Implantação do sistema de faturamento">
+        </div>
+      </div>
+    </div>`;
+}
+
+function kpiTemplate(id, n) {
+  return `
+    <div class="repeater-item">
+      <div class="repeater-item-header">
+        <span class="repeater-badge">KPI ${n}</span>
+        <button class="repeater-remove" onclick="this.closest('.repeater-item').remove()">✕ remover</button>
+      </div>
+      <div class="kpi-grid">
+        <div class="field">
+          <label>Nome do Indicador</label>
+          <input type="text" placeholder="Ex: Taxa de aprovação de contas">
+        </div>
+        <div class="field">
+          <label>Meta</label>
+          <input type="text" placeholder="Ex: 95%">
+        </div>
+        <div class="field">
+          <label>Realizado</label>
+          <input type="text" placeholder="Ex: 93%">
+        </div>
+      </div>
+    </div>`;
+}
+
+function resultadoTemplate(id, n) {
+  return `
+    <div class="repeater-item">
+      <div class="repeater-item-header">
+        <span class="repeater-badge">RESULTADO ${n}</span>
+        <button class="repeater-remove" onclick="this.closest('.repeater-item').remove()">✕ remover</button>
+      </div>
+      <div class="form-grid form-grid-3">
+        <div class="field">
+          <label>Métrica</label>
+          <input type="text" placeholder="Ex: Redução de glosas">
+        </div>
+        <div class="field">
+          <label>Valor absoluto</label>
+          <input type="text" placeholder="Ex: R$ 1,2M">
+        </div>
+        <div class="field">
+          <label>Variação %</label>
+          <input type="text" placeholder="Ex: -42%">
+        </div>
+      </div>
+    </div>`;
+}
+
+function riscoTemplate(id, n) {
+  return `
+    <div class="repeater-item">
+      <div class="repeater-item-header">
+        <span class="repeater-badge">RISCO ${n}</span>
+        <button class="repeater-remove" onclick="this.closest('.repeater-item').remove()">✕ remover</button>
+      </div>
+      <div class="form-grid form-grid-2">
+        <div class="field">
+          <label>Descrição do risco / ponto</label>
+          <input type="text" placeholder="Ex: Resistência da equipe à mudança de processo">
+        </div>
+        <div class="field">
+          <label>Como foi tratado</label>
+          <input type="text" placeholder="Ex: Treinamento intensivo + comunicação constante">
+        </div>
+      </div>
+    </div>`;
+}
+
+function licaoTemplate(id, n) {
+  return `
+    <div class="repeater-item">
+      <div class="repeater-item-header">
+        <span class="repeater-badge">LIÇÃO ${n}</span>
+        <button class="repeater-remove" onclick="this.closest('.repeater-item').remove()">✕ remover</button>
+      </div>
+      <div class="field">
+        <label>Aprendizado</label>
+        <input type="text" placeholder="Ex: Engajar a liderança desde o início acelera a adesão da equipe operacional">
+      </div>
+    </div>`;
+}
+
+let repeaterCounts = {};
+function addRepeaterItem(containerId, templateFn) {
+  repeaterCounts[containerId] = (repeaterCounts[containerId] || 0) + 1;
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const div = document.createElement('div');
+  div.innerHTML = templateFn(containerId, repeaterCounts[containerId]);
+  container.appendChild(div.firstElementChild);
+}
+
+// ─────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const panel = document.getElementById(`panel-${id}`);
+  const tab = document.getElementById(`tab-${id}`);
+  if (panel) panel.classList.add('active');
+  if (tab) tab.classList.add('active');
+  if (id === 'preview') buildPreview();
+  if (id === 'generate') buildGenList();
+  window.scrollTo(0,0);
+}
+
+// ─────────────────────────────────────────────
+// UPLOAD HANDLER
+// ─────────────────────────────────────────────
+function handleUpload(input, key, zoneId) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    uploads[key] = e.target.result;
+    const zone = document.getElementById(zoneId);
+    // Show preview
+    let img = zone.querySelector('.upload-preview');
+    if (!img) { img = document.createElement('img'); img.className = 'upload-preview'; zone.appendChild(img); }
+    img.src = e.target.result;
+    zone.querySelector('.upload-icon').style.display = 'none';
+    zone.querySelector('.upload-label').style.display = 'none';
+    // Update header logo if it's the main logo
+    if (key === 'logoNavega') {
+      const hl = document.getElementById('headerLogo');
+      hl.innerHTML = `<img src="${e.target.result}" alt="logo">`;
+    }
+    updateProgress();
+    showToast('📁 Imagem carregada!', 'success');
+  };
+  reader.readAsDataURL(file);
+}
+
+// ─────────────────────────────────────────────
+// STATUS SELECTOR
+// ─────────────────────────────────────────────
+function selectStatus(pid, el) {
+  el.closest('.status-row').querySelectorAll('.status-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById(`${pid}_status`).value = el.dataset.val;
+}
+
+// ─────────────────────────────────────────────
+// PROGRESS
+// ─────────────────────────────────────────────
+function updateProgress() {
+  let filled = 0, total = PROJECTS.length * 3;
+  PROJECTS.forEach(p => {
+    if (val(`${p.id}_nome`)) filled++;
+    if (val(`${p.id}_objetivo`)) filled++;
+    if (val(`${p.id}_lider`)) filled++;
+  });
+  const pct = Math.round((filled/total)*100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+}
+
+function val(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function getRepeaterData(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return [];
+  const items = container.querySelectorAll('.repeater-item');
+  return Array.from(items).map(item => {
+    const inputs = item.querySelectorAll('input[type=text],input[type=date],textarea');
+    return Array.from(inputs).map(i => i.value.trim());
+  }).filter(arr => arr.some(v => v));
+}
+
+function collectProject(p) {
+  return {
+    id: p.id,
+    nome:      val(`${p.id}_nome`)     || p.name,
+    lider:     val(`${p.id}_lider`)    || p.leader,
+    inicio:    val(`${p.id}_inicio`),
+    fim:       val(`${p.id}_fim`),
+    status:    val(`${p.id}_status`)   || 'Concluído',
+    objetivo:  val(`${p.id}_objetivo`),
+    etapas:    getRepeaterData(`etapas_${p.id}`),
+    marcos:    getRepeaterData(`marcos_${p.id}`),
+    kpis:      getRepeaterData(`kpis_${p.id}`),
+    resultados:getRepeaterData(`resultados_${p.id}`),
+    riscos:    getRepeaterData(`riscos_${p.id}`),
+    licoes:    getRepeaterData(`licoes_${p.id}`),
+    futuros:   val(`${p.id}_futuros`),
+    color:     p.color,
+    evidencias:[1,2,3,4].map(n => uploads[`ev_${p.id}_${n}`]).filter(Boolean),
+  };
+}
+
+// ─────────────────────────────────────────────
+// PREVIEW
+// ─────────────────────────────────────────────
+function buildPreview() {
+  const out = document.getElementById('previewContent');
+  const genOut = document.getElementById('genSlideList');
+  let slides = [], num = 1;
+
+  const addSlide = (label, sep=false) => {
+    slides.push({ n: num++, label, sep });
+  };
+
+  addSlide('Capa — Navega Baleia 2026');
+  addSlide('Sumário dos Projetos');
+  addSlide('Dashboard BI 2025');
+  addSlide('Dashboard BI 2026');
+
+  PROJECTS.forEach((p, i) => {
+    addSlide(`── Projeto ${i+1}: ${p.name}`, true);
+    addSlide(`Capa do Projeto · ${p.leader}`);
+    addSlide('Objetivo');
+    addSlide('Etapas do Projeto');
+    addSlide('Marcos');
+    addSlide('Indicadores (KPIs)');
+    addSlide('Resultados');
+    addSlide('Riscos e Pontos de Atenção');
+    addSlide('Lições Aprendidas');
+    addSlide('Evidências');
+    addSlide('Desafios Futuros');
+  });
+
+  addSlide('Encerramento — Obrigado');
+
+  const html = slides.map(s => `
+    <div class="preview-slide${s.sep?' slide-sep':''}">
+      <span class="slide-n">${s.sep ? '': String(s.n).padStart(2,'0')}</span>
+      ${s.label}
+    </div>`).join('');
+
+  out.innerHTML = `<div class="preview-card"><div class="preview-title">📋 ${slides.filter(s=>!s.sep).length} slides no total</div><div class="preview-slide-list">${html}</div></div>`;
+  if (genOut) genOut.innerHTML = `<div class="preview-slide-list">${html}</div>`;
+}
+
+function buildGenList() { buildPreview(); }
+
+// ─────────────────────────────────────────────
+// PPTX GENERATOR
+// ─────────────────────────────────────────────
+async function generatePPTX() {
+  showToast('⏳ Gerando PPTX…', 'info');
+  await new Promise(r => setTimeout(r, 100));
+
+  try {
+    const pptx = new PptxGenJS();
+    pptx.layout = 'LAYOUT_16x9';
+    pptx.title = 'Navega Baleia — Portfólio de Projetos';
+
+    const W = 10, H = 5.625;
+    const C = { dark:'060810', surface:'0e1220', ocean:'0d2d6b', cobalt:'1d4ed8',
+                electric:'3b82f6', aqua:'06b6d4', mint:'10ffcb', white:'FFFFFF',
+                mist:'94a3b8', teal:'0d9488', gold:'fbbf24', danger:'f87171' };
+
+    const addBg = (slide, color='060810') => {
+      slide.background = { color };
+    };
+    const addLogo = (slide) => {
+      if (uploads.logoNavega) {
+        slide.addImage({ data: uploads.logoNavega, x: W-1.4, y: H-0.7, w: 0.9, h: 0.4, sizing:{type:'contain',w:.9,h:.4} });
+      } else {
+        slide.addText('Navega Baleia', { x: W-1.8, y: H-0.55, w: 1.6, h: 0.3, fontSize: 7, color: C.aqua, fontFace:'Arial', bold:true });
+      }
+    };
+    const slideNum = (slide, n, total) => {
+      slide.addText(`${String(n).padStart(2,'0')} / ${String(total).padStart(2,'0')}`, {
+        x:0.35, y:H-0.45, w:1.2, h:0.3, fontSize:7, color:C.mist, fontFace:'Courier New'
+      });
+    };
+    const makeGradBg = (slide) => {
+      slide.addShape(pptx.shapes.RECTANGLE, { x:0, y:0, w:W, h:H, fill:{color:C.dark} });
+      slide.addShape(pptx.shapes.RECTANGLE, { x:0, y:H-1.2, w:W, h:1.2, fill:{color:C.ocean} });
+    };
+
+    const evento = val('g_evento') || 'Navega Baleia';
+    const orgName = val('g_org') || 'Hospital da Baleia';
+    const dataEvt = val('g_data') ? new Date(val('g_data')).toLocaleDateString('pt-BR') : '18/03/2026';
+
+    // ── SLIDE 1: CAPA ──
+    let s = pptx.addSlide();
+    addBg(s, C.dark);
+    s.addShape(pptx.shapes.RECTANGLE, {x:0,y:0,w:W*0.45,h:H,fill:{color:C.dark}});
+    s.addShape(pptx.shapes.RECTANGLE, {x:W*0.45,y:0,w:W*0.55,h:H,fill:{color:C.ocean}});
+    s.addShape(pptx.shapes.RECTANGLE, {x:0,y:H-0.06,w:W,h:0.06,fill:{color:C.cobalt}});
+    s.addText('APRESENTAÇÃO DE RESULTADOS', {x:.5,y:1.2,w:4,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:3});
+    s.addText(evento, {x:.5,y:1.6,w:4.2,h:1.1,fontSize:36,color:C.white,fontFace:'Arial',bold:true});
+    s.addText('Portfólio de Projetos Estratégicos\n2024 – 2026', {x:.5,y:2.8,w:4,h:.9,fontSize:14,color:C.mist,fontFace:'Arial'});
+    s.addText(orgName, {x:.5,y:3.9,w:3,h:.35,fontSize:9,color:C.aqua,fontFace:'Arial',bold:true});
+    s.addText(dataEvt, {x:.5,y:4.3,w:2,h:.3,fontSize:8,color:C.mist,fontFace:'Arial'});
+    if (uploads.logoNavega) s.addImage({data:uploads.logoNavega,x:5.2,y:1.6,w:3.5,h:2,sizing:{type:'contain',w:3.5,h:2}});
+    if (uploads.logoHospital) s.addImage({data:uploads.logoHospital,x:5.5,y:3.9,w:2,h:.7,sizing:{type:'contain',w:2,h:.7}});
+
+    // ── SLIDE 2: SUMÁRIO ──
+    s = pptx.addSlide();
+    addBg(s, C.surface);
+    s.addText('SUMÁRIO', {x:.5,y:.4,w:9,h:.4,fontSize:8,color:C.aqua,fontFace:'Courier New',charSpacing:4});
+    s.addText('Projetos Estratégicos', {x:.5,y:.85,w:9,h:.7,fontSize:26,color:C.white,fontFace:'Arial',bold:true});
+    PROJECTS.forEach((p,i) => {
+      const col = i < 3 ? 0 : 1;
+      const row = i % 3;
+      const x = .5 + col*4.8;
+      const y = 1.8 + row*.85;
+      s.addShape(pptx.shapes.RECTANGLE, {x,y,w:4.4,h:.7,fill:{color:C.dark},line:{color:C.cobalt,width:.5}});
+      s.addText(`0${i+1}`, {x:x+.15,y:y+.18,w:.4,h:.35,fontSize:9,color:C.electric,fontFace:'Courier New',bold:true});
+      s.addText(p.name, {x:x+.65,y:y+.08,w:3,h:.3,fontSize:10,color:C.white,fontFace:'Arial',bold:true});
+      s.addText(p.leader, {x:x+.65,y:y+.38,w:2.5,h:.22,fontSize:8,color:C.mist,fontFace:'Arial'});
+    });
+    addLogo(s);
+
+    // ── SLIDES BI ──
+    ['bi2025','bi2026'].forEach((key,i) => {
+      s = pptx.addSlide();
+      addBg(s, C.dark);
+      s.addText(i===0 ? 'DASHBOARD BI 2025' : 'DASHBOARD BI 2026', {x:.5,y:.35,w:9,h:.4,fontSize:9,color:C.aqua,fontFace:'Courier New',charSpacing:3});
+      s.addText(i===0 ? 'Panorama Anterior — Base de Comparação' : 'Panorama Atual — Resultados do Portfólio', {x:.5,y:.8,w:9,h:.55,fontSize:20,color:C.white,fontFace:'Arial',bold:true});
+      if (uploads[key]) {
+        s.addImage({data:uploads[key],x:.5,y:1.5,w:9,h:3.7,sizing:{type:'contain',w:9,h:3.7}});
+      } else {
+        s.addShape(pptx.shapes.RECTANGLE, {x:.5,y:1.5,w:9,h:3.7,fill:{color:C.ocean},line:{color:C.cobalt,width:.5}});
+        s.addText(`[ Inserir print do Dashboard BI ${2025+i} ]`, {x:.5,y:2.8,w:9,h:.8,align:'center',fontSize:13,color:C.mist,fontFace:'Arial'});
+      }
+      addLogo(s);
+    });
+
+    // ── PROJETOS ──
+    const totalSlides = 4 + PROJECTS.length * 10 + 1;
+    let slideN = 5;
+
+    for (const p of PROJECTS) {
+      const d = collectProject(p);
+      const colorHex = p.color;
+      const statusColor = d.status==='Concluído' ? C.teal : d.status==='Em andamento' ? C.gold : C.danger;
+
+      // CAPA DO PROJETO
+      s = pptx.addSlide();
+      addBg(s, C.dark);
+      s.addShape(pptx.shapes.RECTANGLE, {x:0,y:0,w:.08,h:H,fill:{color:colorHex}});
+      s.addShape(pptx.shapes.RECTANGLE, {x:0,y:H-1.1,w:W,h:1.1,fill:{color:C.surface}});
+      s.addText(`PROJETO`, {x:.35,y:1.1,w:3,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:4});
+      s.addText(d.nome, {x:.35,y:1.45,w:9,h:1.2,fontSize:28,color:C.white,fontFace:'Arial',bold:true});
+      s.addShape(pptx.shapes.RECTANGLE, {x:.35,y:2.85,w:1.2,h:.32,fill:{color:statusColor}});
+      s.addText(d.status, {x:.35,y:2.85,w:1.2,h:.32,align:'center',fontSize:8,color:C.dark,fontFace:'Arial',bold:true});
+      s.addText(`Líder: ${d.lider}`, {x:.35,y:3.3,w:4,h:.3,fontSize:11,color:C.mist,fontFace:'Arial'});
+      if (d.inicio||d.fim) s.addText(`${d.inicio||'--'} → ${d.fim||'--'}`, {x:.35,y:3.65,w:4,h:.3,fontSize:10,color:C.mist,fontFace:'Arial'});
+      slideNum(s, slideN++, totalSlides); addLogo(s);
+
+      // OBJETIVO
+      s = pptx.addSlide();
+      addBg(s, C.surface);
+      s.addText('OBJETIVO DO PROJETO', {x:.5,y:.35,w:9,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:3});
+      s.addText(d.nome, {x:.5,y:.7,w:9,h:.55,fontSize:18,color:C.white,fontFace:'Arial',bold:true});
+      s.addShape(pptx.shapes.RECTANGLE, {x:.5,y:1.45,w:9,h:3.3,fill:{color:C.dark},line:{color:C.cobalt,width:.5}});
+      s.addText(d.objetivo||'[ Descreva o objetivo do projeto ]', {x:.75,y:1.65,w:8.5,h:2.9,fontSize:13,color:d.objetivo?C.white:C.mist,fontFace:'Arial',valign:'top',wrap:true});
+      slideNum(s, slideN++, totalSlides); addLogo(s);
+
+      // ETAPAS
+      s = pptx.addSlide();
+      addBg(s, C.dark);
+      s.addText('ETAPAS DO PROJETO', {x:.5,y:.35,w:9,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:3});
+      s.addText(d.nome, {x:.5,y:.7,w:9,h:.5,fontSize:18,color:C.white,fontFace:'Arial',bold:true});
+      const etapas = d.etapas.length ? d.etapas : [['Fase placeholder','Período','Descrição']];
+      const ew = (W-1.0)/(etapas.length);
+      etapas.forEach((e,i) => {
+        const x = .5+i*ew;
+        s.addShape(pptx.shapes.RECTANGLE, {x,y:1.5,w:ew-.15,h:3.2,fill:{color:C.surface},line:{color:C.cobalt,width:.5}});
+        s.addShape(pptx.shapes.RECTANGLE, {x,y:1.5,w:ew-.15,h:.32,fill:{color:colorHex}});
+        s.addText(`FASE ${i+1}`, {x,y:1.5,w:ew-.15,h:.32,align:'center',fontSize:7,color:C.white,fontFace:'Courier New',bold:true});
+        s.addText(e[0]||'', {x:x+.1,y:1.9,w:ew-.35,h:.5,fontSize:9,color:C.white,fontFace:'Arial',bold:true,wrap:true});
+        s.addText(e[1]||'', {x:x+.1,y:2.5,w:ew-.35,h:.25,fontSize:7,color:C.aqua,fontFace:'Arial'});
+        s.addText(e[2]||'', {x:x+.1,y:2.85,w:ew-.35,h:1.6,fontSize:8,color:C.mist,fontFace:'Arial',wrap:true,valign:'top'});
+      });
+      slideNum(s, slideN++, totalSlides); addLogo(s);
+
+      // MARCOS
+      s = pptx.addSlide();
+      addBg(s, C.surface);
+      s.addText('MARCOS DO PROJETO', {x:.5,y:.35,w:9,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:3});
+      s.addText(d.nome, {x:.5,y:.7,w:9,h:.5,fontSize:18,color:C.white,fontFace:'Arial',bold:true});
+      const marcos = d.marcos.length ? d.marcos : [['Jan 2024','Marco placeholder']];
+      marcos.slice(0,5).forEach((m,i) => {
+        const y = 1.5+i*.7;
+        s.addShape(pptx.shapes.OVAL, {x:.5,y:y+.05,w:.22,h:.22,fill:{color:colorHex}});
+        if (i<marcos.length-1) s.addShape(pptx.shapes.LINE, {x:.61,y:y+.27,w:0,h:.5,line:{color:C.cobalt,width:1.5}});
+        s.addText(m[0]||'', {x:.85,y:y,w:1.8,h:.32,fontSize:8,color:C.aqua,fontFace:'Courier New',bold:true});
+        s.addText(m[1]||'', {x:2.75,y:y,w:6.8,h:.32,fontSize:10,color:C.white,fontFace:'Arial'});
+      });
+      slideNum(s, slideN++, totalSlides); addLogo(s);
+
+      // KPIs
+      s = pptx.addSlide();
+      addBg(s, C.dark);
+      s.addText('INDICADORES DE ACOMPANHAMENTO', {x:.5,y:.35,w:9,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:3});
+      s.addText(d.nome, {x:.5,y:.7,w:9,h:.5,fontSize:18,color:C.white,fontFace:'Arial',bold:true});
+      const kpis = d.kpis.length ? d.kpis : [['Indicador placeholder','100%','—']];
+      kpis.slice(0,5).forEach((k,i) => {
+        const y = 1.5+i*.72;
+        s.addShape(pptx.shapes.RECTANGLE, {x:.5,y,w:6.5,h:.55,fill:{color:C.surface},line:{color:C.cobalt,width:.5}});
+        s.addShape(pptx.shapes.RECTANGLE, {x:.5,y,w:.06,h:.55,fill:{color:colorHex}});
+        s.addText(k[0]||'', {x:.72,y:y+.12,w:4.5,h:.32,fontSize:10,color:C.white,fontFace:'Arial'});
+        s.addShape(pptx.shapes.RECTANGLE, {x:7.2,y,w:1.2,h:.55,fill:{color:C.ocean},line:{color:C.cobalt,width:.5}});
+        s.addText('META', {x:7.2,y:y+.03,w:1.2,h:.2,align:'center',fontSize:6,color:C.mist,fontFace:'Courier New'});
+        s.addText(k[1]||'—', {x:7.2,y:y+.22,w:1.2,h:.26,align:'center',fontSize:11,color:C.aqua,fontFace:'Arial',bold:true});
+        s.addShape(pptx.shapes.RECTANGLE, {x:8.55,y,w:1.2,h:.55,fill:{color:colorHex},line:{color:colorHex,width:.5}});
+        s.addText('REAL', {x:8.55,y:y+.03,w:1.2,h:.2,align:'center',fontSize:6,color:'FFFFFF80',fontFace:'Courier New'});
+        s.addText(k[2]||'—', {x:8.55,y:y+.22,w:1.2,h:.26,align:'center',fontSize:11,color:C.white,fontFace:'Arial',bold:true});
+      });
+      slideNum(s, slideN++, totalSlides); addLogo(s);
+
+      // RESULTADOS
+      s = pptx.addSlide();
+      addBg(s, C.surface);
+      s.addText('RESULTADOS DO PROJETO', {x:.5,y:.35,w:9,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:3});
+      s.addText(d.nome, {x:.5,y:.7,w:9,h:.5,fontSize:18,color:C.white,fontFace:'Arial',bold:true});
+      const resultados = d.resultados.length ? d.resultados : [['Métrica','Valor','%']];
+      const cols = Math.min(resultados.length, 4);
+      const rw = (W-1.0)/cols;
+      resultados.slice(0,4).forEach((r,i) => {
+        const x = .5+i*rw;
+        s.addShape(pptx.shapes.RECTANGLE, {x,y:1.45,w:rw-.15,h:3.3,fill:{color:C.dark},line:{color:C.cobalt,width:.5}});
+        s.addShape(pptx.shapes.RECTANGLE, {x,y:4.45,w:rw-.15,h:.3,fill:{color:colorHex}});
+        s.addText(r[0]||'Métrica', {x:x+.12,y:1.65,w:rw-.4,h:.5,fontSize:8,color:C.mist,fontFace:'Arial',wrap:true});
+        s.addText(r[1]||'—', {x:x+.1,y:2.3,w:rw-.3,h:.8,fontSize:22,color:C.white,fontFace:'Arial',bold:true,wrap:true});
+        s.addText(r[2]||'', {x:x+.1,y:3.2,w:rw-.3,h:.5,fontSize:14,color:C.mint,fontFace:'Arial',bold:true});
+      });
+      slideNum(s, slideN++, totalSlides); addLogo(s);
+
+      // RISCOS
+      s = pptx.addSlide();
+      addBg(s, C.dark);
+      s.addText('RISCOS E PONTOS DE ATENÇÃO', {x:.5,y:.35,w:9,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:3});
+      s.addText(d.nome, {x:.5,y:.7,w:9,h:.5,fontSize:18,color:C.white,fontFace:'Arial',bold:true});
+      const riscos = d.riscos.length ? d.riscos : [['Ponto de atenção placeholder','Tratativa']];
+      riscos.slice(0,5).forEach((r,i) => {
+        const y = 1.5+i*.72;
+        s.addShape(pptx.shapes.RECTANGLE, {x:.5,y,w:9,h:.6,fill:{color:C.surface},line:{color:'f8713130',width:.5}});
+        s.addText('⚠', {x:.6,y:y+.1,w:.4,h:.4,fontSize:12,color:C.gold,fontFace:'Arial'});
+        s.addText(r[0]||'', {x:1.15,y:y+.05,w:4.2,h:.25,fontSize:9,color:C.white,fontFace:'Arial',bold:true});
+        s.addText(r[1]||'', {x:1.15,y:y+.32,w:4.2,h:.22,fontSize:8,color:C.mist,fontFace:'Arial'});
+        if(r[1]) { s.addShape(pptx.shapes.RECTANGLE, {x:5.6,y:y+.05,w:.06,h:.5,fill:{color:C.cobalt}}); s.addText('Tratativa: '+r[1], {x:5.8,y:y+.1,w:3.5,h:.4,fontSize:8,color:C.mist,fontFace:'Arial',wrap:true}); }
+      });
+      slideNum(s, slideN++, totalSlides); addLogo(s);
+
+      // LIÇÕES
+      s = pptx.addSlide();
+      addBg(s, C.surface);
+      s.addText('LIÇÕES APRENDIDAS', {x:.5,y:.35,w:9,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:3});
+      s.addText(d.nome, {x:.5,y:.7,w:9,h:.5,fontSize:18,color:C.white,fontFace:'Arial',bold:true});
+      const licoes = d.licoes.length ? d.licoes : [['Lição aprendida placeholder']];
+      licoes.slice(0,5).forEach((l,i) => {
+        const y = 1.5+i*.7;
+        s.addShape(pptx.shapes.RECTANGLE, {x:.5,y,w:9,h:.58,fill:{color:C.dark},line:{color:C.cobalt,width:.5}});
+        s.addShape(pptx.shapes.RECTANGLE, {x:.5,y,w:.06,h:.58,fill:{color:colorHex}});
+        s.addText(`${i+1}`, {x:.7,y:y+.08,w:.3,h:.42,fontSize:10,color:colorHex,fontFace:'Courier New',bold:true});
+        s.addText(l[0]||'', {x:1.15,y:y+.1,w:8.1,h:.38,fontSize:10,color:C.white,fontFace:'Arial',wrap:true});
+      });
+      slideNum(s, slideN++, totalSlides); addLogo(s);
+
+      // EVIDÊNCIAS
+      s = pptx.addSlide();
+      addBg(s, C.dark);
+      s.addText('EVIDÊNCIAS DO PROJETO', {x:.5,y:.35,w:9,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:3});
+      s.addText(d.nome, {x:.5,y:.7,w:9,h:.5,fontSize:18,color:C.white,fontFace:'Arial',bold:true});
+      if (d.evidencias.length) {
+        const positions = [[.5,1.4,4.5,3.7],[5.1,1.4,4.4,3.7],[.5,1.4,2.1,3.7],[2.7,1.4,2.1,1.8],[5,1.4,2.1,1.8],[2.7,3.3,4.4,1.8]];
+        const layout2 = [[.5,1.4,4.4,3.7],[5.1,1.4,4.4,3.7]];
+        const layout3 = [[.5,1.4,2.9,3.7],[3.55,1.4,2.9,3.7],[6.6,1.4,2.9,3.7]];
+        const layout4 = [[.5,1.4,4.4,1.75],[5.1,1.4,4.4,1.75],[.5,3.25,4.4,1.75],[5.1,3.25,4.4,1.75]];
+        const layout = d.evidencias.length===1?[[.5,1.4,9,3.7]]:d.evidencias.length===2?layout2:d.evidencias.length===3?layout3:layout4;
+        d.evidencias.forEach((ev,i) => {
+          if(i>=layout.length) return;
+          const [x,y,w,h] = layout[i];
+          s.addImage({data:ev,x,y,w,h,sizing:{type:'cover',w,h}});
+        });
+      } else {
+        s.addShape(pptx.shapes.RECTANGLE, {x:.5,y:1.4,w:9,h:3.7,fill:{color:C.surface},line:{color:C.cobalt,width:.5}});
+        s.addText('[ Evidências serão inseridas após upload ]', {x:.5,y:2.8,w:9,h:.8,align:'center',fontSize:12,color:C.mist,fontFace:'Arial'});
+      }
+      slideNum(s, slideN++, totalSlides); addLogo(s);
+
+      // DESAFIOS FUTUROS
+      s = pptx.addSlide();
+      addBg(s, C.surface);
+      s.addText('DESAFIOS FUTUROS', {x:.5,y:.35,w:9,h:.3,fontSize:7,color:C.aqua,fontFace:'Courier New',charSpacing:3});
+      s.addText(d.nome, {x:.5,y:.7,w:9,h:.5,fontSize:18,color:C.white,fontFace:'Arial',bold:true});
+      const futItems = [
+        { label:'Continuidade', icon:'🔄', text: d.futuros||'[ Descreva os próximos passos ]' },
+        { label:'Acompanhamento', icon:'📊', text:'Indicadores e métricas de controle a monitorar.' },
+        { label:'Desdobramentos', icon:'🚀', text:'Possíveis novos projetos estratégicos derivados.' },
+      ];
+      futItems.forEach((f,i) => {
+        const x = .5+i*3.2;
+        s.addShape(pptx.shapes.RECTANGLE, {x,y:1.45,w:3.05,h:3.5,fill:{color:C.dark},line:{color:C.cobalt,width:.5}});
+        s.addShape(pptx.shapes.RECTANGLE, {x,y:1.45,w:3.05,h:.45,fill:{color:colorHex}});
+        s.addText(`${f.icon} ${f.label}`, {x:x+.12,y:1.48,w:2.8,h:.38,fontSize:10,color:C.white,fontFace:'Arial',bold:true});
+        s.addText(i===0?f.text:f.text, {x:x+.15,y:2.05,w:2.75,h:2.7,fontSize:9,color:C.mist,fontFace:'Arial',wrap:true,valign:'top'});
+      });
+      slideNum(s, slideN++, totalSlides); addLogo(s);
+    }
+
+    // ENCERRAMENTO
+    s = pptx.addSlide();
+    addBg(s, C.dark);
+    s.addShape(pptx.shapes.RECTANGLE, {x:0,y:0,w:W,h:H,fill:{color:C.dark}});
+    s.addShape(pptx.shapes.RECTANGLE, {x:0,y:H-0.06,w:W,h:0.06,fill:{color:C.cobalt}});
+    s.addText('PORTFÓLIO DE PROJETOS ESTRATÉGICOS', {x:.5,y:1.3,w:9,h:.35,align:'center',fontSize:8,color:C.aqua,fontFace:'Courier New',charSpacing:3});
+    s.addText('Obrigado!', {x:.5,y:1.8,w:9,h:1.3,align:'center',fontSize:48,color:C.white,fontFace:'Arial',bold:true});
+    s.addText(orgName + ' · ' + evento, {x:.5,y:3.3,w:9,h:.4,align:'center',fontSize:11,color:C.mist,fontFace:'Arial'});
+    if (uploads.logoHospital) s.addImage({data:uploads.logoHospital,x:4,y:4,w:2,h:.7,sizing:{type:'contain',w:2,h:.7}});
+
+    await pptx.writeFile({ fileName: `NavegaBaleia_Apresentacao_${new Date().toISOString().slice(0,10)}.pptx` });
+    showToast('✅ PPTX gerado com sucesso!', 'success');
+  } catch(e) {
+    console.error(e);
+    showToast('❌ Erro ao gerar PPTX. Veja o console.', 'error');
+  }
+}
+
+// ─────────────────────────────────────────────
+// PDF GENERATOR
+// ─────────────────────────────────────────────
+async function generatePDF() {
+  showToast('⏳ Gerando PDF…', 'info');
+  await new Promise(r => setTimeout(r, 100));
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:'landscape', unit:'pt', format:[960,540] });
+    const W=960, H=540;
+    const C = {
+      dark:[6,8,16], surface:[14,18,32], ocean:[13,45,107],
+      cobalt:[29,78,216], electric:[59,130,246], aqua:[6,182,212],
+      mint:[16,255,203], white:[255,255,255], mist:[148,163,184],
+      teal:[13,148,136], gold:[251,191,36], danger:[248,113,113],
+    };
+    const hex2rgb = hex => { const r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16); return [r,g,b]; };
+
+    const rgb = (arr) => ({ r:arr[0], g:arr[1], b:arr[2] });
+    const fill = (arr) => doc.setFillColor(arr[0],arr[1],arr[2]);
+    const stroke = (arr) => doc.setDrawColor(arr[0],arr[1],arr[2]);
+    const text = (t,x,y,opts={}) => {
+      doc.setFontSize(opts.size||10);
+      doc.setTextColor(...(opts.color||C.white));
+      if(opts.bold) doc.setFont('helvetica','bold'); else doc.setFont('helvetica','normal');
+      if(opts.align==='center') doc.text(t,x,y,{align:'center'});
+      else doc.text(t,x,y,{maxWidth:opts.maxW||undefined});
+    };
+    const rect = (x,y,w,h,fillC,strokeC) => {
+      fill(fillC||C.dark); stroke(strokeC||fillC||C.dark);
+      doc.rect(x,y,w,h,'F');
+    };
+    const newSlide = (bg=C.dark) => {
+      doc.addPage([W,H],'landscape');
+      rect(0,0,W,H,bg);
+    };
+    const logo = () => {
+      if(uploads.logoNavega) { try { doc.addImage(uploads.logoNavega,'PNG',W-90,H-40,70,25,'','FAST'); } catch(e){} }
+      else { text('Navega Baleia',W-90,H-20,{size:7,color:C.aqua}); }
+    };
+    const slideN = (n,tot) => {
+      text(`${String(n).padStart(2,'0')} / ${String(tot).padStart(2,'0')}`,30,H-18,{size:7,color:C.mist});
+    };
+
+    const evento = val('g_evento')||'Navega Baleia';
+    const orgName = val('g_org')||'Hospital da Baleia';
+    const dataEvt = val('g_data') ? new Date(val('g_data')).toLocaleDateString('pt-BR') : '18/03/2026';
+
+    // Remove first blank page
+    doc.deletePage(1);
+
+    // CAPA
+    doc.addPage([W,H],'landscape');
+    rect(0,0,W,H,C.dark);
+    rect(0,0,W*0.45,H,C.dark);
+    rect(W*0.45,0,W*0.55,H,C.ocean);
+    rect(0,H-4,W,4,C.cobalt);
+    text('APRESENTAÇÃO DE RESULTADOS',42,80,{size:7,color:C.aqua});
+    text(evento,42,145,{size:36,bold:true});
+    text('Portfólio de Projetos Estratégicos 2024–2026',42,185,{size:13,color:C.mist});
+    text(orgName,42,320,{size:10,color:C.aqua,bold:true});
+    text(dataEvt,42,345,{size:9,color:C.mist});
+    if(uploads.logoNavega){try{doc.addImage(uploads.logoNavega,'PNG',480,120,340,190,'','FAST');}catch(e){}}
+    if(uploads.logoHospital){try{doc.addImage(uploads.logoHospital,'PNG',490,350,200,70,'','FAST');}catch(e){}}
+
+    const totalSlides = 4 + PROJECTS.length * 10 + 1;
+    let sn = 2;
+
+    // SUMÁRIO
+    newSlide(C.surface);
+    text('SUMÁRIO',48,55,{size:7,color:C.aqua});
+    text('Projetos Estratégicos',48,95,{size:22,bold:true});
+    PROJECTS.forEach((p,i) => {
+      const col=i<3?0:1, row=i%3;
+      const x=48+col*455, y=125+row*105;
+      rect(x,y,430,88,C.dark); fill(C.cobalt); doc.setDrawColor(...C.cobalt); doc.rect(x,y,430,88,'S');
+      text(`0${i+1}`,x+12,y+36,{size:9,color:C.electric});
+      text(p.name,x+42,y+30,{size:10,bold:true});
+      text(p.leader,x+42,y+55,{size:8,color:C.mist});
+    });
+    logo(); slideN(sn++,totalSlides);
+
+    // BI slides
+    ['bi2025','bi2026'].forEach((key,i) => {
+      newSlide(C.dark);
+      text(i===0?'DASHBOARD BI 2025':'DASHBOARD BI 2026',48,50,{size:7,color:C.aqua});
+      text(i===0?'Panorama Anterior':'Panorama Atual',48,80,{size:20,bold:true});
+      if(uploads[key]){
+        try{doc.addImage(uploads[key],'PNG',48,100,W-96,H-120,'','FAST');}catch(e){
+          rect(48,100,W-96,H-120,C.ocean);
+          text('[ Print do BI será exibido aqui ]',W/2,H/2,{size:12,color:C.mist,align:'center'});
+        }
+      } else {
+        rect(48,100,W-96,H-120,C.ocean);
+        text(`[ Inserir print do Dashboard BI ${2025+i} ]`,W/2,H/2,{size:12,color:C.mist,align:'center'});
+      }
+      logo(); slideN(sn++,totalSlides);
+    });
+
+    // PROJETOS
+    for (const p of PROJECTS) {
+      const d = collectProject(p);
+      const pColor = hex2rgb(p.color);
+
+      // CAPA PROJETO
+      newSlide(C.dark);
+      doc.setFillColor(...pColor); doc.rect(0,0,6,H,'F');
+      rect(0,H-88,W,88,C.surface);
+      text('PROJETO',36,90,{size:7,color:C.aqua});
+      text(d.nome,36,140,{size:24,bold:true,maxW:850});
+      doc.setFillColor(...hex2rgb(d.status==='Concluído'?'0d9488':d.status==='Em andamento'?'fbbf24':'f87171'));
+      doc.rect(36,165,100,24,'F');
+      text(d.status,42,181,{size:7,color:C.dark,bold:true});
+      text(`Líder: ${d.lider}`,36,220,{size:10,color:C.mist});
+      if(d.inicio||d.fim) text(`${d.inicio||'--'} → ${d.fim||'--'}`,36,245,{size:9,color:C.mist});
+      logo(); slideN(sn++,totalSlides);
+
+      // OBJETIVO
+      newSlide(C.surface);
+      text('OBJETIVO DO PROJETO',48,50,{size:7,color:C.aqua});
+      text(d.nome,48,80,{size:16,bold:true,maxW:850});
+      rect(48,100,W-96,H-140,C.dark);
+      text(d.objetivo||'[ Descreva o objetivo ]',70,135,{size:11,color:d.objetivo?C.white:C.mist,maxW:W-160});
+      logo(); slideN(sn++,totalSlides);
+
+      // ETAPAS
+      newSlide(C.dark);
+      text('ETAPAS DO PROJETO',48,50,{size:7,color:C.aqua});
+      text(d.nome,48,80,{size:16,bold:true,maxW:850});
+      const etapas = d.etapas.length?d.etapas:[['Fase','Período','Desc']];
+      const ew2=(W-96)/etapas.length;
+      etapas.forEach((e,i)=>{
+        const x=48+i*ew2;
+        rect(x,100,ew2-8,H-140,C.surface); doc.setDrawColor(...C.cobalt); doc.rect(x,100,ew2-8,H-140,'S');
+        doc.setFillColor(...pColor); doc.rect(x,100,ew2-8,28,'F');
+        text(`FASE ${i+1}`,x+(ew2-8)/2,117,{size:7,color:C.white,bold:true,align:'center'});
+        text(e[0]||'',x+10,148,{size:8,bold:true,maxW:ew2-28});
+        text(e[1]||'',x+10,168,{size:7,color:C.aqua,maxW:ew2-28});
+        text(e[2]||'',x+10,192,{size:7.5,color:C.mist,maxW:ew2-28});
+      });
+      logo(); slideN(sn++,totalSlides);
+
+      // MARCOS
+      newSlide(C.surface);
+      text('MARCOS DO PROJETO',48,50,{size:7,color:C.aqua});
+      text(d.nome,48,80,{size:16,bold:true,maxW:850});
+      const marcos=(d.marcos.length?d.marcos:[['Data','Marco']]).slice(0,5);
+      marcos.forEach((m,i)=>{
+        const y=108+i*72;
+        doc.setFillColor(...pColor); doc.circle(60,y+10,8,'F');
+        if(i<marcos.length-1){doc.setDrawColor(...C.cobalt);doc.setLineWidth(1.5);doc.line(60,y+18,60,y+72);}
+        text(m[0]||'',80,y+5,{size:7,color:C.aqua,bold:true});
+        text(m[1]||'',220,y+5,{size:9,maxW:680});
+      });
+      logo(); slideN(sn++,totalSlides);
+
+      // KPIs
+      newSlide(C.dark);
+      text('INDICADORES DE ACOMPANHAMENTO',48,50,{size:7,color:C.aqua});
+      text(d.nome,48,80,{size:16,bold:true,maxW:850});
+      const kpis=(d.kpis.length?d.kpis:[['Indicador','Meta','Real']]).slice(0,5);
+      kpis.forEach((k,i)=>{
+        const y=105+i*72;
+        rect(48,y,W-196,60,C.surface); doc.setFillColor(...pColor); doc.rect(48,y,5,60,'F');
+        text(k[0]||'',65,y+25,{size:9,maxW:520});
+        rect(W-144,y,90,60,C.ocean); text('META',W-99,y+18,{size:6,color:C.mist,align:'center'}); text(k[1]||'—',W-99,y+40,{size:11,color:C.aqua,bold:true,align:'center'});
+        doc.setFillColor(...pColor); doc.rect(W-48,y,45,60,'F'); text('REAL',W-25,y+18,{size:6,color:C.white,align:'center'}); text(k[2]||'—',W-25,y+40,{size:11,color:C.white,bold:true,align:'center'});
+      });
+      logo(); slideN(sn++,totalSlides);
+
+      // RESULTADOS
+      newSlide(C.surface);
+      text('RESULTADOS DO PROJETO',48,50,{size:7,color:C.aqua});
+      text(d.nome,48,80,{size:16,bold:true,maxW:850});
+      const res=(d.resultados.length?d.resultados:[['Métrica','Valor','%']]).slice(0,4);
+      const rw2=(W-96)/res.length;
+      res.forEach((r,i)=>{
+        const x=48+i*rw2;
+        rect(x,100,rw2-10,H-140,C.dark); doc.setFillColor(...pColor); doc.rect(x,H-48,rw2-10,8,'F');
+        text(r[0]||'Métrica',x+12,130,{size:8,color:C.mist,maxW:rw2-30});
+        text(r[1]||'—',x+12,200,{size:20,bold:true,maxW:rw2-24});
+        text(r[2]||'',x+12,240,{size:14,color:C.mint,bold:true});
+      });
+      logo(); slideN(sn++,totalSlides);
+
+      // RISCOS
+      newSlide(C.dark);
+      text('RISCOS E PONTOS DE ATENÇÃO',48,50,{size:7,color:C.aqua});
+      text(d.nome,48,80,{size:16,bold:true,maxW:850});
+      const riscos=(d.riscos.length?d.riscos:[['Risco','Tratativa']]).slice(0,5);
+      riscos.forEach((r,i)=>{
+        const y=105+i*72;
+        rect(48,y,W-96,60,C.surface);
+        text('⚠',55,y+22,{size:12,color:C.gold});
+        text(r[0]||'',82,y+18,{size:9,bold:true,maxW:400});
+        text(r[1]||'',82,y+40,{size:8,color:C.mist,maxW:400});
+        if(r[1]){ doc.setDrawColor(...C.cobalt); doc.line(510,y+5,510,y+55); text('Tratativa: '+r[1],525,y+28,{size:7.5,color:C.mist,maxW:360}); }
+      });
+      logo(); slideN(sn++,totalSlides);
+
+      // LIÇÕES
+      newSlide(C.surface);
+      text('LIÇÕES APRENDIDAS',48,50,{size:7,color:C.aqua});
+      text(d.nome,48,80,{size:16,bold:true,maxW:850});
+      const licoes=(d.licoes.length?d.licoes:[['Lição aprendida']]).slice(0,5);
+      licoes.forEach((l,i)=>{
+        const y=105+i*72;
+        rect(48,y,W-96,60,C.dark); doc.setFillColor(...pColor); doc.rect(48,y,5,60,'F');
+        text(`${i+1}`,62,y+26,{size:10,color:pColor,bold:true});
+        text(l[0]||'',85,y+28,{size:10,maxW:W-180});
+      });
+      logo(); slideN(sn++,totalSlides);
+
+      // EVIDÊNCIAS
+      newSlide(C.dark);
+      text('EVIDÊNCIAS DO PROJETO',48,50,{size:7,color:C.aqua});
+      text(d.nome,48,80,{size:16,bold:true,maxW:850});
+      if(d.evidencias.length){
+        const layouts={1:[[48,100,W-96,H-140]],2:[[48,100,(W-100)/2,H-140],[(W+4)/2,100,(W-100)/2,H-140]],3:[[48,100,(W-108)/3,H-140],[(W+4-((W-108)/3)*2)/2+(W-108)/3,100,(W-108)/3,H-140],[W-48-(W-108)/3,100,(W-108)/3,H-140]],4:[[48,100,(W-104)/2,(H-140)/2],[W-46-(W-104)/2,100,(W-104)/2,(H-140)/2],[48,H/2+10,(W-104)/2,(H-140)/2],[W-46-(W-104)/2,H/2+10,(W-104)/2,(H-140)/2]]};
+        const layout=layouts[Math.min(d.evidencias.length,4)]||layouts[1];
+        d.evidencias.forEach((ev,i)=>{
+          if(i>=layout.length)return;
+          const [x,y,w,h]=layout[i];
+          try{doc.addImage(ev,'PNG',x,y,w,h,'','FAST');}catch(e){}
+        });
+      } else {
+        rect(48,100,W-96,H-140,C.surface);
+        text('[ Evidências serão exibidas após upload ]',W/2,H/2,{size:12,color:C.mist,align:'center'});
+      }
+      logo(); slideN(sn++,totalSlides);
+
+      // DESAFIOS FUTUROS
+      newSlide(C.surface);
+      text('DESAFIOS FUTUROS',48,50,{size:7,color:C.aqua});
+      text(d.nome,48,80,{size:16,bold:true,maxW:850});
+      const futCards=['Continuidade','Acompanhamento','Desdobramentos'];
+      futCards.forEach((fc,i)=>{
+        const x=48+i*300;
+        rect(x,100,290,H-140,C.dark);
+        doc.setFillColor(...pColor); doc.rect(x,100,290,36,'F');
+        text(fc,x+145,123,{size:10,color:C.white,bold:true,align:'center'});
+        const txt = i===0 ? (d.futuros||'[ Preencher ]') : i===1?'Indicadores e métricas de controle a monitorar.':'Possíveis novos projetos estratégicos derivados.';
+        text(txt,x+14,155,{size:8,color:C.mist,maxW:262});
+      });
+      logo(); slideN(sn++,totalSlides);
+    }
+
+    // ENCERRAMENTO
+    newSlide(C.dark);
+    rect(0,H-4,W,4,C.cobalt);
+    text('PORTFÓLIO DE PROJETOS ESTRATÉGICOS',W/2,140,{size:8,color:C.aqua,align:'center'});
+    text('Obrigado!',W/2,270,{size:52,bold:true,align:'center'});
+    text(`${orgName} · ${evento}`,W/2,330,{size:11,color:C.mist,align:'center'});
+    if(uploads.logoHospital){try{doc.addImage(uploads.logoHospital,'PNG',W/2-80,380,160,55,'','FAST');}catch(e){}}
+
+    doc.save(`NavegaBaleia_Apresentacao_${new Date().toISOString().slice(0,10)}.pdf`);
+    showToast('✅ PDF gerado com sucesso!', 'success');
+  } catch(e) {
+    console.error(e);
+    showToast('❌ Erro ao gerar PDF. Veja o console.', 'error');
+  }
+}
+
+// ─────────────────────────────────────────────
+// SAVE / LOAD
+// ─────────────────────────────────────────────
+function saveData() {
+  const data = { global:{}, projects:{}, uploads:{} };
+  ['g_evento','g_data','g_org','g_subtitle'].forEach(id => { data.global[id]=val(id); });
+  PROJECTS.forEach(p => {
+    data.projects[p.id] = collectProject(p);
+  });
+  // Save uploads (minus large images to avoid quota)
+  Object.keys(uploads).forEach(k => { if(!k.startsWith('ev_')) data.uploads[k]=uploads[k]; });
+  try {
+    localStorage.setItem('navegaBaleia_draft', JSON.stringify(data));
+    showToast('💾 Rascunho salvo!', 'success');
+  } catch(e) {
+    showToast('⚠️ Rascunho muito grande. Reduza as imagens.', 'error');
+  }
+}
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem('navegaBaleia_draft');
+    if (!raw) { showToast('Nenhum rascunho encontrado.', 'info'); return; }
+    const data = JSON.parse(raw);
+    if (data.global) Object.keys(data.global).forEach(id => { const el=document.getElementById(id); if(el) el.value=data.global[id]; });
+    if (data.uploads) Object.assign(uploads, data.uploads);
+    updateProgress();
+    showToast('📂 Rascunho carregado!', 'success');
+  } catch(e) {
+    showToast('Erro ao carregar rascunho.', 'error');
+  }
+}
+
+// ─────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  const icon = {success:'✅',error:'❌',info:'⏳',warning:'⚠️'}[type]||'ℹ️';
+  document.getElementById('toastMsg').textContent = msg;
+  document.getElementById('toastIcon').textContent = icon;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ─────────────────────────────────────────────
+// BOOT
+// ─────────────────────────────────────────────
+init();
+showPanel('global');
+// Try to restore saved data
+setTimeout(() => {
+  const raw = localStorage.getItem('navegaBaleia_draft');
+  if (raw) showToast('📂 Rascunho anterior encontrado. Clique em "Carregar".', 'info');
+}, 600);
+</script>
 </body>
 </html>
