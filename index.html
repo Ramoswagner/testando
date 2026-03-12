@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fundo para Capa LinkedIn · Wagner Ramos</title>
+    <title>Fundo Premium · Wagner Ramos</title>
     <style>
         body {
             background: #0B1E33;
@@ -14,133 +14,160 @@
             min-height: 100vh;
             margin: 0;
             padding: 20px;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
         }
         .container {
             text-align: center;
         }
         canvas {
             width: 100%;
-            max-width: 792px; /* metade do tamanho real */
+            max-width: 792px; /* visualização em metade do tamanho */
             height: auto;
             border: 2px solid #C4A35A;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
         }
         .btn {
             margin-top: 30px;
             background: linear-gradient(135deg, #C4A35A, #D8B87A);
             color: #0B1E33;
-            font-family: 'Inter', sans-serif;
             font-size: 1rem;
-            font-weight: 500;
+            font-weight: 600;
             letter-spacing: 0.05em;
             text-transform: uppercase;
-            padding: 14px 32px;
+            padding: 16px 36px;
             border: none;
-            border-radius: 40px;
+            border-radius: 50px;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(196,163,90,0.3);
         }
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(196, 163, 90, 0.4);
-        }
-        .btn:active {
-            transform: translateY(0);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(196,163,90,0.5);
         }
         .note {
             color: #A0B3CC;
-            font-size: 0.8rem;
-            margin-top: 15px;
+            font-size: 0.85rem;
+            margin-top: 16px;
         }
     </style>
-    <!-- Fonte apenas para a coordenada (pode ser removida se preferir) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <canvas id="linkedinBanner" width="1584" height="396"></canvas>
+        <canvas id="premiumCanvas" width="1584" height="396"></canvas>
         <br>
-        <button class="btn" id="downloadBtn">⬇ Baixar Fundo (PNG)</button>
-        <p class="note">Dimensões: 1584 x 396 px — alta qualidade. Use como base no Canva.</p>
+        <button class="btn" id="downloadBtn">⬇ Baixar Fundo Premium</button>
+        <p class="note">1584 x 396 px · qualidade superior · pronto para edição no Canva</p>
     </div>
 
     <script>
         (function() {
-            const canvas = document.getElementById('linkedinBanner');
+            const canvas = document.getElementById('premiumCanvas');
             const ctx = canvas.getContext('2d');
 
-            // Cores do tema (apenas as necessárias para o fundo)
+            // Cores refinadas
             const colors = {
                 bg: '#0B1E33',
-                low: '#62748C',
                 gold: '#C4A35A',
-                lineg: 'rgba(196,163,90,0.25)'
+                goldSoft: 'rgba(196,163,90,0.08)',
+                goldLine: 'rgba(196,163,90,0.25)',
+                navyGlow: 'rgba(26,62,90,0.6)',
+                ghost: 'rgba(255,255,255,0.02)',
             };
 
-            const width = canvas.width;
-            const height = canvas.height;
+            const w = canvas.width;
+            const h = canvas.height;
 
-            // Ativar alta qualidade
+            // Habilitar alta qualidade
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
 
-            // 1. Fundo principal
+            // ─────────────────────────────────────────────────
+            // 1. Fundo sólido
             ctx.fillStyle = colors.bg;
-            ctx.fillRect(0, 0, width, height);
+            ctx.fillRect(0, 0, w, h);
 
-            // 2. Gradientes suaves (característicos do site)
-            // Gradiente inferior esquerdo (dourado suave)
-            const grad1 = ctx.createRadialGradient(200, height - 100, 50, 250, height - 150, 600);
-            grad1.addColorStop(0, 'rgba(196,163,90,0.1)');
-            grad1.addColorStop(1, 'transparent');
+            // ─────────────────────────────────────────────────
+            // 2. Gradientes complexos (múltiplas camadas)
+            // Camada 1: Brilho dourado no canto inferior esquerdo
+            const grad1 = ctx.createRadialGradient(200, h-100, 30, 250, h-150, 700);
+            grad1.addColorStop(0, colors.goldSoft);
+            grad1.addColorStop(0.7, 'transparent');
             ctx.fillStyle = grad1;
-            ctx.fillRect(0, 0, width, height);
+            ctx.fillRect(0, 0, w, h);
 
-            // Gradiente superior direito (azul profundo)
-            const grad2 = ctx.createRadialGradient(width - 200, 100, 50, width - 300, 150, 700);
-            grad2.addColorStop(0, 'rgba(26,62,90,0.5)');
-            grad2.addColorStop(1, 'transparent');
+            // Camada 2: Brilho azul profundo no canto superior direito
+            const grad2 = ctx.createRadialGradient(w-200, 80, 20, w-300, 120, 800);
+            grad2.addColorStop(0, colors.navyGlow);
+            grad2.addColorStop(0.8, 'transparent');
             ctx.fillStyle = grad2;
-            ctx.fillRect(0, 0, width, height);
+            ctx.fillRect(0, 0, w, h);
 
-            // 3. Linha vertical esquerda (característica)
-            ctx.strokeStyle = colors.lineg;
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(80, 60);
-            ctx.lineTo(80, height - 60);
-            ctx.stroke();
+            // Camada 3: Suave vinheta escura nas bordas
+            const grad3 = ctx.createRadialGradient(w/2, h/2, 400, w/2, h/2, 900);
+            grad3.addColorStop(0, 'transparent');
+            grad3.addColorStop(1, 'rgba(0,0,0,0.15)');
+            ctx.fillStyle = grad3;
+            ctx.fillRect(0, 0, w, h);
 
-            // 4. Coordenada geográfica no canto superior direito (vertical)
+            // ─────────────────────────────────────────────────
+            // 3. Linha vertical esquerda (mais refinada)
             ctx.save();
-            ctx.translate(width - 50, 100);
-            ctx.rotate(-Math.PI/2);
-            ctx.font = '400 12px "Inter", monospace';
-            ctx.fillStyle = colors.low;
-            ctx.textAlign = 'left';
-            ctx.fillText('19°55\'S · 43°56\'W', 0, 0);
+            ctx.shadowColor = 'rgba(196,163,90,0.3)';
+            ctx.shadowBlur = 6;
+            ctx.shadowOffsetX = 2;
+            ctx.strokeStyle = colors.goldLine;
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(80, 50);
+            ctx.lineTo(80, h-50);
+            ctx.stroke();
             ctx.restore();
 
-            // 5. Ghost "PMO" no canto inferior direito (extremamente sutil)
-            // Usando Cormorant Garamond, mas como é apenas um ghost, qualquer fonte serifada funciona
-            // Vamos usar uma fonte padrão, mas para manter a identidade, carregamos a Cormorant via sistema
-            ctx.font = '700 110px "Cormorant Garamond", "Times New Roman", serif';
-            ctx.fillStyle = 'rgba(255,255,255,0.03)';
+            // ─────────────────────────────────────────────────
+            // 4. Linha horizontal sutil na base (reforça a estrutura)
+            ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+            ctx.lineWidth = 0.6;
+            ctx.beginPath();
+            ctx.moveTo(100, h-70);
+            ctx.lineTo(w-100, h-70);
+            ctx.stroke();
+
+            // ─────────────────────────────────────────────────
+            // 5. Ghost "PMO" extremamente suave, com leve desfoque
+            ctx.save();
+            ctx.shadowColor = 'rgba(196,163,90,0.1)';
+            ctx.shadowBlur = 20;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            ctx.font = '700 130px "Cormorant Garamond", "Times New Roman", serif';
+            ctx.fillStyle = colors.ghost;
             ctx.textAlign = 'right';
             ctx.textBaseline = 'bottom';
-            ctx.fillText('PMO', width - 40, height - 20);
+            ctx.fillText('PMO', w-40, h-20);
+            ctx.restore();
 
-            // Botão de download
-            document.getElementById('downloadBtn').addEventListener('click', function() {
+            // ─────────────────────────────────────────────────
+            // 6. Pequenos detalhes: pontos de luz (opcional)
+            ctx.beginPath();
+            ctx.arc(80, 60, 3, 0, 2*Math.PI);
+            ctx.fillStyle = colors.gold;
+            ctx.shadowColor = colors.gold;
+            ctx.shadowBlur = 10;
+            ctx.fill();
+            ctx.shadowBlur = 0; // reset
+
+            // ─────────────────────────────────────────────────
+            // Download
+            document.getElementById('downloadBtn').addEventListener('click', () => {
                 const link = document.createElement('a');
-                link.download = 'fundo-linkedin-wagner-ramos.png';
+                link.download = 'wagner-ramos-fundo-premium.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             });
 
-            console.log('Fundo de alta qualidade gerado com sucesso!');
+            console.log('Fundo premium gerado com excelência.');
         })();
     </script>
 </body>
