@@ -3,330 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Capa LinkedIn - Wagner Ramos</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-    <!-- html2canvas para gerar a imagem -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <title>Capa LinkedIn · Wagner Ramos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg: #0B1E33;
-            --bg2: #0F2A40;
-            --bg3: #153450;
-            --bg4: #1A3E5A;
-            --text: #F0F4FA;
-            --mid: #A0B3CC;
-            --low: #62748C;
-            --gold: #C4A35A;
-            --glt: #D8B87A;
-            --gdim: rgba(196,163,90,0.12);
-            --line: rgba(255,255,255,.08);
-            --line2: rgba(255,255,255,.04);
-            --lineg: rgba(196,163,90,.25);
-            --serif: 'Cormorant Garamond', Georgia, serif;
-            --sans: 'Inter', system-ui, sans-serif;
-        }
-
         body {
-            background: #1e1e2f; /* apenas para contraste fora da capa */
+            background: #0B1E33;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            font-family: var(--sans);
+            margin: 0;
             padding: 20px;
+            font-family: 'Inter', sans-serif;
         }
-
-        .canvas-container {
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-            margin-bottom: 30px;
+        .container {
+            text-align: center;
         }
-
-        #linkedin-banner {
-            width: 1584px;   /* largura oficial da capa do LinkedIn */
-            height: 396px;    /* altura oficial */
-            background: var(--bg);
-            position: relative;
-            overflow: hidden;
-            font-family: var(--sans);
-            color: var(--text);
+        canvas {
+            width: 100%;
+            max-width: 792px; /* metade do tamanho real para visualização */
+            height: auto;
+            border: 2px solid #C4A35A;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-
-        /* Gradientes e elementos decorativos (mesmos do site) */
-        #linkedin-banner::before {
-            content: '';
-            position: absolute;
-            top: -20%;
-            right: -5%;
-            width: 50%;
-            height: 80%;
-            background: radial-gradient(ellipse at 60% 35%, rgba(26,62,90,.8) 0%, rgba(11,30,51,0) 70%);
-            pointer-events: none;
-        }
-        #linkedin-banner::after {
-            content: '';
-            position: absolute;
-            bottom: -30%;
-            left: 10%;
-            width: 40%;
-            height: 60%;
-            background: radial-gradient(ellipse, rgba(196,163,90,.07) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        /* Linha vertical decorativa */
-        .vline {
-            position: absolute;
-            left: 60px;
-            top: 15%;
-            bottom: 15%;
-            width: 1px;
-            background: linear-gradient(to bottom, transparent, rgba(196,163,90,.2), transparent);
-        }
-
-        /* Coordenada no canto superior direito (mesmo estilo) */
-        .coord {
-            position: absolute;
-            top: 30px;
-            right: 40px;
-            font-size: 14px;
-            letter-spacing: 2px;
-            color: var(--low);
-            writing-mode: vertical-rl;
-            transform: rotate(180deg);
-            font-family: var(--sans);
-            font-weight: 300;
-        }
-
-        /* Nome grande */
-        .name {
-            position: absolute;
-            bottom: 50px;
-            left: 60px;
-            font-family: var(--serif);
-            font-size: 92px;
-            font-weight: 300;
-            line-height: 0.88;
-            letter-spacing: -0.02em;
-            color: var(--text);
-            z-index: 2;
-        }
-        .name .n2 {
-            display: block;
-            font-style: italic;
-            font-weight: 300;
-            color: var(--mid);
-            padding-left: 120px;
-            margin-top: -10px;
-        }
-        .name .n3 {
-            display: block;
-            font-weight: 700;
-            margin-top: -10px;
-        }
-
-        /* Linha dourada */
-        .gold-line {
-            position: absolute;
-            bottom: 170px;
-            left: 60px;
-            width: 240px;
-            height: 1px;
-            background: linear-gradient(to right, var(--lineg), var(--line), transparent);
-        }
-
-        /* Título / descrição */
-        .title {
-            position: absolute;
-            bottom: 70px;
-            right: 60px;
-            text-align: right;
-            font-family: var(--sans);
-            z-index: 2;
-        }
-        .title .main {
-            font-size: 28px;
-            font-weight: 300;
-            color: var(--text);
-            line-height: 1.2;
-        }
-        .title .main strong {
+        .btn {
+            margin-top: 30px;
+            background: linear-gradient(135deg, #C4A35A, #D8B87A);
+            color: #0B1E33;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
             font-weight: 500;
-            color: var(--glt);
-        }
-        .title .sub {
-            font-size: 16px;
-            font-weight: 300;
-            color: var(--mid);
-            letter-spacing: 1px;
-            margin-top: 8px;
+            letter-spacing: 0.05em;
             text-transform: uppercase;
-        }
-
-        /* Eyebrow (detalhe) */
-        .eyebrow {
-            position: absolute;
-            top: 40px;
-            left: 60px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            z-index: 2;
-        }
-        .edot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--gold);
-            animation: blink 3s infinite;
-        }
-        .etxt {
-            font-size: 12px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: var(--mid);
-        }
-        .esep {
-            width: 40px;
-            height: 1px;
-            background: var(--line);
-        }
-
-        /* Números de impacto (opcional) */
-        .stats {
-            position: absolute;
-            top: 40px;
-            right: 60px;
-            display: flex;
-            gap: 40px;
-            z-index: 2;
-        }
-        .stat-item {
-            text-align: right;
-        }
-        .stat-number {
-            font-family: var(--serif);
-            font-size: 28px;
-            font-weight: 600;
-            color: var(--text);
-            line-height: 1;
-        }
-        .stat-number .u {
-            font-size: 16px;
-            color: var(--gold);
-            font-weight: 300;
-            margin-left: 2px;
-        }
-        .stat-label {
-            font-size: 10px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: var(--low);
-        }
-
-        @keyframes blink {
-            0%,100% { opacity: 1; transform: scale(1); }
-            50% { opacity: .2; transform: scale(1.7); }
-        }
-
-        /* Botão download */
-        .btn-download {
-            background: var(--gold);
-            border: none;
-            color: var(--bg);
-            font-family: var(--sans);
-            font-size: 18px;
-            font-weight: 500;
             padding: 14px 32px;
+            border: none;
             border-radius: 40px;
-            letter-spacing: 1px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
-            margin-top: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .btn-download:hover {
-            background: var(--glt);
+        .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 24px rgba(196,163,90,0.3);
+            box-shadow: 0 8px 20px rgba(196, 163, 90, 0.4);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .note {
+            color: #A0B3CC;
+            font-size: 0.8rem;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
-    <div class="canvas-container">
-        <div id="linkedin-banner">
-            <!-- Linha vertical decorativa -->
-            <div class="vline"></div>
-            <!-- Coordenada -->
-            <div class="coord">19°55'S · 43°56'W</div>
-            <!-- Eyebrow -->
-            <div class="eyebrow">
-                <span class="edot"></span>
-                <span class="etxt">Portfólio Profissional</span>
-                <span class="esep"></span>
-                <span style="font-size:12px; color:var(--low); letter-spacing:1px;">2026</span>
-            </div>
-            <!-- Stats rápidos (opcional, pode remover se preferir) -->
-            <div class="stats">
-                <div class="stat-item">
-                    <div class="stat-number">R$500<span class="u">k</span></div>
-                    <div class="stat-label">Recursos viabilizados</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">−75<span class="u">%</span></div>
-                    <div class="stat-label">Tempo de análise</div>
-                </div>
-            </div>
-            <!-- Nome -->
-            <div class="name">
-                Wagner<span class="n2">Douglas</span><span class="n3">Ramos</span>
-            </div>
-            <!-- Linha dourada -->
-            <div class="gold-line"></div>
-            <!-- Título e área de atuação -->
-            <div class="title">
-                <div class="main"><strong>PMO</strong> · Projetos · <strong>BI</strong></div>
-                <div class="sub">Engenharia · Dados · Estratégia</div>
-            </div>
-        </div>
+    <div class="container">
+        <canvas id="linkedinBanner" width="1584" height="396"></canvas>
+        <br>
+        <button class="btn" id="downloadBtn">⬇ Baixar Capa LinkedIn</button>
+        <p class="note">Dimensões: 1584 x 396 px — ideal para capa do LinkedIn.</p>
     </div>
 
-    <button class="btn-download" id="downloadBtn">⬇ Baixar Capa para LinkedIn</button>
-
     <script>
-        document.getElementById('downloadBtn').addEventListener('click', function() {
-            const banner = document.getElementById('linkedin-banner');
-            // Usar html2canvas para capturar o elemento
-            html2canvas(banner, {
-                scale: 2, // alta resolução
-                backgroundColor: '#0B1E33',
-                allowTaint: false,
-                useCORS: true,
-                logging: false,
-                windowWidth: 1584,
-                windowHeight: 396
-            }).then((canvas) => {
-                // Criar link de download
+        (function() {
+            const canvas = document.getElementById('linkedinBanner');
+            const ctx = canvas.getContext('2d');
+
+            // Cores do tema (mesmas do site)
+            const colors = {
+                bg: '#0B1E33',
+                text: '#F0F4FA',
+                mid: '#A0B3CC',
+                low: '#62748C',
+                gold: '#C4A35A',
+                glt: '#D8B87A',
+                line: 'rgba(255,255,255,0.08)',
+                lineg: 'rgba(196,163,90,0.25)'
+            };
+
+            const width = canvas.width;
+            const height = canvas.height;
+
+            // Fundo principal
+            ctx.fillStyle = colors.bg;
+            ctx.fillRect(0, 0, width, height);
+
+            // Gradiente radial suave (canto inferior esquerdo)
+            const gradient = ctx.createRadialGradient(200, height - 100, 50, 250, height - 150, 600);
+            gradient.addColorStop(0, 'rgba(196,163,90,0.1)');
+            gradient.addColorStop(1, 'transparent');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+
+            // Outro gradiente no canto superior direito
+            const gradient2 = ctx.createRadialGradient(width - 200, 100, 50, width - 300, 150, 700);
+            gradient2.addColorStop(0, 'rgba(26,62,90,0.5)');
+            gradient2.addColorStop(1, 'transparent');
+            ctx.fillStyle = gradient2;
+            ctx.fillRect(0, 0, width, height);
+
+            // Linha vertical fina (lado esquerdo)
+            ctx.strokeStyle = colors.lineg;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(80, 60);
+            ctx.lineTo(80, height - 60);
+            ctx.stroke();
+
+            // Linha horizontal fina (parte inferior)
+            ctx.beginPath();
+            ctx.strokeStyle = colors.line;
+            ctx.lineWidth = 0.5;
+            ctx.moveTo(100, height - 70);
+            ctx.lineTo(width - 100, height - 70);
+            ctx.stroke();
+
+            // Coordenada geográfica (canto superior direito, vertical)
+            ctx.save();
+            ctx.translate(width - 50, 100);
+            ctx.rotate(-Math.PI/2);
+            ctx.font = '400 12px "Inter", monospace';
+            ctx.fillStyle = colors.low;
+            ctx.textAlign = 'left';
+            ctx.fillText('19°55\'S · 43°56\'W', 0, 0);
+            ctx.restore();
+
+            // Nome principal
+            ctx.font = '300 100px "Cormorant Garamond", serif';
+            ctx.fillStyle = colors.text;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillText('Wagner', 120, 100);
+
+            ctx.font = '300 100px "Cormorant Garamond", serif';
+            ctx.fillStyle = colors.mid;
+            ctx.fillText('Douglas', 120, 210);
+
+            ctx.font = '700 110px "Cormorant Garamond", serif';
+            ctx.fillStyle = colors.text;
+            ctx.fillText('Ramos', 120, 290);
+
+            // Linha dourada abaixo do nome
+            ctx.strokeStyle = colors.gold;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(120, 380);
+            ctx.lineTo(600, 380);
+            ctx.stroke();
+
+            // Título / tags
+            ctx.font = '400 18px "Inter", sans-serif';
+            ctx.fillStyle = colors.gold;
+            ctx.fillText('PMO · Projetos · Business Intelligence', 120, 350);
+
+            // Pequeno detalhe: ponto dourado pulsante (estático aqui)
+            ctx.beginPath();
+            ctx.arc(80, 60, 4, 0, 2 * Math.PI);
+            ctx.fillStyle = colors.gold;
+            ctx.fill();
+
+            // Canto inferior direito: um "ghost" sutil PMO
+            ctx.font = '700 140px "Cormorant Garamond", serif';
+            ctx.fillStyle = 'rgba(255,255,255,0.03)';
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText('PMO', width - 40, height - 20);
+
+            // Botão de download
+            document.getElementById('downloadBtn').addEventListener('click', function() {
+                // Cria um link temporário para download
                 const link = document.createElement('a');
-                link.download = 'linkedin-capa-wagner-ramos.png';
+                link.download = 'wagner-ramos-linkedin-capa.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
-            }).catch(error => {
-                console.error('Erro ao gerar imagem:', error);
-                alert('Não foi possível gerar a imagem. Verifique o console.');
             });
-        });
+
+            // Exibe no console se ocorrer tudo bem
+            console.log('Capa gerada com sucesso!');
+        })();
     </script>
-    <!-- Pequena nota: as dimensões da capa são 1584x396, que é o tamanho recomendado pelo LinkedIn. O download gerará um PNG com essas dimensões em alta resolução. -->
 </body>
 </html>
