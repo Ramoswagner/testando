@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wagner Ramos — The Decision Architect</title>
-  <!-- Fonte ultra premium: Fraunces (peso óptico) + Space Grotesk (tech) -->
+  <title>Wagner Ramos — Strategic X‑Ray</title>
+  <!-- Fontes ultra premium: Anton (display) + DM Sans (corpo) + Fraunces (serif) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
   <style>
-    /* ===== RESET E VARIÁVEIS COM TRANSIÇÕES DRAMÁTICAS ===== */
+    /* ===== RESET E VARIÁVEIS COM CONCEITO "X-RAY" ===== */
     * {
       margin: 0;
       padding: 0;
@@ -17,82 +17,104 @@
     }
 
     :root {
-      --bg-deep: #0B0C10;
-      --bg-panel: #14161C;
-      --text-light: #EAECF0;
-      --text-dim: #9AA1B0;
-      --accent-bright: #F26835;      /* cobre queimado / laranja estratégico */
-      --accent-dim: #A6401C;
-      --grid-line: rgba(242, 104, 53, 0.15);
-      --glass-edge: rgba(255, 255, 255, 0.03);
-      --shadow-heavy: 0 20px 40px -10px rgba(0,0,0,0.8);
-      --transition-premium: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      --bg-black: #0A0C0F;
+      --bg-deeper: #050607;
+      --panel-dark: #14181E;
+      --accent-neon: #FF4D2E;        /* laranja elétrico */
+      --accent-glow: rgba(255, 77, 46, 0.3);
+      --text-bright: #F0F2F5;
+      --text-dim: #9AA9B9;
+      --grid-color: rgba(255, 77, 46, 0.15);
+      --glass-edge: rgba(255, 255, 255, 0.02);
+      --shadow-hard: 0 30px 50px -20px black;
+      --transition-xray: all 0.6s cubic-bezier(0.2, 0.9, 0.3, 1);
+      --font-display: 'Anton', sans-serif;
+      --font-sans: 'DM Sans', system-ui, sans-serif;
       --font-serif: 'Fraunces', Georgia, serif;
-      --font-sans: 'Space Grotesk', system-ui, sans-serif;
     }
 
     body {
-      background-color: var(--bg-deep);
-      color: var(--text-light);
+      background-color: var(--bg-black);
+      color: var(--text-bright);
       font-family: var(--font-sans);
       font-weight: 300;
       line-height: 1.5;
       overflow-x: hidden;
-      cursor: none; /* cursor personalizado */
+      cursor: none; /* vamos criar um cursor de scanner */
     }
 
-    /* Cursor magnético com rastro de partículas (via pseudo-elemento) */
-    #custom-cursor {
+    /* ===== CURSOR SCANNER ===== */
+    #scanner {
       position: fixed;
-      width: 32px;
-      height: 32px;
-      border: 2px solid var(--accent-bright);
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, rgba(255,77,46,0.2) 0%, transparent 70%);
       border-radius: 50%;
       pointer-events: none;
       z-index: 9999;
-      mix-blend-mode: difference;
-      transition: transform 0.1s ease, width 0.2s, height 0.2s;
+      mix-blend-mode: screen;
       transform: translate(-50%, -50%);
-      backdrop-filter: invert(1);
+      filter: blur(8px);
+      transition: width 0.2s, height 0.2s;
     }
 
-    #cursor-trail {
+    #scanner-core {
       position: fixed;
-      width: 8px;
-      height: 8px;
-      background: var(--accent-bright);
+      width: 4px;
+      height: 4px;
+      background: var(--accent-neon);
       border-radius: 50%;
       pointer-events: none;
-      z-index: 9998;
-      opacity: 0.5;
-      filter: blur(2px);
-      transition: all 0.05s ease;
+      z-index: 10000;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 20px var(--accent-neon);
     }
 
-    /* Grade cinética de fundo */
-    .grid-background {
+    /* ===== FUNDO CINÉTICO ===== */
+    .xray-grid {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       background-image: 
-        linear-gradient(var(--grid-line) 1px, transparent 1px),
-        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-      background-size: 60px 60px;
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+      background-size: 40px 40px;
       pointer-events: none;
       z-index: 0;
+      opacity: 0.5;
+      animation: grid-breath 8s infinite alternate;
+    }
+
+    @keyframes grid-breath {
+      0% { opacity: 0.3; background-size: 40px 40px; }
+      100% { opacity: 0.6; background-size: 45px 45px; }
+    }
+
+    .xray-scanline {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(0deg, 
+        transparent, 
+        transparent 2px, 
+        rgba(255,77,46,0.02) 3px, 
+        transparent 4px);
+      pointer-events: none;
+      z-index: 1;
       opacity: 0.3;
-      animation: grid-pulse 8s infinite alternate;
+      animation: scan 10s linear infinite;
     }
 
-    @keyframes grid-pulse {
-      0% { opacity: 0.2; background-size: 60px 60px; }
-      100% { opacity: 0.4; background-size: 70px 70px; }
+    @keyframes scan {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 20px; }
     }
 
-    /* overlay de ruído analógico */
-    .noise {
+    .noise-overlay {
       position: fixed;
       top: 0;
       left: 0;
@@ -100,18 +122,18 @@
       height: 100%;
       background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJmIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc0IiBudW1PY3RhdmVzPSIzIiAvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNmKSIgb3BhY2l0eT0iMC4wMjUiIC8+PC9zdmc+');
       pointer-events: none;
-      z-index: 1;
-      opacity: 0.3;
+      z-index: 2;
+      opacity: 0.15;
       mix-blend-mode: overlay;
     }
 
-    /* container principal com z-index gerencial */
+    /* ===== CONTAINER PRINCIPAL ===== */
     main {
       position: relative;
-      z-index: 2;
+      z-index: 10;
     }
 
-    /* ===== NAVEGAÇÃO LÍQUIDA ===== */
+    /* ===== NAVEGAÇÃO LÍQUIDA COM EFEITO VIDRO ===== */
     nav {
       position: fixed;
       top: 0;
@@ -122,35 +144,24 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(11, 12, 16, 0.7);
-      backdrop-filter: blur(16px) saturate(180%);
-      border-bottom: 1px solid var(--glass-edge);
-      transition: var(--transition-premium);
+      background: rgba(10, 12, 15, 0.6);
+      backdrop-filter: blur(16px) saturate(200%);
+      border-bottom: 1px solid rgba(255, 77, 46, 0.2);
+      transition: var(--transition-xray);
     }
 
     .nav-mark {
-      font-family: var(--font-serif);
-      font-size: 1.8rem;
-      font-weight: 400;
+      font-family: var(--font-display);
+      font-size: 2.2rem;
       letter-spacing: -0.02em;
-      color: var(--text-light);
+      color: var(--text-bright);
+      line-height: 1;
       position: relative;
     }
 
-    .nav-mark::after {
-      content: '⚡';
-      position: absolute;
-      right: -2rem;
-      top: 0.2rem;
-      color: var(--accent-bright);
-      font-size: 1.2rem;
-      opacity: 0.7;
-      animation: spark 2s infinite;
-    }
-
-    @keyframes spark {
-      0%,100% { opacity: 0.3; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.2); }
+    .nav-mark span {
+      color: var(--accent-neon);
+      margin-left: 4px;
     }
 
     .nav-links {
@@ -162,11 +173,11 @@
     .nav-links a {
       text-decoration: none;
       color: var(--text-dim);
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 400;
       text-transform: uppercase;
       letter-spacing: 0.15em;
-      transition: var(--transition-premium);
+      transition: var(--transition-xray);
       position: relative;
       padding: 0.5rem 0;
     }
@@ -177,20 +188,20 @@
       bottom: 0;
       left: 0;
       width: 0;
-      height: 1px;
-      background: var(--accent-bright);
+      height: 2px;
+      background: var(--accent-neon);
       transition: width 0.4s ease;
     }
 
     .nav-links a:hover {
-      color: var(--text-light);
+      color: var(--text-bright);
     }
 
     .nav-links a:hover::before {
       width: 100%;
     }
 
-    /* menu mobile minimalista */
+    /* menu toggle minimal */
     .menu-toggle {
       display: none;
       flex-direction: column;
@@ -202,13 +213,13 @@
     }
 
     .menu-toggle span {
-      width: 28px;
+      width: 30px;
       height: 2px;
-      background: var(--text-light);
-      transition: var(--transition-premium);
+      background: var(--text-bright);
+      transition: var(--transition-xray);
     }
 
-    /* ===== SEÇÕES COM CLIP-PATH DRAMÁTICO ===== */
+    /* ===== SEÇÕES COM CLIP-PATH ANIMADO ===== */
     section {
       position: relative;
       min-height: 100vh;
@@ -216,7 +227,7 @@
       display: flex;
       align-items: center;
       clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
-      /* cada seção terá um clip personalizado no scroll via JS, mas já com um foundation */
+      transition: clip-path 0.8s ease;
     }
 
     .section-container {
@@ -224,45 +235,43 @@
       margin: 0 auto;
       width: 100%;
       position: relative;
-      z-index: 3;
     }
 
-    /* badges de seção */
     .section-badge {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
       font-size: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 0.4em;
-      color: var(--accent-bright);
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
+      color: var(--accent-neon);
+      margin-bottom: 2rem;
     }
 
     .section-badge span {
       width: 60px;
-      height: 1px;
-      background: var(--accent-bright);
+      height: 2px;
+      background: currentColor;
       opacity: 0.5;
     }
 
     .section-title {
       font-family: var(--font-serif);
-      font-size: clamp(3.5rem, 8vw, 6rem);
+      font-size: clamp(4rem, 8vw, 7rem);
       font-weight: 400;
       line-height: 0.95;
       letter-spacing: -0.03em;
-      color: var(--text-light);
-      max-width: 1000px;
+      max-width: 1100px;
       margin-bottom: 3rem;
-      text-shadow: 0 0 20px rgba(242,104,53,0.2);
+      color: var(--text-bright);
+      text-shadow: 0 0 30px rgba(255,77,46,0.2);
     }
 
     .section-title em {
       font-style: italic;
-      color: var(--accent-bright);
+      color: var(--accent-neon);
       display: inline-block;
-      transform: rotate(-2deg) translateY(0.1em);
+      transform: rotate(-1deg) translateY(0.1em);
     }
 
     /* ===== HERO ===== */
@@ -271,32 +280,33 @@
       padding-bottom: 6rem;
     }
 
-    .hero-bg-number {
+    .hero-bg-xray {
       position: absolute;
       right: 0;
       bottom: 0;
-      font-family: var(--font-serif);
+      font-family: var(--font-display);
       font-size: 30vw;
-      line-height: 0.8;
-      font-weight: 600;
+      line-height: 0.7;
       color: transparent;
-      -webkit-text-stroke: 2px var(--grid-line);
+      -webkit-text-stroke: 2px rgba(255,77,46,0.2);
       pointer-events: none;
       z-index: 1;
-      opacity: 0.3;
       user-select: none;
     }
 
     .hero-content {
       position: relative;
-      z-index: 4;
+      z-index: 5;
     }
 
     .hero-name {
-      font-size: clamp(4rem, 12vw, 9rem);
-      font-family: var(--font-serif);
+      font-family: var(--font-display);
+      font-size: clamp(5rem, 15vw, 12rem);
       line-height: 0.85;
+      text-transform: uppercase;
+      color: var(--text-bright);
       margin-bottom: 2rem;
+      letter-spacing: -0.02em;
     }
 
     .hero-name-line {
@@ -304,22 +314,23 @@
     }
 
     .hero-name-line:last-child {
-      color: var(--accent-bright);
-      padding-left: 2rem;
+      color: var(--accent-neon);
+      padding-left: 4rem;
     }
 
     .hero-desc {
-      font-size: 1.4rem;
-      max-width: 600px;
+      font-size: 1.6rem;
+      max-width: 700px;
       color: var(--text-dim);
       margin-bottom: 3rem;
-      border-left: 4px solid var(--accent-bright);
+      border-left: 4px solid var(--accent-neon);
       padding-left: 2rem;
+      line-height: 1.4;
     }
 
     .hero-metrics {
       display: flex;
-      gap: 4rem;
+      gap: 5rem;
       flex-wrap: wrap;
     }
 
@@ -329,10 +340,10 @@
     }
 
     .metric-value {
-      font-size: 3rem;
-      font-weight: 500;
+      font-size: 3.5rem;
       font-family: var(--font-serif);
-      color: var(--text-light);
+      font-weight: 400;
+      color: var(--text-bright);
       display: flex;
       align-items: baseline;
       gap: 4px;
@@ -340,7 +351,7 @@
 
     .metric-unit {
       font-size: 1.2rem;
-      color: var(--accent-bright);
+      color: var(--accent-neon);
     }
 
     .metric-label {
@@ -350,58 +361,56 @@
       color: var(--text-dim);
     }
 
-    /* ===== BOTÕES ORGÂNICOS ===== */
     .btn-group {
       display: flex;
-      gap: 1.5rem;
+      gap: 2rem;
       flex-wrap: wrap;
-      margin-top: 3rem;
+      margin-top: 4rem;
     }
 
     .btn {
-      padding: 1.2rem 2.8rem;
+      padding: 1.5rem 3.5rem;
       border-radius: 0;
       font-size: 0.9rem;
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.2em;
       text-decoration: none;
-      transition: var(--transition-premium);
+      transition: var(--transition-xray);
       border: 1px solid transparent;
       position: relative;
       overflow: hidden;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 0.8rem;
+      gap: 1rem;
+      background: transparent;
     }
 
     .btn-primary {
-      background: var(--accent-bright);
-      color: var(--bg-deep);
-      border-color: var(--accent-bright);
+      background: var(--accent-neon);
+      color: var(--bg-black);
+      border-color: var(--accent-neon);
     }
 
     .btn-primary:hover {
       background: transparent;
-      color: var(--accent-bright);
-      transform: scale(1.02);
-      box-shadow: 0 0 25px rgba(242,104,53,0.5);
+      color: var(--accent-neon);
+      box-shadow: 0 0 40px rgba(255,77,46,0.5);
     }
 
     .btn-outline {
-      background: transparent;
-      border-color: rgba(242,104,53,0.3);
-      color: var(--text-light);
+      border-color: rgba(255,77,46,0.3);
+      color: var(--text-bright);
     }
 
     .btn-outline:hover {
-      border-color: var(--accent-bright);
-      background: rgba(242,104,53,0.05);
-      transform: translateY(-2px);
+      border-color: var(--accent-neon);
+      background: rgba(255,77,46,0.1);
+      transform: translateY(-3px);
     }
 
-    /* ===== SOBRE COM BLOCOS FLUTUANTES ===== */
+    /* ===== SOBRE COM EFEITO RAIO-X ===== */
     .about-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -416,29 +425,48 @@
     }
 
     .about-text p {
-      margin-bottom: 1.8rem;
+      margin-bottom: 2rem;
     }
 
     .about-text strong {
-      color: var(--text-light);
+      color: var(--text-bright);
       font-weight: 500;
     }
 
-    .info-panel {
-      background: var(--bg-panel);
+    .xray-card {
+      background: var(--panel-dark);
       padding: 3rem;
-      border: 1px solid var(--glass-edge);
-      backdrop-filter: blur(8px);
-      box-shadow: var(--shadow-heavy);
+      border: 1px solid rgba(255,77,46,0.2);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow-hard);
       position: relative;
+      overflow: hidden;
     }
 
-    .info-panel::before {
+    .xray-card::before {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(45deg, transparent 70%, rgba(242,104,53,0.1) 100%);
+      background: linear-gradient(45deg, transparent 70%, rgba(255,77,46,0.1) 100%);
       pointer-events: none;
+    }
+
+    .xray-card::after {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, transparent 70%, var(--accent-neon) 100%);
+      opacity: 0;
+      transition: opacity 0.6s;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .xray-card:hover::after {
+      opacity: 0.3;
     }
 
     .info-row {
@@ -453,7 +481,7 @@
     .info-label {
       font-size: 0.7rem;
       letter-spacing: 0.2em;
-      color: var(--accent-bright);
+      color: var(--accent-neon);
     }
 
     .info-value {
@@ -462,50 +490,51 @@
     }
 
     .info-value a {
-      color: var(--text-light);
+      color: var(--text-bright);
       text-decoration: none;
-      border-bottom: 1px dashed var(--accent-dim);
+      border-bottom: 1px dashed var(--accent-neon);
     }
 
-    /* ===== CARD DE ENTREGAS COM ANIMAÇÃO 3D ===== */
+    /* ===== ENTREGAS COM CARDS RADIOGRÁFICOS ===== */
     .deliveries-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 1px;
-      background: var(--glass-edge);
-      border: 1px solid var(--glass-edge);
+      background: rgba(255,77,46,0.2);
+      border: 1px solid rgba(255,77,46,0.2);
     }
 
     .delivery-card {
-      background: var(--bg-panel);
+      background: var(--panel-dark);
       padding: 3rem 2rem;
-      transition: var(--transition-premium);
+      transition: var(--transition-xray);
       position: relative;
       overflow: hidden;
       backdrop-filter: blur(4px);
     }
 
-    .delivery-card::after {
+    .delivery-card::before {
       content: '';
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, transparent 70%, rgba(242,104,53,0.2) 100%);
+      background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255,77,46,0.2) 0%, transparent 50%);
       opacity: 0;
       transition: opacity 0.4s;
+      pointer-events: none;
+    }
+
+    .delivery-card:hover::before {
+      opacity: 1;
     }
 
     .delivery-card:hover {
-      transform: translateY(-8px) scale(1.02);
-      background: #1C1F28;
-      box-shadow: var(--shadow-heavy);
+      transform: scale(1.02) translateY(-5px);
+      border-color: var(--accent-neon);
+      box-shadow: 0 20px 40px -10px black;
       z-index: 10;
-    }
-
-    .delivery-card:hover::after {
-      opacity: 1;
     }
 
     .delivery-value {
@@ -513,7 +542,7 @@
       font-family: var(--font-serif);
       line-height: 1;
       margin-bottom: 0.5rem;
-      color: var(--accent-bright);
+      color: var(--accent-neon);
     }
 
     .delivery-label {
@@ -530,7 +559,7 @@
       line-height: 1.6;
     }
 
-    /* ===== COMPETÊNCIAS EM CAMADAS CINÉTICAS ===== */
+    /* ===== COMPETÊNCIAS COM SCANNER ===== */
     .skills-layout {
       display: grid;
       grid-template-columns: 280px 1fr;
@@ -545,20 +574,20 @@
 
     .skill-nav-item {
       padding: 1.5rem 0;
-      border-bottom: 1px solid rgba(242,104,53,0.2);
+      border-bottom: 1px solid rgba(255,77,46,0.2);
       font-size: 1.2rem;
       font-weight: 400;
       color: var(--text-dim);
       cursor: pointer;
-      transition: var(--transition-premium);
+      transition: var(--transition-xray);
       display: flex;
       align-items: center;
       gap: 1rem;
     }
 
     .skill-nav-item.active {
-      color: var(--accent-bright);
-      border-bottom-color: var(--accent-bright);
+      color: var(--accent-neon);
+      border-bottom-color: var(--accent-neon);
       padding-left: 1rem;
     }
 
@@ -589,28 +618,29 @@
 
     .skill-tag {
       padding: 0.8rem 1.8rem;
-      border: 1px solid rgba(242,104,53,0.3);
+      border: 1px solid rgba(255,77,46,0.3);
       font-size: 0.9rem;
       color: var(--text-dim);
-      transition: var(--transition-premium);
+      transition: var(--transition-xray);
       cursor: default;
       backdrop-filter: blur(4px);
     }
 
     .skill-tag:hover {
-      border-color: var(--accent-bright);
-      color: var(--text-light);
-      background: rgba(242,104,53,0.1);
+      border-color: var(--accent-neon);
+      color: var(--text-bright);
+      background: rgba(255,77,46,0.1);
       transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(255,77,46,0.3);
     }
 
     .skill-tag.highlight {
-      border-color: var(--accent-bright);
-      background: var(--accent-bright);
-      color: var(--bg-deep);
+      border-color: var(--accent-neon);
+      background: var(--accent-neon);
+      color: var(--bg-black);
     }
 
-    /* ===== EXPERIÊNCIA COM LINHA DO TEMPO INTERATIVA ===== */
+    /* ===== TIMELINE INTERATIVA COM RAIO-X ===== */
     .timeline {
       position: relative;
     }
@@ -618,17 +648,17 @@
     .timeline::before {
       content: '';
       position: absolute;
-      left: 200px;
+      left: 220px;
       top: 0;
       bottom: 0;
       width: 2px;
-      background: linear-gradient(to bottom, transparent, var(--accent-bright), transparent);
-      opacity: 0.3;
+      background: linear-gradient(to bottom, transparent, var(--accent-neon), transparent);
+      opacity: 0.5;
     }
 
     .timeline-entry {
       display: grid;
-      grid-template-columns: 200px 1fr;
+      grid-template-columns: 220px 1fr;
       gap: 3rem;
       padding: 3rem 0;
       border-bottom: 1px solid rgba(255,255,255,0.03);
@@ -637,14 +667,14 @@
 
     .timeline-date {
       font-size: 1rem;
-      color: var(--accent-bright);
+      color: var(--accent-neon);
       letter-spacing: 0.1em;
     }
 
     .timeline-current {
       display: inline-block;
-      background: var(--accent-bright);
-      color: var(--bg-deep);
+      background: var(--accent-neon);
+      color: var(--bg-black);
       padding: 0.2rem 1rem;
       font-size: 0.7rem;
       letter-spacing: 0.2em;
@@ -658,7 +688,7 @@
     }
 
     .timeline-role {
-      color: var(--accent-bright);
+      color: var(--accent-neon);
       font-size: 0.9rem;
       text-transform: uppercase;
       letter-spacing: 0.2em;
@@ -673,8 +703,8 @@
     }
 
     .timeline-badge {
-      background: rgba(242,104,53,0.1);
-      border: 1px solid rgba(242,104,53,0.3);
+      background: rgba(255,77,46,0.1);
+      border: 1px solid rgba(255,77,46,0.3);
       padding: 0.3rem 1rem;
       font-size: 0.7rem;
       letter-spacing: 0.1em;
@@ -696,24 +726,24 @@
       content: '▹';
       position: absolute;
       left: 0;
-      color: var(--accent-bright);
+      color: var(--accent-neon);
     }
 
-    /* ===== PROJETOS COM HOVER 3D E PROFUNDIDADE ===== */
+    /* ===== PROJETOS EM 3D COM HOVER MAGNÉTICO ===== */
     .projects-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 2px;
-      perspective: 1000px;
+      perspective: 1200px;
     }
 
     .project-card {
-      background: var(--bg-panel);
+      background: var(--panel-dark);
       padding: 3rem;
-      border: 1px solid var(--glass-edge);
+      border: 1px solid rgba(255,77,46,0.2);
       text-decoration: none;
       color: inherit;
-      transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s;
+      transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s, border-color 0.4s;
       display: flex;
       flex-direction: column;
       transform-style: preserve-3d;
@@ -721,15 +751,15 @@
     }
 
     .project-card:hover {
-      transform: translateZ(30px) scale(1.02);
-      box-shadow: 0 30px 50px -20px black;
-      border-color: var(--accent-bright);
-      z-index: 20;
+      transform: translateZ(40px) rotateX(2deg) rotateY(1deg) scale(1.02);
+      box-shadow: 0 40px 60px -20px black;
+      border-color: var(--accent-neon);
+      z-index: 30;
     }
 
     .project-num {
       font-size: 0.8rem;
-      color: var(--accent-bright);
+      color: var(--accent-neon);
       margin-bottom: 1rem;
     }
 
@@ -756,12 +786,12 @@
     .project-tag {
       font-size: 0.6rem;
       padding: 0.2rem 0.8rem;
-      border: 1px solid rgba(242,104,53,0.3);
+      border: 1px solid rgba(255,77,46,0.3);
       border-radius: 20px;
     }
 
     .project-link {
-      color: var(--accent-bright);
+      color: var(--accent-neon);
       font-size: 0.8rem;
       text-transform: uppercase;
       letter-spacing: 0.2em;
@@ -774,22 +804,22 @@
     .certs-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 2px;
-      background: var(--glass-edge);
-      border: 1px solid var(--glass-edge);
+      gap: 1px;
+      background: rgba(255,77,46,0.2);
+      border: 1px solid rgba(255,77,46,0.2);
     }
 
     .cert-category {
-      background: var(--bg-panel);
+      background: var(--panel-dark);
       padding: 2.5rem;
     }
 
     .cert-category h3 {
       font-size: 1rem;
       letter-spacing: 0.2em;
-      color: var(--accent-bright);
+      color: var(--accent-neon);
       margin-bottom: 2rem;
-      border-bottom: 1px solid rgba(242,104,53,0.2);
+      border-bottom: 1px solid rgba(255,77,46,0.2);
       padding-bottom: 1rem;
     }
 
@@ -802,17 +832,17 @@
       font-size: 0.85rem;
       color: var(--text-dim);
       padding-left: 1rem;
-      border-left: 1px solid rgba(242,104,53,0.3);
-      transition: var(--transition-premium);
+      border-left: 1px solid rgba(255,77,46,0.3);
+      transition: var(--transition-xray);
     }
 
     .cert-list li:hover {
-      border-left-color: var(--accent-bright);
-      color: var(--text-light);
+      border-left-color: var(--accent-neon);
+      color: var(--text-bright);
       padding-left: 1.5rem;
     }
 
-    /* ===== CONTATO COM INTERAÇÃO MAGNÉTICA ===== */
+    /* ===== CONTATO ===== */
     .contact-layout {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -827,7 +857,7 @@
     }
 
     .contact-big em {
-      color: var(--accent-bright);
+      color: var(--accent-neon);
       font-style: italic;
     }
 
@@ -841,24 +871,24 @@
       align-items: center;
       justify-content: space-between;
       padding: 1.5rem 0;
-      border-top: 1px solid rgba(242,104,53,0.2);
+      border-top: 1px solid rgba(255,77,46,0.2);
       text-decoration: none;
       color: var(--text-dim);
-      transition: var(--transition-premium);
+      transition: var(--transition-xray);
     }
 
     .contact-item:last-child {
-      border-bottom: 1px solid rgba(242,104,53,0.2);
+      border-bottom: 1px solid rgba(255,77,46,0.2);
     }
 
     .contact-item:hover {
-      color: var(--text-light);
+      color: var(--text-bright);
       padding-left: 1rem;
-      border-top-color: var(--accent-bright);
+      border-top-color: var(--accent-neon);
     }
 
     .contact-item .arrow {
-      color: var(--accent-bright);
+      color: var(--accent-neon);
       transition: transform 0.3s;
     }
 
@@ -867,14 +897,10 @@
     }
 
     .contact-card {
-      background: var(--bg-panel);
+      background: var(--panel-dark);
       padding: 3rem;
-      border: 1px solid var(--glass-edge);
-      box-shadow: var(--shadow-heavy);
-    }
-
-    .contact-card .info-row {
-      border-bottom: none;
+      border: 1px solid rgba(255,77,46,0.2);
+      box-shadow: var(--shadow-hard);
     }
 
     /* ===== FOOTER ===== */
@@ -883,12 +909,12 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-top: 1px solid var(--glass-edge);
+      border-top: 1px solid rgba(255,77,46,0.2);
       font-size: 0.8rem;
       color: var(--text-dim);
     }
 
-    /* ===== ANIMAÇÕES DE SCROLL (REVEAL) ===== */
+    /* ===== REVEAL ANIMATION ===== */
     .reveal {
       opacity: 0;
       transform: translateY(40px);
@@ -899,6 +925,11 @@
       opacity: 1;
       transform: translateY(0);
     }
+
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.3s; }
+    .delay-4 { transition-delay: 0.4s; }
 
     /* ===== RESPONSIVIDADE ===== */
     @media (max-width: 1200px) {
@@ -919,7 +950,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: var(--bg-deep);
+        background: var(--bg-black);
         padding: 6rem 2rem;
         align-items: center;
         justify-content: center;
@@ -935,10 +966,10 @@
       .timeline::before { left: 0; }
       .timeline-entry { grid-template-columns: 1fr; gap: 1rem; }
       .contact-layout { grid-template-columns: 1fr; }
+      section { padding: 4rem 2rem; }
     }
 
     @media (max-width: 600px) {
-      section { padding: 4rem 1.5rem; }
       .deliveries-grid { grid-template-columns: 1fr; }
       .projects-grid { grid-template-columns: 1fr; }
       .certs-grid { grid-template-columns: 1fr; }
@@ -947,17 +978,18 @@
   </style>
 </head>
 <body>
-  <!-- cursores personalizados -->
-  <div id="custom-cursor"></div>
-  <div id="cursor-trail"></div>
+  <!-- cursor scanner -->
+  <div id="scanner"></div>
+  <div id="scanner-core"></div>
 
-  <!-- fundo cinético -->
-  <div class="grid-background"></div>
-  <div class="noise"></div>
+  <!-- fundos x-ray -->
+  <div class="xray-grid"></div>
+  <div class="xray-scanline"></div>
+  <div class="noise-overlay"></div>
 
   <!-- NAVEGAÇÃO -->
   <nav>
-    <div class="nav-mark">WR</div>
+    <div class="nav-mark">WR<span>⚡</span></div>
     <button class="menu-toggle" id="menuToggle" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
@@ -975,14 +1007,14 @@
   <main>
     <!-- HERO -->
     <section id="home" class="hero">
-      <div class="hero-bg-number">WR</div>
+      <div class="hero-bg-xray">X-RAY</div>
       <div class="section-container hero-content">
-        <div class="section-badge reveal"><span></span> Decision Architect</div>
+        <div class="section-badge reveal"><span></span> Strategic X‑Ray</div>
         <h1 class="hero-name reveal">
           <span class="hero-name-line">Wagner</span>
           <span class="hero-name-line">Ramos</span>
         </h1>
-        <p class="hero-desc reveal delay-1">Engenheiro · Estrategista · Arquiteto de dados que transforma complexidade em vantagem competitiva.</p>
+        <p class="hero-desc reveal delay-1">Engenheiro · Arquiteto de Decisões · Revelando a estrutura oculta dos projetos.</p>
         <div class="hero-metrics reveal delay-2">
           <div class="metric">
             <div class="metric-value"><span class="counter" data-target="500">0</span><span class="metric-unit">M R$</span></div>
@@ -998,7 +1030,7 @@
           </div>
         </div>
         <div class="btn-group reveal delay-3">
-          <a href="#experiencia" class="btn btn-primary">Explorar trajetória</a>
+          <a href="#experiencia" class="btn btn-primary">Escaneie a trajetória</a>
           <a href="#" class="btn btn-outline">Baixar currículo</a>
         </div>
       </div>
@@ -1007,15 +1039,15 @@
     <!-- SOBRE -->
     <section id="sobre">
       <div class="section-container">
-        <div class="section-badge reveal"><span></span> Quem é</div>
-        <h2 class="section-title reveal">Engenharia que<br><em>pensa em sistemas</em></h2>
+        <div class="section-badge reveal"><span></span> Anatomia</div>
+        <h2 class="section-title reveal">Engenharia que<br><em>revela sistemas</em></h2>
         <div class="about-grid">
           <div class="about-text reveal delay-1">
             <p><strong>Wagner Ramos</strong> — profissional de PMO e gestão de projetos com base em engenharia civil e especialização em dados. Atua na <strong>governança de portfólios estratégicos</strong>, integrando áreas de negócio, tecnologia e finanças para viabilizar entregas complexas em ambientes regulados.</p>
             <p>Combina <strong>visão executiva com capacidade técnica</strong> em automação (Python, Power BI) para transformar dados em decisões, garantindo conformidade, rastreabilidade e eficiência operacional.</p>
             <p>Experiência destacada em gestão de verbas públicas, reporting para C-level e estruturação de PMO hospitalar com 4 eixos estratégicos monitorados em tempo real.</p>
           </div>
-          <div class="info-panel reveal delay-2">
+          <div class="xray-card reveal delay-2">
             <div class="info-row">
               <span class="info-label">Localização</span>
               <span class="info-value">Belo Horizonte, MG</span>
@@ -1036,10 +1068,10 @@
     <!-- ENTREGAS -->
     <section id="entregas">
       <div class="section-container">
-        <div class="section-badge reveal"><span></span> Impacto mensurável</div>
-        <h2 class="section-title reveal">Entregas que<br><em>ficam no registro</em></h2>
+        <div class="section-badge reveal"><span></span> Impacto</div>
+        <h2 class="section-title reveal">Entregas que<br><em>transparentes</em></h2>
         <div class="deliveries-grid">
-          <div class="delivery-card reveal">
+          <div class="delivery-card reveal" id="card1">
             <div class="delivery-value">R$500k</div>
             <div class="delivery-label">Recursos viabilizados</div>
             <div class="delivery-desc">Automação em Python e Excel para gestão de verbas públicas — emendas e convênios.</div>
@@ -1066,7 +1098,7 @@
     <!-- COMPETÊNCIAS -->
     <section id="competencias">
       <div class="section-container">
-        <div class="section-badge reveal"><span></span> Toolkit estratégico</div>
+        <div class="section-badge reveal"><span></span> Toolkit</div>
         <h2 class="section-title reveal">O que sei<br><em>fazer de verdade</em></h2>
         <div class="skills-layout">
           <nav class="skills-nav reveal">
@@ -1188,7 +1220,7 @@
     <!-- PROJETOS -->
     <section id="projetos">
       <div class="section-container">
-        <div class="section-badge reveal"><span></span> Aplicações práticas</div>
+        <div class="section-badge reveal"><span></span> Aplicações</div>
         <h2 class="section-title reveal">Código que<br><em>resolve problemas</em></h2>
         <div class="projects-grid">
           <a href="#" class="project-card reveal">
@@ -1264,7 +1296,7 @@
     <!-- CERTIFICAÇÕES -->
     <section id="certificacoes">
       <div class="section-container">
-        <div class="section-badge reveal"><span></span> Formação contínua</div>
+        <div class="section-badge reveal"><span></span> Formação</div>
         <h2 class="section-title reveal">Certificações<br><em>e especializações</em></h2>
         <div class="certs-grid">
           <div class="cert-category reveal">
@@ -1311,7 +1343,7 @@
         <div class="section-badge reveal"><span></span> Conexão</div>
         <div class="contact-layout">
           <div>
-            <p class="contact-big reveal">Vamos estruturar<br><em>algo relevante</em><br>juntos?</p>
+            <p class="contact-big reveal">Vamos escanear<br><em>seu próximo</em><br>desafio?</p>
             <div class="contact-list reveal">
               <a class="contact-item" href="mailto:wagnerramoseng@gmail.com">
                 <div>
@@ -1347,7 +1379,7 @@
             </div>
             <div class="info-row">
               <span class="info-label">Currículo</span>
-              <span class="info-value"><a href="#" style="color:var(--accent-bright);">download PDF →</a></span>
+              <span class="info-value"><a href="#" style="color:var(--accent-neon);">download PDF →</a></span>
             </div>
           </div>
         </div>
@@ -1355,31 +1387,33 @@
     </section>
 
     <footer>
-      <div>© 2026 Wagner Ramos — The Decision Architect</div>
+      <div>© 2026 Wagner Ramos — Strategic X‑Ray</div>
       <div>Estratégia · PMO · Dados</div>
     </footer>
   </main>
 
   <script>
-    // ===== CURSOR PERSONALIZADO =====
-    const cursor = document.getElementById('custom-cursor');
-    const trail = document.getElementById('cursor-trail');
+    // ===== SCANNER CURSOR =====
+    const scanner = document.getElementById('scanner');
+    const core = document.getElementById('scanner-core');
     document.addEventListener('mousemove', (e) => {
-      cursor.style.left = e.clientX + 'px';
-      cursor.style.top = e.clientY + 'px';
-      trail.style.left = e.clientX + 'px';
-      trail.style.top = e.clientY + 'px';
+      scanner.style.left = e.clientX + 'px';
+      scanner.style.top = e.clientY + 'px';
+      core.style.left = e.clientX + 'px';
+      core.style.top = e.clientY + 'px';
     });
 
-    // Efeito de hover em elementos clicáveis
-    document.querySelectorAll('a, button, .skill-nav-item, .project-card').forEach(el => {
+    // efeito de scanner em elementos interativos
+    document.querySelectorAll('a, button, .skill-nav-item, .project-card, .delivery-card').forEach(el => {
       el.addEventListener('mouseenter', () => {
-        cursor.style.transform = 'translate(-50%, -50%) scale(1.5)';
-        cursor.style.borderColor = 'var(--accent-bright)';
+        scanner.style.width = '160px';
+        scanner.style.height = '160px';
+        scanner.style.background = 'radial-gradient(circle, rgba(255,77,46,0.3) 0%, transparent 70%)';
       });
       el.addEventListener('mouseleave', () => {
-        cursor.style.transform = 'translate(-50%, -50%) scale(1)';
-        cursor.style.borderColor = 'var(--accent-bright)';
+        scanner.style.width = '120px';
+        scanner.style.height = '120px';
+        scanner.style.background = 'radial-gradient(circle, rgba(255,77,46,0.2) 0%, transparent 70%)';
       });
     });
 
@@ -1453,9 +1487,20 @@
         if (window.scrollY >= top) current = s.id;
       });
       navAs.forEach(a => {
-        a.style.color = a.getAttribute('href') === '#' + current ? 'var(--accent-bright)' : '';
+        a.style.color = a.getAttribute('href') === '#' + current ? 'var(--accent-neon)' : '';
       });
     }, { passive: true });
+
+    // ===== EFEITO DE SCANNER NOS CARDS (posição do mouse) =====
+    document.querySelectorAll('.delivery-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        card.style.setProperty('--x', x + '%');
+        card.style.setProperty('--y', y + '%');
+      });
+    });
   </script>
 </body>
 </html>
